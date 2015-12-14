@@ -1,0 +1,16 @@
+#chessboard {
+	border:1px solid #000000;
+	position:absolute;
+	left:10px;
+	top:75px;
+	z-index:0;
+}
+
+#topChessboard {
+	border:1px solid #000000;
+	position:absolute;
+	left:10px;
+	top:75px;
+	z-index:1;
+}
+
