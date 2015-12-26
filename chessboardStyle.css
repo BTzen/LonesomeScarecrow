@@ -6,7 +6,7 @@
 	z-index:0;
 }
 
-#topChessboard {
+#chesspieces {
 	border:1px solid #000000;
 	position:absolute;
 	left:10px;
