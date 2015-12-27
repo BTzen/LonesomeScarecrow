@@ -1,10 +1,10 @@
 var chesspieces = [];
-var currentPossibleMove;
-var previousLeft;
-var previousTop;
-var rectangleWidth;
-var rectangleTop;
 var moveFlag = false;
+const LENGTH = 75;
+const OFFSET = 5;
+const PIECE_FONT = "70px Arial unicode MS";
+const BLACK = "rgb(0,0,0)";
+const MELLOW_YELLOW = "rgba(255, 255, 102, 0.5)";
 
 /**
 This method draws the board in a checkered patterns using two shades
@@ -16,11 +16,11 @@ function drawBoard(canvas, ctx) {
         for (var j = 0; j < 8; j++) {
             if (!white) {
                 ctx.fillStyle = "rgb(160,82,45)";
-                ctx.fillRect(j * 75, i * 75, 75, 75);
+                ctx.fillRect(j * LENGTH, i * LENGTH, LENGTH, LENGTH);
                 white = true;
             } else {
                 ctx.fillStyle = "rgb(245,222,179)";
-                ctx.fillRect(j * 75, i * 75, 75, 75);
+                ctx.fillRect(j * LENGTH, i * LENGTH, LENGTH, LENGTH);
                 white = false;
             }
         }
@@ -36,47 +36,26 @@ stored
 function pushPieces(ctx) {
     chesspieces.push({
         unicode: 9817,
-        //colour can always be set to black
-        colour: "rgb(0,0,0)",
-        //font can be hardcoded
-        font: "70px Arial unicode MS",
         left: 0,
         top: 145,
-        //make width and height static, since each one takes up the square
-        width: 75,
-        height: 75,
     });
-	
-	chesspieces.push({
+
+    chesspieces.push({
         unicode: 9817,
-        //colour can always be set to black
-        colour: "rgb(0,0,0)",
-        //font can be hardcoded
-        font: "70px Arial unicode MS",
         left: 75,
         top: 220,
-        //make width and height static, since each one takes up the square
-        width: 75,
-        height: 75,
     });
-	
-	    chesspieces.push({
+
+    chesspieces.push({
         unicode: 9817,
-        //colour can always be set to black
-        colour: "rgb(0,0,0)",
-        //font can be hardcoded
-        font: "70px Arial unicode MS",
         left: 0,
         top: 295,
-        //make width and height static, since each one takes up the square
-        width: 75,
-        height: 75,
     });
 
     chesspieces.forEach(function(piece) {
         var unicode = piece.unicode;
-        ctx.fillStyle = piece.colour;
-        ctx.font = piece.font;
+        ctx.fillStyle = BLACK;
+        ctx.font = PIECE_FONT;
         ctx.fillText(String.fromCharCode(unicode), piece.left, piece.top);
     });
 }
@@ -91,55 +70,82 @@ function init() {
 
     canvasLeft = canvas.offsetLeft;
     canvasTop = canvas.offsetTop;
+
     ctx = canvas.getContext('2d');
-    ctxGame = canvasPieces.getContext('2d');
-	ctxHighlight = canvasHighlight.getContext('2d');
+    ctxPiece = canvasPieces.getContext('2d');
+    ctxHighlight = canvasHighlight.getContext('2d');
+
     drawBoard(canvas, ctx);
-    pushPieces(ctxGame);
+    pushPieces(ctxPiece);
+
 
     //On click event will check what piece has been clicked
     canvasPieces.addEventListener('click', function(event) {
         var x = event.pageX - canvasLeft,
             y = event.pageY - canvasTop;
-        chesspieces.forEach(function(piece) {
-            if (y > piece.top - 70 && y < piece.top - 70 + piece.height && x > piece.left && x < piece.left + piece.width) {
-                //-70 because text draws from the bottom and then up, unlike rectnagles which draw down and right
-                alert(piece.unicode.toString()); //maybe change this to an id, but the unicode should tell you about their movement
-                if (!moveFlag) {
-                    for (var i = 0; i < 2; i++) {
-                        if (checkTile(piece.left, piece.top +(i*75+5), ctxGame)) {
-                            ctxHighlight.fillStyle = "rgba(255, 255, 102, 0.5)";
-                            ctxHighlight.fillRect(piece.left, piece.top +(i*75+5), 75, 75);
-                            moveFlag = true;
-                        } else {
-                            break;
-                        }
-                    }
-                }
-
-            } else {
-                ctxHighlight.clearRect(piece.left, piece.top + 5, 75, 150);
-                moveFlag = false;
-            }
-        });
+        chessPieceListener(ctxHighlight, ctxPiece, x, y);
 
     }, false);
 }
 
 /**
-This will check an area of a 75x75 pixels to see if an object is there or not.
+for every piece in the array I check if it has been clicked and do the corresponding highlighting
+*/
+function chessPieceListener(ctxHighlight, ctxPiece, x, y) {
+    //chesspieces.forEach(function(piece) {
+	for (var i = 0; i < chesspieces.length; i++) {
+		var piece = chesspieces[i];
+        if (y > piece.top - LENGTH + OFFSET && y < piece.top + OFFSET && x > piece.left && x < piece.left + LENGTH) {
+            //-70 because text draws from the bottom and then up, unlike rectnagles which draw down and right
+            //alert(piece.unicode.toString()); //we want to get an is white property
+            if (!moveFlag) {
+                for (var i = 0; i < 2; i++) {
+                    if (checkTile(piece.left, piece.top + (i * LENGTH + OFFSET), ctxPiece)) {
+                        ctxHighlight.fillStyle = MELLOW_YELLOW;
+                        //+5 is the offset to make the position of the piece look more natural (aka doesn't touch bottom)
+                        ctxHighlight.fillRect(piece.left, piece.top + (i * LENGTH + OFFSET), LENGTH, LENGTH);
+						getTileInformation(piece.left, piece.top + (i * LENGTH + OFFSET), ctxPiece, ctxHighlight, piece);
+                        moveFlag = true;
+                    } 
+                }
+            }
+			break;
+        } else {
+            //150 for now, needs to be changed to some variabled linked to the number in tyhe for loop above
+            ctxHighlight.clearRect(piece.left, piece.top + OFFSET, LENGTH, 150);
+            moveFlag = false;
+        }
+	}
+    //});
+}
+/**
+This will check an area of a LENGTHxLENGTH pixels to see if an object is there or not.
 if something is in that area return false
 */
 function checkTile(x, y, context) {
-	//width and height = 75
-	var imgd = context.getImageData(x, y, 75,75);
-	var pix = imgd.data;
-	for (var i = 0, n = pix.length; i < n; i ++) {
-       var test = pix[i];
-	   if (test!=0) {
-		   return false;
-	   }
+    //width and height = LENGTH
+    var imgd = context.getImageData(x, y, LENGTH, LENGTH);
+    var pix = imgd.data;
+    for (var i = 0, n = pix.length; i < n; i++) {
+        var test = pix[i];
+        if (test != 0) {
+            return false;
+        }
     }
     return true;
+}
+
+function getTileInformation(x, y, ctxPiece, ctxHighlight, piece) {
+	var imgd = ctxHighlight.getImageData(x, y, LENGTH, LENGTH);
+    var pix = imgd.data;
+    for (var i = 0, n = pix.length; i < n; i++) {
+        var test = pix[i];
+        if (test != 0) {
+			//console.log("mellow yellow");
+           // break;
+        }
+    }
+	console.log(piece.unicode.toString());
+    //return true;
 }
 window.onload = init;
