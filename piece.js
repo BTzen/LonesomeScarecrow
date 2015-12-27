@@ -23,7 +23,7 @@ var Piece = function(type, isWhite, unicode, x, y) {
 //PAWN
 function Pawn(isWhite, x, y) {
 	//call superclass constructor.  Note that the constructor must pass the child object's context (ie. this)
-	Piece.call(this, "Pawn", isWhite, (isWhite) ? "&#9817;" : "&#9823;", x, y);
+	Piece.call(this, "Pawn", isWhite, (isWhite) ? "9817" : "9823", x, y);
 	this.hasMoved = false;
 }
 
@@ -47,7 +47,7 @@ Pawn.prototype.attack = function(x, y) {
 //KNIGHT
 
 function Knight(isWhite, x, y) {
-	Piece.call(this, "Knight", isWhite, (isWhite) ? "&#9816;" : "&#9822;", x, y);
+	Piece.call(this, "Knight", isWhite, (isWhite) ? "9816" : "9822", x, y);
 }
 
 Knight.prototype = Object.create(Piece.prototype);
@@ -59,7 +59,7 @@ Knight.prototype.move = function() {};
 //BISHOP
 
 function Bishop(isWhite, x, y) {
-	Piece.call(this, "Bishop", isWhite, (isWhite) ? "&#9815;" : "&#9821;", x, y);
+	Piece.call(this, "Bishop", isWhite, (isWhite) ? "9815" : "9821", x, y);
 }
 
 Bishop.prototype = Object.create(Piece.prototype);
@@ -71,7 +71,7 @@ Bishop.prototype.move = function () {};
 //ROOK
 
 function Rook(isWhite, x, y) {
-	Piece.call(this, "Rook", isWhite, (isWhite) ? "&#9814;": "&#9820;", x, y);
+	Piece.call(this, "Rook", isWhite, (isWhite) ? "9814": "9820", x, y);
 }
 
 Rook.prototype = Object.create(Piece.prototype);
@@ -83,7 +83,7 @@ Rook.prototype.move = function () {};
 //QUEEN
 
 function Queen(isWhite, x, y) {
-	Piece.call(this, "Queen", isWhite, (isWhite) ? "&#9813;": "&#9819;", x, y);
+	Piece.call(this, "Queen", isWhite, (isWhite) ? "9813": "9819", x, y);
 }
 
 Queen.prototype = Object.create(Piece.prototype);
@@ -95,7 +95,7 @@ Queen.prototype.move = function () {};
 //KING
 
 function King(isWhite, x, y) {
-	Piece.call(this, "King", isWhite, (isWhite) ? "&#9812;" : "&#9818;", x, y); 
+	Piece.call(this, "King", isWhite, (isWhite) ? "9812" : "9818", x, y); 
 }
 
 King.prototype = Object.create(Piece.prototype);
