@@ -93,9 +93,9 @@ for every piece in the array I check if it has been clicked and do the correspon
 */
 function chessPieceListener(ctxHighlight, ctxPiece, x, y) {
     chesspieces.forEach(function(piece) {
-        if (y > piece.top - LENGTH + OFFSET && y < piece.top - LENGTH + OFFSET + LENGTH && x > piece.left && x < piece.left + LENGTH) {
+        if (y > piece.top - LENGTH + OFFSET && y < piece.top + OFFSET && x > piece.left && x < piece.left + LENGTH) {
             //-70 because text draws from the bottom and then up, unlike rectnagles which draw down and right
-            alert(piece.unicode.toString()); //maybe change this to an id, but the unicode should tell you about their movement
+            alert(piece.unicode.toString()); //we want to get an iswhite property
             if (!moveFlag) {
                 for (var i = 0; i < 2; i++) {
                     if (checkTile(piece.left, piece.top + (i * LENGTH + OFFSET), ctxPiece)) {
@@ -110,6 +110,7 @@ function chessPieceListener(ctxHighlight, ctxPiece, x, y) {
             }
 
         } else {
+            //150 for now, needs to be changed to some variabled linked to the number in tyhe for loop above
             ctxHighlight.clearRect(piece.left, piece.top + OFFSET, LENGTH, 150);
             moveFlag = false;
         }
@@ -132,7 +133,7 @@ function checkTile(x, y, context) {
     return true;
 }
 
-function getTileInformation() {
-	
+function getTileInformation(x, y, ctxPiece, ctxHighlight) {
+
 }
 window.onload = init;
