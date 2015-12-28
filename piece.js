@@ -14,6 +14,9 @@ var Piece = function(type, isWhite, unicode, x, y) {
 	this.y = y;
 };
 
+Piece.prototype.toString = function() {
+	return ((this.isWhite) ? "White " : "Black ") + this.type;
+}
 //methods
 //valid if the desired location does not have a piece of the same color located there
 // Piece.prototype.isValidMove = function() {
