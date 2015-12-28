@@ -18,13 +18,12 @@ var board = {
 	/*
 	 *row expects row index
 	*/
-	placePiece: function(piece, row, column) { console.log(row + ' ' + column);
+	placePiece: function(piece, row, column) {
 		var x = column * LENGTH;
 		var y = (row + 1) * LENGTH - OFFSET;
 		var canvasPieces = document.getElementById('chesspieces');
 		var ctxPiece = canvasPieces.getContext('2d');
 		ctxPiece.fillText(String.fromCharCode(piece.unicode), x, y);
-		//console.log('Piece drawn at: ' + x + ' ' + y);
 
 		//add piece to position array
 		this.__position__[column + row * 8] = piece;
@@ -51,15 +50,6 @@ var board = {
 		else 
 			return false;
 	}
-	/*
-	 *x horizontal pixel location on canvas
-	 *y vertical pixel location on canvas
-	 */
-	// getRankAndFile : (x, y) {
-		// var rank = Math.floor(x / LENGTH);
-		// var file = Math.floor(y / LENGTH);
-		// return [rank, file];
-	// }
 };
 
 /**
@@ -132,12 +122,13 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 	var row = Math.floor(y/75);
 	console.log(row + ' ' + column);
     
+	//check if player clicked on a piece and highlight the appropriate tiles in response
 	if (board.hasPiece(x,y)) {	
         //console.log("youhitme");
-		
 
         //if pawn hasn't move, highlight up to 2 spaces forward
 		for (var i = 1; i <= 2; i++) {
+			//board represented as 1D array so the row # must be multiplied by the 
 			var piecePosition = (row * 8) + column;
 			//tile in front of pawn is empty
 			if (board.__position__[piecePosition + (i * 8)] === null) {
