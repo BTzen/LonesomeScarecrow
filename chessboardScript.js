@@ -15,18 +15,20 @@ var board = {
 			this.__position__.push(null);
 		}
 	},
-
-	placePiece: function(piece, rank, file) {
-		var x = rank * LENGTH;
-		var y = (file + 1) * LENGTH - OFFSET;
+	/*
+	 *row expects row index
+	*/
+	placePiece: function(piece, row, column) { console.log(row + ' ' + column);
+		var x = column * LENGTH;
+		var y = (row + 1) * LENGTH - OFFSET;
 		var canvasPieces = document.getElementById('chesspieces');
 		var ctxPiece = canvasPieces.getContext('2d');
 		ctxPiece.fillText(String.fromCharCode(piece.unicode), x, y);
 		//console.log('Piece drawn at: ' + x + ' ' + y);
 
 		//add piece to position array
-		this.__position__[rank + file * 8] = piece;
-		console.log('Piece drawn at ' + x + ', ' + y + ' and added at index ' + (rank + file * 8));
+		this.__position__[column + row * 8] = piece;
+		console.log('Piece drawn at ' + x + ', ' + y + ' and added at index ' + (column + row * 8));
 	},
 	
 	//get piece at specific index
@@ -99,14 +101,13 @@ function init() {
     drawBoard(canvas, ctx);
     ctxPiece.font = PIECE_FONT;
 
-    // STARTS HERE
-       
+	//board stuff
     board.initializeBoard();
-	//need to pass an x and y to the pawn for click listener, added in the piece.js
-    board.placePiece(new Pawn(true, 1 * LENGTH, (2 + 1) * LENGTH - OFFSET), 1, 2);
-	board.placePiece(new Pawn(true, 2 * LENGTH, (0 + 1) * LENGTH - OFFSET), 2, 0);
-    board.placePiece(new Pawn(true, 1 * LENGTH, (0 + 1) * LENGTH - OFFSET), 1, 0);
-    board.placePiece(new Pawn(true, 0 * LENGTH, (1 + 1) * LENGTH - OFFSET), 0, 1);
+	
+    board.placePiece(new Pawn(true), 0, 1);
+	board.placePiece(new Pawn(true), 0, 2);
+	board.placePiece(new Pawn(true), 2, 1);
+    board.placePiece(new Pawn(true), 1, 0);
 
     //On click event will check what piece has been clicked
     canvasPieces.addEventListener('click', function(event) {

@@ -10,8 +10,6 @@ var Piece = function(type, isWhite, unicode, x, y) {
 	this.type = type;
 	this.isWhite = isWhite;
 	this.unicode = unicode;
-	this.x = x;
-	this.y = y;
 };
 
 Piece.prototype.toString = function() {
