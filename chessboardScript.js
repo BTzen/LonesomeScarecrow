@@ -85,9 +85,9 @@ function init() {
     //On click event will check what piece has been clicked
     canvasPieces.addEventListener('click', function(event) {
         ctxHighlight.clearRect(0, 0, 600, 600);
-        var count = -1;
+        var index = -1;
         board.__position__.forEach(function(position) {
-            count++;
+            index++;
             //console.log(board.__position__.length);
             if (position == null) {
                 //console.log("null");
@@ -95,7 +95,7 @@ function init() {
                 console.log("piece");
                 var x = event.pageX - canvasLeft,
                     y = event.pageY - canvasTop;
-                chessPieceListener(ctxHighlight, ctxPiece, board, count, position, x, y);
+                chessPieceListener(ctxHighlight, ctxPiece, board, index, position, x, y);
             }
             //console.log(getRankAndFile(x,y));
         }), false
