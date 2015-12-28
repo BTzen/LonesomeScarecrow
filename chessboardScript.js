@@ -1,5 +1,4 @@
 var chesspieces = [];
-var highlightedTiles = [];	//ADD
 var moveFlag = false;
 const LENGTH = 75;
 const OFFSET = 5;
@@ -7,8 +6,6 @@ const PIECE_FONT = "70px Arial unicode MS";
 const BLACK = "rgb(0,0,0)";
 const MELLOW_YELLOW = "rgba(255, 255, 102, 0.5)";
 
-
-var board;
 /**
 This method draws the board in a checkered patterns using two shades
 of brown.
@@ -43,11 +40,11 @@ function pushPieces(ctx) {
         top: 145,
     });
 
-    // chesspieces.push({
-        // unicode: 9817,
-        // left: 75,
-        // top: 220,
-    // });
+    chesspieces.push({
+        unicode: 9817,
+        left: 75,
+        top: 220,
+    });
 
     chesspieces.push({
         unicode: 9817,
@@ -87,39 +84,8 @@ function init() {
         var x = event.pageX - canvasLeft,
             y = event.pageY - canvasTop;
         chessPieceListener(ctxHighlight, ctxPiece, x, y);
-		//console.log(getRankAndFile(x,y));
+
     }, false);
-	
-	// STARTS HERE
-	
-	board = { 
-		__position__ : [],	//NOTE: uses standard file-rank order (ie. column-row) instead of row column, so the first index is the column and the 2nd is the row
-		
-		initializeBoard : function() {
-			for (var i = 0, rankNum = 64; i < rankNum; i++) {
-					this.__position__.push(null);
-				}
-		},
-		
-		placePiece : function(piece, rank, file) {
-			var x = rank * LENGTH;
-			var y = (file + 1) * LENGTH - OFFSET;
-			var canvasPieces = document.getElementById('chesspieces');
-			var ctxPiece = canvasPieces.getContext('2d');
-			ctxPiece.fillText(String.fromCharCode(piece.unicode), x, y);
-			console.log(x + ' ' + y);
-			
-			//add piece to position array
-			this.__position__[rank + file * 8] = piece;
-			console.log(rank + file * 8);
-		},
-		
-		getPiece: function(rank, file) {
-			return this.__position__[rank + file * 8];
-		}
-	};
-	board.initializeBoard();
-	window.addEventListener('load', board.placePiece(new Pawn(true), 1, 2));
 }
 
 /**
@@ -133,16 +99,13 @@ function chessPieceListener(ctxHighlight, ctxPiece, x, y) {
             //-70 because text draws from the bottom and then up, unlike rectnagles which draw down and right
             //alert(piece.unicode.toString()); //we want to get an is white property
             if (!moveFlag) {
-				//if pawn hasn't move, highlight up to 2 spaces forward
                 for (var i = 0; i < 2; i++) {
                     if (checkTile(piece.left, piece.top + (i * LENGTH + OFFSET), ctxPiece)) {
                         ctxHighlight.fillStyle = MELLOW_YELLOW;
                         //+5 is the offset to make the position of the piece look more natural (aka doesn't touch bottom)
                         ctxHighlight.fillRect(piece.left, piece.top + (i * LENGTH + OFFSET), LENGTH, LENGTH);
 						getTileInformation(piece.left, piece.top + (i * LENGTH + OFFSET), ctxPiece, ctxHighlight, piece);
-						moveFlag = true;
-						
-						highlightedTiles.push();	//push the tile at those coords into the list
+                        moveFlag = true;
                     } 
                 }
             }
@@ -155,7 +118,6 @@ function chessPieceListener(ctxHighlight, ctxPiece, x, y) {
 	}
     //});
 }
-
 /**
 This will check an area of a LENGTHxLENGTH pixels to see if an object is there or not.
 if something is in that area return false
@@ -174,34 +136,16 @@ function checkTile(x, y, context) {
 }
 
 function getTileInformation(x, y, ctxPiece, ctxHighlight, piece) {
-	var imgd = ctxHighlight.getImageData(x, y, LENGTH, LENGTH);	//returns ImageData object that copies pixel data for a specific rectangle
+	var imgd = ctxHighlight.getImageData(x, y, LENGTH, LENGTH);
     var pix = imgd.data;
     for (var i = 0, n = pix.length; i < n; i++) {
         var test = pix[i];
         if (test != 0) {
-			// console.log("mellow yellow");
-            // break;
+			//console.log("mellow yellow");
+           // break;
         }
     }
-	console.log(piece.unicode.toString() + ", " + piece.left + " " + piece.top);
+	console.log(piece.unicode.toString());
     //return true;
 }
 window.onload = init;
-// 27/12 MATT
-
-//create 8x8 board
-// for (var i = 0, rankNum = 8; i < rankNum; rankNum++) {
-	// for (var j = 0, fileNum = 8; j < fileNum; fileNum++) {
-		// board.push[i][j] = null;
-	// }
-// }
-
-/*
- *x horizontal pixel location on canvas
- *y vertical pixel location on canvas
-*/
-function getRankAndFile(x,y) {
-	var rank = Math.floor(x / LENGTH); 
-	var file = Math.floor(y / LENGTH);
-	return [rank, file];
-}
