@@ -139,7 +139,6 @@ function chessPieceListener(ctxHighlight, ctxPiece, x, y) {
                         ctxHighlight.fillStyle = MELLOW_YELLOW;
                         //+5 is the offset to make the position of the piece look more natural (aka doesn't touch bottom)
                         ctxHighlight.fillRect(piece.left, piece.top + (i * LENGTH + OFFSET), LENGTH, LENGTH);
-						getTileInformation(piece.left, piece.top + (i * LENGTH + OFFSET), ctxPiece, ctxHighlight, piece);
 						moveFlag = true;
 						
 						highlightedTiles.push();	//push the tile at those coords into the list
@@ -172,21 +171,6 @@ function checkTile(x, y, context) {
     }
     return true;
 }
-
-function getTileInformation(x, y, ctxPiece, ctxHighlight, piece) {
-	var imgd = ctxHighlight.getImageData(x, y, LENGTH, LENGTH);	//returns ImageData object that copies pixel data for a specific rectangle
-    var pix = imgd.data;
-    for (var i = 0, n = pix.length; i < n; i++) {
-        var test = pix[i];
-        if (test != 0) {
-			// console.log("mellow yellow");
-            // break;
-        }
-    }
-	console.log(piece.unicode.toString() + ", " + piece.left + " " + piece.top);
-    //return true;
-}
-window.onload = init;
 // 27/12 MATT
 
 //create 8x8 board
@@ -205,3 +189,5 @@ function getRankAndFile(x,y) {
 	var file = Math.floor(y / LENGTH);
 	return [rank, file];
 }
+
+window.onload = init;
