@@ -6,6 +6,7 @@ const OFFSET = 5;
 const PIECE_FONT = "70px Arial unicode MS";
 const BLACK = "rgb(0,0,0)";
 const MELLOW_YELLOW = "rgba(255, 255, 102, 0.5)";
+const LIGHT_RED = "rgba(255, 0, 0, 0.25)"
 
 
 var board;
@@ -30,39 +31,6 @@ function drawBoard(canvas, ctx) {
         white = !white;
     }
 }
-
-/**
-This method creates the chess pieces needed
-pushes a chesspiece object with the position
-stored
-*/
-function pushPieces(ctx) {
-    chesspieces.push({
-        unicode: 9817,
-        left: 0,
-        top: 145,
-    });
-
-    // chesspieces.push({
-        // unicode: 9817,
-        // left: 75,
-        // top: 220,
-    // });
-
-    chesspieces.push({
-        unicode: 9817,
-        left: 0,
-        top: 295,
-    });
-
-    chesspieces.forEach(function(piece) {
-        var unicode = piece.unicode;
-        ctx.fillStyle = BLACK;
-        ctx.font = PIECE_FONT;
-        ctx.fillText(String.fromCharCode(unicode), piece.left, piece.top);
-    });
-}
-
 /**
 This method initializes on load and creates an onclick event.
 */
@@ -79,16 +47,7 @@ function init() {
     ctxHighlight = canvasHighlight.getContext('2d');
 
     drawBoard(canvas, ctx);
-    pushPieces(ctxPiece);
-
-
-    //On click event will check what piece has been clicked
-    canvasPieces.addEventListener('click', function(event) {
-        var x = event.pageX - canvasLeft,
-            y = event.pageY - canvasTop;
-        chessPieceListener(ctxHighlight, ctxPiece, x, y);
-		//console.log(getRankAndFile(x,y));
-    }, false);
+	ctxPiece.font = PIECE_FONT;
 	
 	// STARTS HERE
 	
@@ -119,41 +78,70 @@ function init() {
 		}
 	};
 	board.initializeBoard();
-	window.addEventListener('load', board.placePiece(new Pawn(true), 1, 2));
+	board.placePiece(new Pawn(true, 1 * LENGTH, (2 + 1) * LENGTH - OFFSET), 1, 2);
+	board.placePiece(new Pawn(true, 1 * LENGTH, (0 + 1) * LENGTH - OFFSET), 1, 0);
+	board.placePiece(new Pawn(true, 0 * LENGTH, (1 + 1) * LENGTH - OFFSET), 0, 1);
+	
+	//On click event will check what piece has been clicked
+    canvasPieces.addEventListener('click', function(event) {
+		ctxHighlight.clearRect(0,0,600,600);
+		board.__position__.forEach(function(position) {
+			//console.log(board.__position__.length);
+			if (position == null) {
+				//console.log("null");
+			} else {
+				console.log("piece");
+				var x = event.pageX - canvasLeft,
+					y = event.pageY - canvasTop;
+				chessPieceListener(ctxHighlight, ctxPiece,board, position, x, y);
+			}
+			/*
+
+		*/
+		//console.log(getRankAndFile(x,y));
+    }), false});
 }
 
 /**
 for every piece in the array I check if it has been clicked and do the corresponding highlighting
 */
-function chessPieceListener(ctxHighlight, ctxPiece, x, y) {
-    //chesspieces.forEach(function(piece) {
-	for (var i = 0; i < chesspieces.length; i++) {
-		var piece = chesspieces[i];
-        if (y > piece.top - LENGTH + OFFSET && y < piece.top + OFFSET && x > piece.left && x < piece.left + LENGTH) {
-            //-70 because text draws from the bottom and then up, unlike rectnagles which draw down and right
-            //alert(piece.unicode.toString()); //we want to get an is white property
+
+function chessPieceListener(ctxHighlight, ctxPiece,board, piece, x, y) {
+		//var piece = chesspieces[i];
+		var attackFlag1 = false;
+		var attackFlag2 = false;
+        if (y > piece.y - LENGTH + OFFSET && y < piece.y + OFFSET && x > piece.x && x < piece.x + LENGTH) {
+			console.log("youhitme");
             if (!moveFlag) {
 				//if pawn hasn't move, highlight up to 2 spaces forward
                 for (var i = 0; i < 2; i++) {
-                    if (checkTile(piece.left, piece.top + (i * LENGTH + OFFSET), ctxPiece)) {
+                    if (checkTile(piece.x, piece.y + (i * LENGTH + OFFSET), ctxPiece)) {
                         ctxHighlight.fillStyle = MELLOW_YELLOW;
                         //+5 is the offset to make the position of the piece look more natural (aka doesn't touch bottom)
-                        ctxHighlight.fillRect(piece.left, piece.top + (i * LENGTH + OFFSET), LENGTH, LENGTH);
-						getTileInformation(piece.left, piece.top + (i * LENGTH + OFFSET), ctxPiece, ctxHighlight, piece);
+                        ctxHighlight.fillRect(piece.x, piece.y + (i * LENGTH + OFFSET), LENGTH, LENGTH);
+						//getTileInformation();
 						moveFlag = true;
-						
-						highlightedTiles.push();	//push the tile at those coords into the list
-                    } 
+						//highlightedTiles.push();	//push the tile at those coords into the list
+                    }
+					//next two ifs check for an 
+					if (!checkTile(piece.x + LENGTH, piece.y + (0 * LENGTH + OFFSET), ctxPiece) && !attackFlag1) {
+						ctxHighlight.fillStyle = LIGHT_RED;
+                        //+5 is the offset to make the position of the piece look more natural (aka doesn't touch bottom)
+                        ctxHighlight.fillRect(piece.x + LENGTH, piece.y + (i * LENGTH + OFFSET), LENGTH, LENGTH);
+						attackFlag1 = true;
+					}
+					if (!checkTile(piece.x - LENGTH, piece.y + (0 * LENGTH + OFFSET), ctxPiece) && !attackFlag2) {
+						ctxHighlight.fillStyle = LIGHT_RED;
+                        //+5 is the offset to make the position of the piece look more natural (aka doesn't touch bottom)
+                        ctxHighlight.fillRect(piece.x - LENGTH, piece.y + (i * LENGTH + OFFSET), LENGTH, LENGTH);
+						attackFlag2 = true;
+					}
                 }
             }
-			break;
+			//break;
         } else {
-            //150 for now, needs to be changed to some variabled linked to the number in tyhe for loop above
-            ctxHighlight.clearRect(piece.left, piece.top + OFFSET, LENGTH, 150);
             moveFlag = false;
         }
-	}
-    //});
 }
 
 /**
@@ -173,20 +161,10 @@ function checkTile(x, y, context) {
     return true;
 }
 
-function getTileInformation(x, y, ctxPiece, ctxHighlight, piece) {
-	var imgd = ctxHighlight.getImageData(x, y, LENGTH, LENGTH);	//returns ImageData object that copies pixel data for a specific rectangle
-    var pix = imgd.data;
-    for (var i = 0, n = pix.length; i < n; i++) {
-        var test = pix[i];
-        if (test != 0) {
-			// console.log("mellow yellow");
-            // break;
-        }
-    }
+function getTileInformation() {
 	console.log(piece.unicode.toString() + ", " + piece.left + " " + piece.top);
     //return true;
 }
-window.onload = init;
 // 27/12 MATT
 
 //create 8x8 board
@@ -205,3 +183,4 @@ function getRankAndFile(x,y) {
 	var file = Math.floor(y / LENGTH);
 	return [rank, file];
 }
+window.onload = init;
