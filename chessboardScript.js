@@ -78,6 +78,7 @@ function init() {
     board.initializeBoard();
 	//need to pass an x and y to the pawn for click listener, added in the piece.js
     board.placePiece(new Pawn(true, 1 * LENGTH, (2 + 1) * LENGTH - OFFSET), 1, 2);
+	board.placePiece(new Pawn(true, 2 * LENGTH, (0 + 1) * LENGTH - OFFSET), 2, 0);
     board.placePiece(new Pawn(true, 1 * LENGTH, (0 + 1) * LENGTH - OFFSET), 1, 0);
     board.placePiece(new Pawn(true, 0 * LENGTH, (1 + 1) * LENGTH - OFFSET), 0, 1);
 
