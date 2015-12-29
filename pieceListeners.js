@@ -1,4 +1,4 @@
-//FILL
+//FILL METHOD
 function fill(ctxHighlight, color, moveType, row, column) {
     ctxHighlight.fillStyle = color;
     ctxHighlight.fillRect(column * LENGTH, row * LENGTH, LENGTH, LENGTH);
@@ -276,7 +276,7 @@ function queenListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePo
 }
 
 //KING
-function queenListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition) {
+function kingListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition) {
     var uprightFlag = false;
     var downleftFlag = false;
     var downrightFlag = false;

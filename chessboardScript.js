@@ -69,6 +69,8 @@ var board = {
 /**
 This method draws the board in a checkered patterns using two shades
 of brown.
+
+MIGHT WANT TO SEPARTE THIS, PLACEPIECES AND INIT INTO AN INITIALIZE.JS
 */
 function drawBoard(canvas, ctx) {
     var white = true;
@@ -219,7 +221,7 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 		} else if (board.__position__[piecePosition].type === "Queen") {
 			queenListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
 		} else if (board.__position__[piecePosition].type === "King") {
-			queenListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
+			kingListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
 		} 
 
         //DEBUG
