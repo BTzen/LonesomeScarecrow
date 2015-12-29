@@ -47,7 +47,7 @@ var board = {
         var canvasPieces = document.getElementById('chesspieces');
         var ctxPiece = canvasPieces.getContext('2d');
         ctxPiece.clearRect(lastColumn * LENGTH, lastRow * LENGTH, LENGTH, LENGTH); //erase old piece
-        ctxPiece.fillText(String.fromCharCode(piece.unicode), y * LENGTH, (x + 1) * LENGTH - 5); //draw piece at required spot
+        ctxPiece.fillText(String.fromCharCode(piece.unicode), y * LENGTH, (x + 1) * LENGTH - OFFSET); //draw piece at required spot
     },
     // Find a piece on the board using row, column indices
     getPiece: function(row, column) {
@@ -91,6 +91,7 @@ function drawBoard(canvas, ctx) {
 function placePieces() {
     //ACTUAL STARTING POSITION
     //*
+	//WHITE
     board.placePiece(new Rook(true), 0, 0);
     board.placePiece(new Knight(true), 0, 1);
     board.placePiece(new Bishop(true), 0, 2);
@@ -107,9 +108,28 @@ function placePieces() {
     board.placePiece(new Pawn(true), 1, 5);
     board.placePiece(new Pawn(true), 1, 6);
     board.placePiece(new Pawn(true), 1, 7);
+	//BLACK
+	board.placePiece(new Rook(false), 7, 0);
+    board.placePiece(new Knight(false), 7, 1);
+    board.placePiece(new Bishop(false), 7, 2);
+    board.placePiece(new Queen(false), 7, 3);
+    board.placePiece(new King(false), 7, 4);
+    board.placePiece(new Bishop(false), 7, 5);
+    board.placePiece(new Knight(false),7, 6);
+    board.placePiece(new Rook(false), 7, 7);
+    board.placePiece(new Pawn(false), 6, 0);
+    board.placePiece(new Pawn(false), 6, 1);
+    board.placePiece(new Pawn(false), 6, 2);
+    board.placePiece(new Pawn(false), 6, 3);
+    board.placePiece(new Pawn(false), 6, 4);
+    board.placePiece(new Pawn(false), 6, 5);
+    board.placePiece(new Pawn(false), 6, 6);
+    board.placePiece(new Pawn(false), 6, 7);
     //*/
 
     //TEST PIECES
+	//board.placePiece(new Knight(true), 4, 4);
+	//board.placePiece(new Bishop(true), 4, 4);
     /*
     board.placePiece(new Pawn(false), 0, 1);
 	board.placePiece(new Pawn(true), 0, 2);
@@ -182,6 +202,7 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
         highlightedTiles = [];
 
         var piecePosition = (row * 8) + column;
+		//check what kind of highlighting should take place based on the piece type
         if (board.__position__[piecePosition].type === "Pawn") {
             //if pawn hasn't moved, highlight up to 2 spaces forward
             var forwardMoves = 2; //how many space the piece can potentially move forward
@@ -191,7 +212,15 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
             pawnListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition, forwardMoves);
         } else if (board.__position__[piecePosition].type === "Rook") {
 			rookListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-		}
+		} else if (board.__position__[piecePosition].type === "Knight") {
+			knightListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
+		} else if (board.__position__[piecePosition].type === "Bishop") {
+			bishopListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
+		} else if (board.__position__[piecePosition].type === "Queen") {
+			queenListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
+		} else if (board.__position__[piecePosition].type === "King") {
+			queenListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
+		} 
 
         //DEBUG
         highlightedTiles.forEach(function(item) {
