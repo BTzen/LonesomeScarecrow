@@ -93,7 +93,7 @@ function drawBoard(canvas, ctx) {
 function placePieces() {
     //ACTUAL STARTING POSITION
     //*
-	//WHITE
+    //WHITE
     board.placePiece(new Rook(true), 0, 0);
     board.placePiece(new Knight(true), 0, 1);
     board.placePiece(new Bishop(true), 0, 2);
@@ -110,14 +110,14 @@ function placePieces() {
     board.placePiece(new Pawn(true), 1, 5);
     board.placePiece(new Pawn(true), 1, 6);
     board.placePiece(new Pawn(true), 1, 7);
-	//BLACK
-	board.placePiece(new Rook(false), 7, 0);
+    //BLACK
+    board.placePiece(new Rook(false), 7, 0);
     board.placePiece(new Knight(false), 7, 1);
     board.placePiece(new Bishop(false), 7, 2);
     board.placePiece(new Queen(false), 7, 3);
     board.placePiece(new King(false), 7, 4);
     board.placePiece(new Bishop(false), 7, 5);
-    board.placePiece(new Knight(false),7, 6);
+    board.placePiece(new Knight(false), 7, 6);
     board.placePiece(new Rook(false), 7, 7);
     board.placePiece(new Pawn(false), 6, 0);
     board.placePiece(new Pawn(false), 6, 1);
@@ -130,8 +130,8 @@ function placePieces() {
     //*/
 
     //TEST PIECES
-	//board.placePiece(new Knight(true), 4, 4);
-	//board.placePiece(new Bishop(true), 4, 4);
+    //board.placePiece(new Knight(true), 4, 4);
+    //board.placePiece(new Bishop(true), 4, 4);
     /*
     board.placePiece(new Pawn(false), 0, 1);
 	board.placePiece(new Pawn(true), 0, 2);
@@ -204,25 +204,26 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
         highlightedTiles = [];
 
         var piecePosition = (row * 8) + column;
-		//check what kind of highlighting should take place based on the piece type
+        //check what kind of highlighting should take place based on the piece type
         if (board.__position__[piecePosition].type === "Pawn") {
             //if pawn hasn't moved, highlight up to 2 spaces forward
             var forwardMoves = 2; //how many space the piece can potentially move forward
             if (lastSelectedPiece.hasMoved) {
                 forwardMoves = 1;
             }
-            pawnListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition, forwardMoves);
+			//For some reason the rook couldn't define colourBool when passed board.__position__[piecePosition].isWhite, only left it for the pawn atm.
+            pawnListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition, forwardMoves, board.__position__[piecePosition].isWhite);
         } else if (board.__position__[piecePosition].type === "Rook") {
-			rookListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-		} else if (board.__position__[piecePosition].type === "Knight") {
-			knightListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-		} else if (board.__position__[piecePosition].type === "Bishop") {
-			bishopListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-		} else if (board.__position__[piecePosition].type === "Queen") {
-			queenListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-		} else if (board.__position__[piecePosition].type === "King") {
-			kingListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-		} 
+            rookListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
+        } else if (board.__position__[piecePosition].type === "Knight") {
+            knightListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
+        } else if (board.__position__[piecePosition].type === "Bishop") {
+            bishopListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
+        } else if (board.__position__[piecePosition].type === "Queen") {
+            queenListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
+        } else if (board.__position__[piecePosition].type === "King") {
+            kingListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
+        }
 
         //DEBUG
         highlightedTiles.forEach(function(item) {
