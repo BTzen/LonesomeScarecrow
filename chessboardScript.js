@@ -209,8 +209,9 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x
         highlightedTiles = [];
 
         var piecePosition = (row * 8) + column;	//convert 2d indices to 1d for backing array
+		var turnCheck = board.__position__[piecePosition].isWhite === yourTurn;
         //check what kind of highlighting should take place based on the piece type
-        if (board.__position__[piecePosition].type === "Pawn" && board.__position__[piecePosition].isWhite === yourTurn) {
+        if (board.__position__[piecePosition].type === "Pawn" && turnCheck) {
             //if pawn hasn't moved, highlight up to 2 spaces forward
             var forwardMoves = 2; //how many space the piece can potentially move forward
             if (lastSelectedPiece.hasMoved) {
@@ -218,15 +219,15 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x
             }
 			//For some reason the rook couldn't define colourBool when passed board.__position__[piecePosition].isWhite, only left it for the pawn atm.
             pawnListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition, forwardMoves, board.__position__[piecePosition].isWhite);
-        } else if (board.__position__[piecePosition].type === "Rook" && board.__position__[piecePosition].isWhite === yourTurn) {
+        } else if (board.__position__[piecePosition].type === "Rook" && turnCheck) {
             rookListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-        } else if (board.__position__[piecePosition].type === "Knight" && board.__position__[piecePosition].isWhite === yourTurn) {
+        } else if (board.__position__[piecePosition].type === "Knight" && turnCheck) {
             knightListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-        } else if (board.__position__[piecePosition].type === "Bishop" && board.__position__[piecePosition].isWhite === yourTurn) {
+        } else if (board.__position__[piecePosition].type === "Bishop" && turnCheck) {
             bishopListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-        } else if (board.__position__[piecePosition].type === "Queen" && board.__position__[piecePosition].isWhite === yourTurn) {
+        } else if (board.__position__[piecePosition].type === "Queen" && turnCheck) {
             queenListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-        } else if (board.__position__[piecePosition].type === "King" && board.__position__[piecePosition].isWhite === yourTurn) {
+        } else if (board.__position__[piecePosition].type === "King" && turnCheck) {
             kingListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
         }
 
