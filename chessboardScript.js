@@ -50,6 +50,13 @@ var board = {
         ctxPiece.clearRect(lastColumn * LENGTH, lastRow * LENGTH, LENGTH, LENGTH); //erase old piece
         ctxPiece.fillText(String.fromCharCode(piece.unicode), y * LENGTH, (x + 1) * LENGTH - OFFSET); //draw piece at required spot
 		isWhiteTurn = !isWhiteTurn;
+		
+		//update turn info on HTML page
+		if (isWhiteTurn) { 
+			document.getElementById('turn').innerHTML = "Turn: White";}
+		else {
+			document.getElementById('turn').innerHTML = "Turn: Black";
+		}
     },
     // Find a piece on the board using row, column indices
     getPiece: function(row, column) {
@@ -142,8 +149,12 @@ function init() {
     canvasPieces = document.getElementById("chesspieces");
     canvasHighlight = document.getElementById("highlight");
 
-    canvasLeft = canvas.offsetLeft;
-    canvasTop = canvas.offsetTop;
+	/* account for fact that board may not be positioned in the top left corner of the page
+	 * body margin is 8px by default and border is 2
+	*/
+    canvasLeft = parseInt($('body').css('margin')) + parseInt($('#game').css('border-left-width'));
+    canvasTop = $('#game').offset().top
+
 
     ctx = canvas.getContext('2d');
     ctxPiece = canvasPieces.getContext('2d');
@@ -160,7 +171,7 @@ function init() {
         ctxHighlight.clearRect(0, 0, LENGTH * 8, LENGTH * 8);
 
         var x = event.pageX - canvasLeft,
-            y = event.pageY - canvasTop;
+            y = event.pageY - canvasTop; //alert('event.pageY - canvasTop = ' + event.pageY + '-' + canvasTop);
         chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
     });
 }

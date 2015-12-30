@@ -40,11 +40,6 @@ Pawn.prototype.move = function(x, y) {
 		// alert("");
 	// }	
 };
-
-Pawn.prototype.attack = function(x, y) {
-	
-};
-
 //KNIGHT
 
 function Knight(isWhite, x, y) {
@@ -55,7 +50,6 @@ Knight.prototype = Object.create(Piece.prototype);
 Knight.prototype.value = 3;
 
 //KNIGHT METHODS
-Knight.prototype.move = function() {};
 
 //BISHOP
 
