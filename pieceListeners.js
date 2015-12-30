@@ -22,7 +22,7 @@ function validAttack(index, colourBool) {
     if  (index > 63 || index < 0) { 
         return false;
     } else {
-        return board.__position__[index].isWhite !== colourBool;
+        return board.__position__[index].isWhite === colourBool;
     }
 }
 
@@ -38,13 +38,13 @@ function pawnListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePos
             //tile in front of pawn is empty
 			
             // //next two ifs check for attack moves
-            if (board.__position__[piecePosition + 9] !== null && validAttack(piecePosition + 9, colourBool) && !attackFlag1) {
+            if (board.__position__[piecePosition + 9] !== null && validAttack(piecePosition + 9, !colourBool) && !attackFlag1) {
                 //somewhere here we should check the team, maybe by passing in the isWhite boolean, 
                 //then check if the highlighted piece is the opposite.
                 fill(ctxHighlight, LIGHT_RED, ATK, row + 1, column + 1);
                 attackFlag1 = true;
             }
-            if (board.__position__[piecePosition + 7] !== null && validAttack(piecePosition + 7, colourBool) && !attackFlag2) {
+            if (board.__position__[piecePosition + 7] !== null && validAttack(piecePosition + 7, !colourBool) && !attackFlag2) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row + 1, column - 1);
                 attackFlag2 = true;
             }
@@ -58,13 +58,13 @@ function pawnListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePos
     } else {	// for white pieces
         for (var i = 1; i <= forwardMoves; i++) { 
 
-            if (board.__position__[piecePosition - 9] !== null && validAttack(piecePosition - 9, colourBool) && !attackFlag1) {
+            if (board.__position__[piecePosition - 9] !== null && validAttack(piecePosition - 9, !colourBool) && !attackFlag1) {
                 //somewhere here we should check the team, maybe by passing in the isWhite boolean, 
                 //then check if the highlighted piece is the opposite.
                 fill(ctxHighlight, LIGHT_RED, ATK, row - 1, column - 1);
                 attackFlag1 = true;
             }
-            if (board.__position__[piecePosition - 7] !== null && validAttack(piecePosition - 7, colourBool) && !attackFlag2) {
+            if (board.__position__[piecePosition - 7] !== null && validAttack(piecePosition - 7, !colourBool) && !attackFlag2) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row - 1, column + 1);
                 attackFlag2 = true;
             }

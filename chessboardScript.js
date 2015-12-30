@@ -1,3 +1,4 @@
+var yourTurn = true;
 var highlightedTiles = [];
 var lastSelectedPiece; // for moving pieces
 var lastRow, lastColumn; //
@@ -48,6 +49,7 @@ var board = {
         var ctxPiece = canvasPieces.getContext('2d');
         ctxPiece.clearRect(lastColumn * LENGTH, lastRow * LENGTH, LENGTH, LENGTH); //erase old piece
         ctxPiece.fillText(String.fromCharCode(piece.unicode), y * LENGTH, (x + 1) * LENGTH - OFFSET); //draw piece at required spot
+		yourTurn = !yourTurn;
     },
     // Find a piece on the board using row, column indices
     getPiece: function(row, column) {
@@ -208,7 +210,7 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x
 
         var piecePosition = (row * 8) + column;	//convert 2d indices to 1d for backing array
         //check what kind of highlighting should take place based on the piece type
-        if (board.__position__[piecePosition].type === "Pawn") {
+        if (board.__position__[piecePosition].type === "Pawn" && board.__position__[piecePosition].isWhite === yourTurn) {
             //if pawn hasn't moved, highlight up to 2 spaces forward
             var forwardMoves = 2; //how many space the piece can potentially move forward
             if (lastSelectedPiece.hasMoved) {
@@ -216,15 +218,15 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x
             }
 			//For some reason the rook couldn't define colourBool when passed board.__position__[piecePosition].isWhite, only left it for the pawn atm.
             pawnListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition, forwardMoves, board.__position__[piecePosition].isWhite);
-        } else if (board.__position__[piecePosition].type === "Rook") {
+        } else if (board.__position__[piecePosition].type === "Rook" && board.__position__[piecePosition].isWhite === yourTurn) {
             rookListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-        } else if (board.__position__[piecePosition].type === "Knight") {
+        } else if (board.__position__[piecePosition].type === "Knight" && board.__position__[piecePosition].isWhite === yourTurn) {
             knightListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-        } else if (board.__position__[piecePosition].type === "Bishop") {
+        } else if (board.__position__[piecePosition].type === "Bishop" && board.__position__[piecePosition].isWhite === yourTurn) {
             bishopListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-        } else if (board.__position__[piecePosition].type === "Queen") {
+        } else if (board.__position__[piecePosition].type === "Queen" && board.__position__[piecePosition].isWhite === yourTurn) {
             queenListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-        } else if (board.__position__[piecePosition].type === "King") {
+        } else if (board.__position__[piecePosition].type === "King" && board.__position__[piecePosition].isWhite === yourTurn) {
             kingListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
         }
 
