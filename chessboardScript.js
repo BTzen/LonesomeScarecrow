@@ -5,7 +5,7 @@ const LENGTH = 75;
 const OFFSET = 10;
 const PIECE_FONT = "70px Arial unicode MS";
 const BLACK = "rgb(0,0,0)";
-const MELLOW_YELLOW = "rgba(255, 255, 102, 0.5)";
+const MELLOW_YELLOW = "rgba(255, 255, 102, 0.7)";
 const LIGHT_RED = "rgba(255, 0, 0, 0.25)"
 
 //BOARD
@@ -89,55 +89,47 @@ function drawBoard(canvas, ctx) {
         white = !white;
     }
 }
-
-function placePieces() {
-    //ACTUAL STARTING POSITION
-    //*
-    //WHITE
-    board.placePiece(new Rook(true), 0, 0);
-    board.placePiece(new Knight(true), 0, 1);
-    board.placePiece(new Bishop(true), 0, 2);
-    board.placePiece(new Queen(true), 0, 3);
-    board.placePiece(new King(true), 0, 4);
-    board.placePiece(new Bishop(true), 0, 5);
-    board.placePiece(new Knight(true), 0, 6);
-    board.placePiece(new Rook(true), 0, 7);
-    board.placePiece(new Pawn(true), 1, 0);
-    board.placePiece(new Pawn(true), 1, 1);
-    board.placePiece(new Pawn(true), 1, 2);
-    board.placePiece(new Pawn(true), 1, 3);
-    board.placePiece(new Pawn(true), 1, 4);
-    board.placePiece(new Pawn(true), 1, 5);
-    board.placePiece(new Pawn(true), 1, 6);
-    board.placePiece(new Pawn(true), 1, 7);
-    //BLACK
-    board.placePiece(new Rook(false), 7, 0);
-    board.placePiece(new Knight(false), 7, 1);
-    board.placePiece(new Bishop(false), 7, 2);
-    board.placePiece(new Queen(false), 7, 3);
-    board.placePiece(new King(false), 7, 4);
-    board.placePiece(new Bishop(false), 7, 5);
-    board.placePiece(new Knight(false), 7, 6);
-    board.placePiece(new Rook(false), 7, 7);
-    board.placePiece(new Pawn(false), 6, 0);
-    board.placePiece(new Pawn(false), 6, 1);
-    board.placePiece(new Pawn(false), 6, 2);
-    board.placePiece(new Pawn(false), 6, 3);
-    board.placePiece(new Pawn(false), 6, 4);
-    board.placePiece(new Pawn(false), 6, 5);
-    board.placePiece(new Pawn(false), 6, 6);
-    board.placePiece(new Pawn(false), 6, 7);
-    //*/
-
-    //TEST PIECES
-    //board.placePiece(new Knight(true), 4, 4);
-    //board.placePiece(new Bishop(true), 4, 4);
-    /*
-    board.placePiece(new Pawn(false), 0, 1);
-	board.placePiece(new Pawn(true), 0, 2);
-	board.placePiece(new Pawn(false), 2, 1);
-    board.placePiece(new Pawn(true), 1, 0);
-	//*/
+/*
+ * Setup board initially
+*/
+function placePieces(playerIsWhite) {
+    if (playerIsWhite) {
+		// WHITE
+		board.placePiece(new Rook(true), 7, 0);
+		board.placePiece(new Knight(true), 7, 1);
+		board.placePiece(new Bishop(true), 7, 2);
+		board.placePiece(new Queen(true), 7, 3);
+		board.placePiece(new King(true), 7, 4);
+		board.placePiece(new Bishop(true), 7, 5);
+		board.placePiece(new Knight(true), 7, 6);
+		board.placePiece(new Rook(true), 7, 7);
+		board.placePiece(new Pawn(true), 6, 0);
+		board.placePiece(new Pawn(true), 6, 1);
+		board.placePiece(new Pawn(true), 6, 2);
+		board.placePiece(new Pawn(true), 6, 3);
+		board.placePiece(new Pawn(true), 6, 4);
+		board.placePiece(new Pawn(true), 6, 5);
+		board.placePiece(new Pawn(true), 6, 6);
+		board.placePiece(new Pawn(true), 6, 7);
+		
+		// BLACK
+		board.placePiece(new Rook(false), 0, 0);
+		board.placePiece(new Knight(false), 0, 1);
+		board.placePiece(new Bishop(false), 0, 2);
+		board.placePiece(new Queen(false), 0, 3);
+		board.placePiece(new King(false), 0, 4);
+		board.placePiece(new Bishop(false), 0, 5);
+		board.placePiece(new Knight(false), 0, 6);
+		board.placePiece(new Rook(false), 0, 7);
+		board.placePiece(new Pawn(false), 1, 0);
+		board.placePiece(new Pawn(false), 1, 1);
+		board.placePiece(new Pawn(false), 1, 2);
+		board.placePiece(new Pawn(false), 1, 3);
+		board.placePiece(new Pawn(false), 1, 4);
+		board.placePiece(new Pawn(false), 1, 5);
+		board.placePiece(new Pawn(false), 1, 6);
+		board.placePiece(new Pawn(false), 1, 7);
+	}
 }
 
 /**
@@ -160,7 +152,7 @@ function init() {
 
     //board stuff
     board.initializeBoard();
-    placePieces();
+    placePieces(true);
     //On click event will check what piece has been clicked
     canvasPieces.addEventListener('click', function(event) {
         ctxHighlight.clearRect(0, 0, LENGTH * 8, LENGTH * 8);

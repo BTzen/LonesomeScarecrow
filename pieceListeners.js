@@ -32,7 +32,7 @@ function pawnListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePos
     var attackFlag2 = false;
 
     //check direction of pawn travels, same principle can be applied to see what can attack what
-    if (board.__position__[piecePosition].isWhite) {
+    if (!board.__position__[piecePosition].isWhite) {
         for (var i = 1; i <= forwardMoves; i++) { //alert('p');
             //board represented as 1D array so the row # must be multiplied by the # of tiles in a row
             //tile in front of pawn is empty
@@ -80,7 +80,7 @@ function pawnListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePos
 
 //ROOK
 function rookListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition) {
-    var colourBool = board.__position__[piecePosition].isWhite;
+    var colourBool = !board.__position__[piecePosition].isWhite;
     var upFlag = false;
     var downFlag = false;
     var rightFlag = false;
@@ -134,7 +134,7 @@ function rookListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePos
 
 //KNIGHT
 function knightListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition) {
-    var colourBool = board.__position__[piecePosition].isWhite;
+    var colourBool = !board.__position__[piecePosition].isWhite;
     //note to self row + i is down 
     //DOWNRIGHT
     if (board.__position__[piecePosition + (16) + 1] === null) {
@@ -190,7 +190,7 @@ function knightListener(ctxHighlight, ctxPiece, board, x, y, row, column, pieceP
 
 //BISHOP
 function bishopListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition) {
-    var colourBool = board.__position__[piecePosition].isWhite;
+    var colourBool = !board.__position__[piecePosition].isWhite;
     var uprightFlag = false;
     var downleftFlag = false;
     var downrightFlag = false;
@@ -252,7 +252,7 @@ function queenListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePo
 //KING
 //Note: I left all the methods in the king because he will have to have a lot more conditions added in the futre
 function kingListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition) {
-    var colourBool = board.__position__[piecePosition].isWhite;
+    var colourBool = !board.__position__[piecePosition].isWhite;
     var uprightFlag = false;
     var downleftFlag = false;
     var downrightFlag = false;
