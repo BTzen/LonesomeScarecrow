@@ -175,7 +175,7 @@ function init() {
 for every piece in the array I check if it has been clicked and do the corresponding highlighting
 */
 
-function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
+function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x + ' row col ' + y);
     var column = Math.floor(x / LENGTH);
     var row = Math.floor(y / LENGTH);
     var isHighlighted = null; // not null if tile selected is highlighted in someway, ie. can the piece be moved there
@@ -187,14 +187,25 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
         if (item[1] == row && item[2] == column)
             isHighlighted = item;
     });
-    console.log('prev. coords ' + lastRow + ' ' + lastColumn);
+    //console.log('prev. coords ' + lastRow + ' ' + lastColumn);
 
     //deal with movement
     if (isHighlighted) {
-        //move the piece corresponding to that highlighted pattern to the selected location 
-        board.movePiece(lastSelectedPiece, row, column);
-        isHighlighted = null;
-        lastSelectedPiece.hasMoved = true;
+        
+		if (isHighlighted[0] == ATK) {
+			//alert(ATK);
+			//remove piece at that position
+			//board.__position__[isHighlighted[1] * 8 + isHighlighted[2]] = null;
+			 ctxPiece.clearRect(isHighlighted[2] * LENGTH, isHighlighted[1] * LENGTH, LENGTH, LENGTH); 
+		}
+		//move the piece corresponding to that highlighted pattern to the selected location 
+		board.movePiece(lastSelectedPiece, row, column);
+        
+		//update tracking variables
+		isHighlighted = null;
+		if (lastSelectedPiece.type == "Pawn") {
+			lastSelectedPiece.hasMoved = true;
+		}
         highlightedTiles = []; //reset which tiles are hightlighted each time this runs
     }
     //check if player clicked on a piece and highlight the appropriate tiles in response
