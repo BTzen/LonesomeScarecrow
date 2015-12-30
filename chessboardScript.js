@@ -1,4 +1,4 @@
-var yourTurn = true;
+var isWhiteTurn = true;
 var highlightedTiles = [];
 var lastSelectedPiece; // for moving pieces
 var lastRow, lastColumn; //
@@ -49,7 +49,7 @@ var board = {
         var ctxPiece = canvasPieces.getContext('2d');
         ctxPiece.clearRect(lastColumn * LENGTH, lastRow * LENGTH, LENGTH, LENGTH); //erase old piece
         ctxPiece.fillText(String.fromCharCode(piece.unicode), y * LENGTH, (x + 1) * LENGTH - OFFSET); //draw piece at required spot
-		yourTurn = !yourTurn;
+		isWhiteTurn = !isWhiteTurn;
     },
     // Find a piece on the board using row, column indices
     getPiece: function(row, column) {
@@ -209,7 +209,7 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x
         highlightedTiles = [];
 
         var piecePosition = (row * 8) + column;	//convert 2d indices to 1d for backing array
-		var turnCheck = board.__position__[piecePosition].isWhite === yourTurn;
+		var turnCheck = board.__position__[piecePosition].isWhite === isWhiteTurn;
         //check what kind of highlighting should take place based on the piece type
         if (board.__position__[piecePosition].type === "Pawn" && turnCheck) {
             //if pawn hasn't moved, highlight up to 2 spaces forward
