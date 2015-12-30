@@ -33,7 +33,7 @@ function pawnListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePos
 
     //check direction of pawn travels, same principle can be applied to see what can attack what
     if (!board.__position__[piecePosition].isWhite) {
-        for (var i = 1; i <= forwardMoves; i++) { //alert('p');
+        for (var i = 1; i <= forwardMoves; i++) {
             //board represented as 1D array so the row # must be multiplied by the # of tiles in a row
             //tile in front of pawn is empty
 			
@@ -55,7 +55,7 @@ function pawnListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePos
                 break;
             }
         }
-    } else {
+    } else {	// for white pieces
         for (var i = 1; i <= forwardMoves; i++) { 
 
             if (board.__position__[piecePosition - 9] !== null && validAttack(piecePosition - 9, colourBool) && !attackFlag1) {

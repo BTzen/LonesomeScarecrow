@@ -206,7 +206,7 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x
         lastColumn = column;
         highlightedTiles = [];
 
-        var piecePosition = (row * 8) + column;
+        var piecePosition = (row * 8) + column;	//convert 2d indices to 1d for backing array
         //check what kind of highlighting should take place based on the piece type
         if (board.__position__[piecePosition].type === "Pawn") {
             //if pawn hasn't moved, highlight up to 2 spaces forward
@@ -233,7 +233,10 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x
             console.log(item);
         });
 
-    }
+    } else {	// player clicked off the piece
+		highlightedTiles = [];
+		isHighlighted = false;
+	}
 }
 
 window.onload = init;
