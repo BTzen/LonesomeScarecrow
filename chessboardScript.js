@@ -1,4 +1,5 @@
 var isWhiteTurn = true;
+var isGameRunning = false;
 var highlightedTiles = [];
 var lastSelectedPiece; // for moving pieces
 var lastRow, lastColumn; //
@@ -150,10 +151,10 @@ function init() {
     canvasHighlight = document.getElementById("highlight");
 
 	/* account for fact that board may not be positioned in the top left corner of the page
-	 * body margin is 8px by default and border is 2
+	 * border isn't counted with offset()
 	*/
-    canvasLeft = parseInt($('body').css('margin')) + parseInt($('#game').css('border-left-width'));
-    canvasTop = $('#game').offset().top
+    canvasLeft = $('#board').offset().left + parseInt($('#board').css('border-left-width')); 
+    canvasTop = $('#board').offset().top
 
 
     ctx = canvas.getContext('2d');
@@ -171,7 +172,7 @@ function init() {
         ctxHighlight.clearRect(0, 0, LENGTH * 8, LENGTH * 8);
 
         var x = event.pageX - canvasLeft,
-            y = event.pageY - canvasTop; //alert('event.pageY - canvasTop = ' + event.pageY + '-' + canvasTop);
+            y = event.pageY - canvasTop; //alert('event.pageX - canvasLeft = ' + event.pageX + '-' + canvasLeft);
         chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
     });
 }
@@ -181,75 +182,79 @@ for every piece in the array I check if it has been clicked and do the correspon
 */
 
 function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x + ' row col ' + y);
-    var column = Math.floor(x / LENGTH);
-    var row = Math.floor(y / LENGTH);
-    var isHighlighted = null; // not null if tile selected is highlighted in someway, ie. can the piece be moved there
-    var pieceRow, pieceColumn; // tracking piece info
-    //console.log('row col ' + row + ' ' + column);
+	if (isGameRunning) {
+		var column = Math.floor(x / LENGTH);
+		var row = Math.floor(y / LENGTH);
+		var isHighlighted = null; // not null if tile selected is highlighted in someway, ie. can the piece be moved there
+		var pieceRow, pieceColumn; // tracking piece info
+		//console.log('row col ' + row + ' ' + column);
 
-    //check if selected tile is highlighted
-    highlightedTiles.forEach(function(item) {
-        if (item[1] == row && item[2] == column)
-            isHighlighted = item;
-    });
-    //console.log('prev. coords ' + lastRow + ' ' + lastColumn);
+		//check if selected tile is highlighted
+		highlightedTiles.forEach(function(item) {
+			if (item[1] == row && item[2] == column)
+				isHighlighted = item;
+		});
+		//console.log('prev. coords ' + lastRow + ' ' + lastColumn);
 
-    //deal with movement
-    if (isHighlighted) {
-        
-		if (isHighlighted[0] == ATK) {
-			//alert(ATK);
-			//remove piece at that position
-			//board.__position__[isHighlighted[1] * 8 + isHighlighted[2]] = null;
-			 ctxPiece.clearRect(isHighlighted[2] * LENGTH, isHighlighted[1] * LENGTH, LENGTH, LENGTH); 
+		//deal with movement
+		if (isHighlighted) {
+			
+			if (isHighlighted[0] == ATK) {
+				//alert(ATK);
+				//remove piece at that position
+				//board.__position__[isHighlighted[1] * 8 + isHighlighted[2]] = null;
+				 ctxPiece.clearRect(isHighlighted[2] * LENGTH, isHighlighted[1] * LENGTH, LENGTH, LENGTH); 
+			}
+			//move the piece corresponding to that highlighted pattern to the selected location 
+			board.movePiece(lastSelectedPiece, row, column);
+			
+			//update tracking variables
+			isHighlighted = null;
+			if (lastSelectedPiece.type == "Pawn") {
+				lastSelectedPiece.hasMoved = true;
+			}
+			highlightedTiles = []; //reset which tiles are hightlighted each time this runs
 		}
-		//move the piece corresponding to that highlighted pattern to the selected location 
-		board.movePiece(lastSelectedPiece, row, column);
-        
-		//update tracking variables
-		isHighlighted = null;
-		if (lastSelectedPiece.type == "Pawn") {
-			lastSelectedPiece.hasMoved = true;
+		//check if player clicked on a piece and highlight the appropriate tiles in response
+		else if (lastSelectedPiece = board.getPieceWithCoords(x, y)) {
+			lastRow = row;
+			lastColumn = column;
+			highlightedTiles = [];
+
+			var piecePosition = (row * 8) + column;	//convert 2d indices to 1d for backing array
+			var turnCheck = board.__position__[piecePosition].isWhite === isWhiteTurn;
+			//check what kind of highlighting should take place based on the piece type
+			if (board.__position__[piecePosition].type === "Pawn" && turnCheck) {
+				//if pawn hasn't moved, highlight up to 2 spaces forward
+				var forwardMoves = 2; //how many space the piece can potentially move forward
+				if (lastSelectedPiece.hasMoved) {
+					forwardMoves = 1;
+				}
+				//For some reason the rook couldn't define colourBool when passed board.__position__[piecePosition].isWhite, only left it for the pawn atm.
+				pawnListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition, forwardMoves, board.__position__[piecePosition].isWhite);
+			} else if (board.__position__[piecePosition].type === "Rook" && turnCheck) {
+				rookListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
+			} else if (board.__position__[piecePosition].type === "Knight" && turnCheck) {
+				knightListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
+			} else if (board.__position__[piecePosition].type === "Bishop" && turnCheck) {
+				bishopListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
+			} else if (board.__position__[piecePosition].type === "Queen" && turnCheck) {
+				queenListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
+			} else if (board.__position__[piecePosition].type === "King" && turnCheck) {
+				kingListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
+			}
+
+			//DEBUG
+			highlightedTiles.forEach(function(item) {
+				console.log(item);
+			});
+
+		} else {	// player clicked off the piece
+			highlightedTiles = [];
+			isHighlighted = false;
 		}
-        highlightedTiles = []; //reset which tiles are hightlighted each time this runs
-    }
-    //check if player clicked on a piece and highlight the appropriate tiles in response
-    else if (lastSelectedPiece = board.getPieceWithCoords(x, y)) {
-        lastRow = row;
-        lastColumn = column;
-        highlightedTiles = [];
-
-        var piecePosition = (row * 8) + column;	//convert 2d indices to 1d for backing array
-		var turnCheck = board.__position__[piecePosition].isWhite === isWhiteTurn;
-        //check what kind of highlighting should take place based on the piece type
-        if (board.__position__[piecePosition].type === "Pawn" && turnCheck) {
-            //if pawn hasn't moved, highlight up to 2 spaces forward
-            var forwardMoves = 2; //how many space the piece can potentially move forward
-            if (lastSelectedPiece.hasMoved) {
-                forwardMoves = 1;
-            }
-			//For some reason the rook couldn't define colourBool when passed board.__position__[piecePosition].isWhite, only left it for the pawn atm.
-            pawnListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition, forwardMoves, board.__position__[piecePosition].isWhite);
-        } else if (board.__position__[piecePosition].type === "Rook" && turnCheck) {
-            rookListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-        } else if (board.__position__[piecePosition].type === "Knight" && turnCheck) {
-            knightListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-        } else if (board.__position__[piecePosition].type === "Bishop" && turnCheck) {
-            bishopListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-        } else if (board.__position__[piecePosition].type === "Queen" && turnCheck) {
-            queenListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-        } else if (board.__position__[piecePosition].type === "King" && turnCheck) {
-            kingListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-        }
-
-        //DEBUG
-        highlightedTiles.forEach(function(item) {
-            console.log(item);
-        });
-
-    } else {	// player clicked off the piece
-		highlightedTiles = [];
-		isHighlighted = false;
+	} else {
+		alert("Press the 'Start' button to begin your chess adventure!");
 	}
 }
 

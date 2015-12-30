@@ -22,17 +22,27 @@
 	z-index:1;
 }
 
-#game { 
+#board { 
 	border: 2px solid black;
-	height: 600px;
+	height: inherit;
 	margin-left: 25px;
 	overflow: auto;		/* prevent canvas from being pushed out of the border */
 	position: relative; 
 	width: 600px;
 }
 
-#gameArea {
+#boardAndInfo {
+	position: absolute;
+	height: 600px;
+	width: auto;
+}
+
+#gameArea { /* the container for all componenets related to the game */
 	width: 650px;
+}
+
+#gameInfo {
+	float: right;
 }
 
 #fileNotation {

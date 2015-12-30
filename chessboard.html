@@ -16,11 +16,7 @@
 <body>
 	<h1>Chessboard</h1>
 	<div id="gameArea">
-		<legend>
-			<fieldset>
-				<input type="button" value="Start">
-			</fieldset>
-		</legend>
+		
 		<h3 id="turn">Turn: White</h3>
 		<div id="fileNotation">
 			ABCDEFGH
@@ -28,16 +24,29 @@
 		<div id="rankNotation">
 			87654321
 		</div>
-		<div id="game">
-			<canvas id="chessboard" width="600" height="600"></canvas>
-			<canvas id="highlight" width="600" height="600"></canvas>
-			<canvas id="chesspieces" width="600" height="600"></canvas>
+		<div id="boardAndInfo">
+			<legend id="gameInfo">
+				<fieldset>
+					<input type="button" value="Start" onclick="startMatchEvent()">
+				</fieldset>
+			</legend>
+			<div id="board">
+				<canvas id="chessboard" width="600" height="600"></canvas>
+				<canvas id="highlight" width="600" height="600"></canvas>
+				<canvas id="chesspieces" width="600" height="600"></canvas>
+			</div>
 		</div>
-		
 	</div>
 	<script>
 		<!-- document.getElementsByTagName("body")[0].innerHTML += "test"; -->
-		
+		// GAMEPLAY
+		function startMatchEvent() {
+			isGameRunning = true;
+			
+			if (isGameRunning) {
+				alert("The match has started!");
+			}
+		}
 	</script>
 </body>
 
