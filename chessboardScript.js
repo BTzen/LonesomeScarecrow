@@ -76,7 +76,7 @@ var board = {
     }
 };
 
-/**
+/* Draws the actual representation of the physical board
 This method draws the board in a checkered patterns using two shades
 of brown.
 
@@ -99,8 +99,7 @@ function drawBoard(canvas, ctx) {
         white = !white;
     }
 }
-/*
- * Setup board initially
+/* Adds all the pieces to the board
 */
 function placePieces(playerIsWhite) {
     if (playerIsWhite) {
@@ -142,8 +141,7 @@ function placePieces(playerIsWhite) {
 	}
 }
 
-/**
-This method initializes on load and creates an onclick event.
+/* This method initializes on load and creates an onclick event.
 */
 function init() {
     canvas = document.getElementById("chessboard");
@@ -156,13 +154,12 @@ function init() {
     canvasLeft = $('#board').offset().left + parseInt($('#board').css('border-left-width')); 
     canvasTop = $('#board').offset().top
 
-
     ctx = canvas.getContext('2d');
     ctxPiece = canvasPieces.getContext('2d');
+	ctxPiece.font = PIECE_FONT;
     ctxHighlight = canvasHighlight.getContext('2d');
 
     drawBoard(canvas, ctx);
-    ctxPiece.font = PIECE_FONT;
 
     //board stuff
     board.initializeBoard();

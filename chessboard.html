@@ -27,6 +27,7 @@
 		<div id="boardAndInfo">
 			<legend id="gameInfo">
 				<fieldset>
+					<input type="button" value="Surrender" onclick="surrenderListener()">
 					<input type="button" value="Start" onclick="startMatchEvent()">
 				</fieldset>
 			</legend>
@@ -44,7 +45,19 @@
 			isGameRunning = true;
 			
 			if (isGameRunning) {
-				alert("The match has started!");
+				//alert("The match has started!");
+			}
+		}
+		
+		function surrenderListener() {
+			if (isGameRunning) {
+				//reset board to initial state
+				isGameRunning = false;alert("You're a loser!");
+				init();
+				
+			}
+			else {
+				alert("You can't give up if you haven't even started yet!");
 			}
 		}
 	</script>

@@ -32,8 +32,10 @@
 }
 
 #boardAndInfo {
-	position: absolute;
+	/* background-color: red; */
+	overflow: visible;
 	height: 600px;
+	position: relative;
 	width: auto;
 }
 
@@ -41,8 +43,19 @@
 	width: 650px;
 }
 
-#gameInfo {
-	float: right;
+#gameInfo [type=button] {
+	display: table-cell;
+	margin-bottom: 2px;
+	width: 100%;
+}
+
+#gameInfo fieldset{
+	display: table;
+	margin-left: 635px;
+	padding-bottom: 0.75em;
+	padding-top: 0.75em;
+	position: absolute;
+	width: 200px;
 }
 
 #fileNotation {
