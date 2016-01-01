@@ -152,7 +152,7 @@ function init() {
 	 * border isn't counted with offset()
 	*/
     canvasLeft = $('#board').offset().left + parseInt($('#board').css('border-left-width')); 
-    canvasTop = $('#board').offset().top
+    canvasTop = $('#board').offset().top;
 
     ctx = canvas.getContext('2d');
     ctxPiece = canvasPieces.getContext('2d');
@@ -174,6 +174,36 @@ function init() {
     });
 }
 
+function reinit() {
+	// canvas = document.getElementById("chessboard");
+    canvasPieces = document.getElementById("chesspieces");
+    canvasHighlight = document.getElementById("highlight");
+
+	/* account for fact that board may not be positioned in the top left corner of the page
+	 * border isn't counted with offset()
+	*/
+    canvasLeft = $('#board').offset().left + parseInt($('#board').css('border-left-width')); 
+    canvasTop = $('#board').offset().top;
+
+    ctx = document.getElementById("chessboard").getContext('2d');
+    ctxPiece = canvasPieces.getContext('2d');
+	ctxPiece.font = PIECE_FONT;
+    ctxHighlight = canvasHighlight.getContext('2d');
+
+    drawBoard(canvas, ctx);
+
+    //board stuff
+    board.initializeBoard();
+    placePieces(true);
+    //On click event will check what piece has been clicked
+    canvasPieces.addEventListener('click', function(event) {
+        ctxHighlight.clearRect(0, 0, LENGTH * 8, LENGTH * 8);
+
+        var x = event.pageX - canvasLeft,
+            y = event.pageY - canvasTop; //alert('event.pageX - canvasLeft = ' + event.pageX + '-' + canvasLeft);
+        chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
+    });
+}
 /**
 for every piece in the array I check if it has been clicked and do the corresponding highlighting
 */
