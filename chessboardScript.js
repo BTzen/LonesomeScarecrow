@@ -241,6 +241,11 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x
 				lastSelectedPiece.hasMoved = true;
 			}
 			highlightedTiles = []; //reset which tiles are hightlighted each time this runs
+			//AI CALL HERE
+			if (!isWhiteTurn) { //prevent the AI from thinking it's its turn everytime. isAI will need to come in
+				//This is where you call the AI, after you make your move!
+				moveAIPiece(ctxHighlight, ctxPiece, board);
+			}
 		}
 		//check if player clicked on a piece and highlight the appropriate tiles in response
 		else if (lastSelectedPiece = board.getPieceWithCoords(x, y)) {

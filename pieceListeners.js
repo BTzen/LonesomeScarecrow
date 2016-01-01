@@ -7,8 +7,10 @@ const MOVE = "move";
 //FILL METHOD
 function fill(ctxHighlight, color, moveType, row, column) {
 	if (column > -1 && column < 8) {
-		ctxHighlight.fillStyle = color;
-		ctxHighlight.fillRect(column * LENGTH, row * LENGTH, LENGTH, LENGTH);
+		if (isWhiteTurn) { //will need some sort of isAI var
+		   ctxHighlight.fillStyle = color;
+		   ctxHighlight.fillRect(column * LENGTH, row * LENGTH, LENGTH, LENGTH);
+		}
 		highlightedTiles.push([moveType, row, column]);
 	}
 }
