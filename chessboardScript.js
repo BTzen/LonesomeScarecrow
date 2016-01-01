@@ -3,6 +3,8 @@ var isGameRunning = false;
 var highlightedTiles = [];
 var lastSelectedPiece; // for moving pieces
 var lastRow, lastColumn; //
+var initialBoardState = [];
+
 const LENGTH = 75;
 const OFFSET = 10;
 const PIECE_FONT = "70px Arial unicode MS";
@@ -28,11 +30,11 @@ var board = {
         var y = (row + 1) * LENGTH - OFFSET;
         var canvasPieces = document.getElementById('chesspieces');
         var ctxPiece = canvasPieces.getContext('2d');
-        ctxPiece.fillText(String.fromCharCode(piece.unicode), x, y);
+        ctxPiece.fillText(String.fromCharCode(piece.unicode), x, y);	//draws piece on board
 
         //add piece to position array
         this.__position__[column + row * 8] = piece;
-        console.log('Piece drawn at ' + x + ', ' + y + ' and added at index ' + (column + row * 8));
+        //console.log('Piece drawn at ' + x + ', ' + y + ' and added at index ' + (column + row * 8));
     },
     // Move an already placed pieced from one location on the board to another 
     movePiece: function(piece, x, y) {
@@ -190,19 +192,15 @@ function reinit() {
 	ctxPiece.font = PIECE_FONT;
     ctxHighlight = canvasHighlight.getContext('2d');
 
-    drawBoard(canvas, ctx);
-
     //board stuff
-    board.initializeBoard();
+	for (var index = 16; index < 48; index++) {
+		   board.__position__[index] = null;
+	}
+	ctxPiece.clearRect(0, 0, LENGTH * 8, LENGTH * 8);	// remove piece images from board
     placePieces(true);
-    //On click event will check what piece has been clicked
-    canvasPieces.addEventListener('click', function(event) {
-        ctxHighlight.clearRect(0, 0, LENGTH * 8, LENGTH * 8);
-
-        var x = event.pageX - canvasLeft,
-            y = event.pageY - canvasTop; //alert('event.pageX - canvasLeft = ' + event.pageX + '-' + canvasLeft);
-        chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
-    });
+	
+	isWhiteTurn = true;	//white will always move first
+	document.getElementById('turn').innerHTML = "Turn: White";
 }
 /**
 for every piece in the array I check if it has been clicked and do the corresponding highlighting
