@@ -39,6 +39,20 @@
 	width: auto;
 }
 
+#freeplayInfo {
+	margin-left: 635px;
+	position: absolute;
+	height: 585px;
+	width: 300px;
+}
+
+#freeplayPieces {
+	border: 2px solid red;
+	font-size: 200%;
+	height: 500px;
+	overflow: auto;
+}
+
 #gameArea { /* the container for all componenets related to the game */
 	width: 650px;
 }
@@ -51,7 +65,8 @@
 
 #gameInfo fieldset{
 	display: table;
-	margin-left: 635px;
+	margin-top: 620px;
+	/* margin-left: 635px; */
 	padding-bottom: 0.75em;
 	padding-top: 0.75em;
 	position: absolute;

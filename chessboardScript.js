@@ -31,7 +31,7 @@ var board = {
         var canvasPieces = document.getElementById('chesspieces');
         var ctxPiece = canvasPieces.getContext('2d');
         ctxPiece.fillText(String.fromCharCode(piece.unicode), x, y);	//draws piece on board
-
+		
         //add piece to position array
         this.__position__[column + row * 8] = piece;
         //console.log('Piece drawn at ' + x + ', ' + y + ' and added at index ' + (column + row * 8));
@@ -61,6 +61,14 @@ var board = {
 			document.getElementById('turn').innerHTML = "Turn: Black";
 		}
     },
+	/* Convenience method to remove the image and update the array on piece removal
+	*/
+	removePiece(row, column) {
+		ctxPiece = document.getElementById('chesspieces').getContext('2d');
+		board.__position__[column + row * 8] = null;	//remove from data structure
+		ctxPiece.clearRect(column * LENGTH, row * LENGTH, LENGTH, LENGTH);	//remove image
+	},
+	
     // Find a piece on the board using row, column indices
     getPiece: function(row, column) {
         return this.__position__[column + row * 8];
@@ -75,14 +83,23 @@ var board = {
         var row = Math.floor(y / LENGTH);
         //console.log(this.getPiece(rank,file));
         return (this.getPiece(row, column));
-    }
+    },
+	
+	/* Convert std. chess notation into something that can be used to index the positions of the backing data structure
+	 * 
+	*/
+	/*algebraicNotationToIndex: function(fileRankString) {
+		var file = fileRankString.substring(0,1);
+		var rank = fileRankString.substring(1,2);
+		return file * 8 + rank;
+	}*/
 };
 
 /* Draws the actual representation of the physical board
 This method draws the board in a checkered patterns using two shades
 of brown.
 
-MIGHT WANT TO SEPARTE THIS, PLACEPIECES AND INIT INTO AN INITIALIZE.JS
+MIGHT WANT TO SEPARATE THIS, PLACEPIECES AND INIT INTO AN INITIALIZE.JS
 */
 function drawBoard(canvas, ctx) {
     var white = true;
@@ -165,7 +182,7 @@ function init() {
 
     //board stuff
     board.initializeBoard();
-    placePieces(true);
+    //placePieces(true);
     //On click event will check what piece has been clicked
     canvasPieces.addEventListener('click', function(event) {
         ctxHighlight.clearRect(0, 0, LENGTH * 8, LENGTH * 8);

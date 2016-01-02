@@ -31,6 +31,51 @@
 					<input type="button" value="Start" onclick="startMatchEvent()">
 				</fieldset>
 			</legend>
+			
+			
+			<fieldset id="freeplayInfo">
+				<legend>Freeplay</legend>
+				<input type="button" value="Add" 
+					onclick="addPiece($('select[name=fpIsWhite]').val(), $('select[name=fpPiece]').val(), $('select[name=fpRank]').val(), $('select[name=fpFile]').val())">
+				<select name="fpIsWhite">
+					<option value="true">White</option>
+					<option value="false">Black</option>
+				</select>
+				<select name="fpPiece">
+					<option value="Pawn">Pawn</option>
+					<option value="Rook">Rook</option>
+					<option value="Knight">Knight</option>
+					<option value="Bishop">Bishop</option>
+					<option value="Queen">Queen</option>
+					<option value="King">King</option>
+				</select>
+				at
+				<select name="fpFile">
+					<option value="0">a</option>
+					<option value="1">b</option>
+					<option value="2">c</option>
+					<option value="3">d</option>
+					<option value="4">e</option>
+					<option value="5">f</option>
+					<option value="6">g</option>
+					<option value="7">h</option>
+				</select>
+				<select name="fpRank">
+					<option value="7">1</option>
+					<option value="6">2</option>
+					<option value="5">3</option>
+					<option value="4">4</option>
+					<option value="3">5</option>
+					<option value="2">6</option>
+					<option value="1">7</option>
+					<option value="0">8</option>
+				</select>
+				
+				<div id="freeplayPieces">
+					<ol>
+					</ol>
+				</div>
+			</fieldset>
 			<div id="board">
 				<canvas id="chessboard" width="600" height="600"></canvas>
 				<canvas id="highlight" width="600" height="600"></canvas>
@@ -39,8 +84,73 @@
 		</div>
 	</div>
 	<script>
-		<!-- document.getElementsByTagName("body")[0].innerHTML += "test"; -->
+		var listitemID = 1;	//so the remove button knows what list element to delete
+		var occupiedTiles = [];
 		// GAMEPLAY
+		/* Add piece to board for freeplay
+		 * 
+		*/
+		function addPiece(isWhite, pieceName, rank, file) {
+			var row = parseInt(rank);
+			var col = parseInt(file);
+			var color = isWhite == "true";
+			var piece;
+			
+			//add piece to board and backing data structure
+			switch (pieceName) {
+				case "Pawn":
+					piece = new Pawn(color);
+					break;
+				case "Rook":
+					piece = new Rook(color);
+					break;
+				case "Knight":
+					piece = new Knight(color);
+					break;
+				case "Bishop":
+					piece = new Bishop(color);
+					break;
+				case "Queen":
+					piece = new Queen(color);
+					break;
+				case "King":
+					piece = new King(color);
+					break;
+			}
+			//add piece to div
+			var file = $('select[name=fpFile] option:selected').text();
+			var rank = $('select[name=fpRank] option:selected').text();
+			
+			//make sure there's only 1 list entry per tile (eg. there can't be 2 different pieces at 'a1' simulataneously)
+			var tileIndex = -1;	//store index of the list item that's currently in the desired position
+			for (var i = 0; i < occupiedTiles.length; i++) { //mimic behaviour of .indexOf method, since that method doesn't work for complex arrays
+				if (occupiedTiles[i][1] == (file + rank))	tileIndex = i;
+				else tileIndex = -1;
+			}
+			
+			if (tileIndex == -1) {	//may have compatibility issues with older browsers
+				occupiedTiles.push([listitemID, file + rank]);	//add the element to the occupiedTiles list if there's nothing at that tile position
+			}
+			else {
+				removePiece(occupiedTiles[tileIndex][0], occupiedTiles[tileIndex][1]); //remove the old piece and replace the list item currently at that position with the new 1
+			}
+			board.placePiece(piece, row, col);	//overwrite the old piece if the user attempts to place another piece on an already occupied tile
+			
+			//append new entry to list
+			$('#freeplayPieces ol').append('<li>' + String.fromCharCode(piece.unicode) + ' ' + 
+				file + rank + ' ' + '<input id="freeplayEntry' + listitemID + '" type="button" value="Remove" onclick="removePiece(' + listitemID + ', \'' + file + rank + '\')"></li>'); 
+				/*alert('<input id="freeplayEntry' + listitemID + '" type="button" value="Remove" onclick="removePiece(' + listitemID++ + ', \'' + file + rank + '\')">');*/
+			listitemID++;
+		}
+		
+		function removePiece(entryID, fileRankString) {
+			/*alert(entryID + ' ' + fileRankString);*/
+			var row = (8 - parseInt(fileRankString.substring(1,2)));
+			var col = parseInt(fileRankString.charCodeAt(0)) - 97; //97 reduces value of a to 0
+			board.removePiece(row, col);
+			$('#freeplayEntry' + entryID).parent().remove();	//delete list item
+		}
+		
 		function startMatchEvent() {
 			isGameRunning = true;
 			
@@ -53,7 +163,7 @@
 			if (isGameRunning) {
 				//reset board to initial state
 				isGameRunning = false;alert("You're a loser!");
-				reinit();
+				reinit();  // CALL ON START INSTEAD IN CASE AI SURRENDERS?!?!
 			}
 			else {
 				alert("You can't give up if you haven't even started yet!");
