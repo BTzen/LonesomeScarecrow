@@ -1,6 +1,7 @@
 var isWhiteTurn = true;
 var isGameRunning = false;
 var highlightedTiles = [];
+var allHighlightedTiles = [];
 var lastSelectedPiece; // for moving pieces
 var lastRow, lastColumn; //
 var initialBoardState = [];
@@ -222,6 +223,11 @@ function reinit() {
 /**
 for every piece in the array I check if it has been clicked and do the corresponding highlighting
 */
+function fakeChessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
+	highlightedTiles = [];//reset
+	lastSelectedPiece = null;
+	chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
+}
 
 function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x + ' row col ' + y);
 	if (isGameRunning) {
@@ -256,6 +262,8 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x
 				lastSelectedPiece.hasMoved = true;
 			}
 			highlightedTiles = []; //reset which tiles are hightlighted each time this runs
+			//CHECK INCHECK HERE
+			inCheck();
 			//AI CALL HERE
 			if (!isWhiteTurn) { //prevent the AI from thinking it's its turn everytime. isAI will need to come in
 				//This is where you call the AI, after you make your move!

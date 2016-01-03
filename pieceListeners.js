@@ -1,17 +1,22 @@
 /*
  * Contains logic for piece behaviour
  */
+var isCheckingBoard = false;
 const ATK = "attack";
 const MOVE = "move"; 
  
 //FILL METHOD
 function fill(ctxHighlight, color, moveType, row, column) {
 	if (column > -1 && column < 8) {
-		if (isWhiteTurn) { //will need some sort of isAI var
-		   ctxHighlight.fillStyle = color;
-		   ctxHighlight.fillRect(column * LENGTH, row * LENGTH, LENGTH, LENGTH);
+		if (!isCheckingBoard) {
+			if (isWhiteTurn) { //will need some sort of isAI var
+				ctxHighlight.fillStyle = color;
+				ctxHighlight.fillRect(column * LENGTH, row * LENGTH, LENGTH, LENGTH);
+			}
+				highlightedTiles.push([moveType, row, column]);		
+		} else {
+			allHighlightedTiles.push([moveType, row, column]);	
 		}
-		highlightedTiles.push([moveType, row, column]);
 	}
 }
 
@@ -22,6 +27,36 @@ function validAttack(row,column, colourBool) {
     } else {
         return board.getPiece(row,column).isWhite === colourBool;
     }
+}
+
+//CHECK IF KING IS IN CHECK
+function inCheck() {
+	isCheckingBoard = true;
+	for (var i = 0; i < 8; i++) { //LENGTH isn't defined yet when I call this?
+		for (var j = 0; j < 8; j++) {
+			var checkPiece = board.getPiece(i,j);
+			if (checkPiece!==null && checkPiece.type !== "King") {
+				isWhiteTurn = !isWhiteTurn;
+				//highlightedTiles = [];//reset
+				//lastSelectedPiece = null;
+				fakeChessPieceListener(ctxHighlight, ctxPiece, board, j*LENGTH, i*LENGTH);
+				isWhiteTurn = !isWhiteTurn;
+			} 
+			//check if the tiles that get highlightedTiles hits the king in that position
+		}	
+	}
+	allHighlightedTiles.forEach(function(item) {
+		var isAttack = item[0] === ATK;
+		if (isAttack){
+			var isKing = board.getPiece(item[1],item[2]).type === "King";
+			if (isKing) {
+				alert("In check"); //change to a return bool, need to take further action/restrictions	
+			}
+		}
+	});
+	allHighlightedTiles = [];
+	isCheckingBoard = false;
+	//if it does he is in check.
 }
 
 //PAWN
