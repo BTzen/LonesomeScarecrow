@@ -1,7 +1,7 @@
 var isWhiteTurn = true;
 var isGameRunning = false;
 var highlightedTiles = [];
-var allHighlightedTiles = [];
+var allHighlightedTiles = []; //for looking ahead at all possible moves in a ply.
 var lastSelectedPiece; // for moving pieces
 var lastRow, lastColumn; //
 var initialBoardState = [];

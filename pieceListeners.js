@@ -32,13 +32,11 @@ function validAttack(row,column, colourBool) {
 //CHECK IF KING IS IN CHECK
 function inCheck() {
 	isCheckingBoard = true;
-	for (var i = 0; i < 8; i++) { //LENGTH isn't defined yet when I call this?
+	for (var i = 0; i < 8; i++) {
 		for (var j = 0; j < 8; j++) {
 			var checkPiece = board.getPiece(i,j);
 			if (checkPiece!==null && checkPiece.type !== "King") {
 				isWhiteTurn = !isWhiteTurn;
-				//highlightedTiles = [];//reset
-				//lastSelectedPiece = null;
 				fakeChessPieceListener(ctxHighlight, ctxPiece, board, j*LENGTH, i*LENGTH);
 				isWhiteTurn = !isWhiteTurn;
 			} 
@@ -47,15 +45,19 @@ function inCheck() {
 	}
 	allHighlightedTiles.forEach(function(item) {
 		var isAttack = item[0] === ATK;
-		if (isAttack){
+		if (isAttack){ //is it an attack tile
 			var isKing = board.getPiece(item[1],item[2]).type === "King";
-			if (isKing) {
-				alert("In check"); //change to a return bool, need to take further action/restrictions	
+			if (isKing) { //is it attacking a king
+				alert("In check");
+				allHighlightedTiles = [];
+				isCheckingBoard = false;
+				return true;
 			}
 		}
 	});
 	allHighlightedTiles = [];
 	isCheckingBoard = false;
+	return false;
 	//if it does he is in check.
 }
 
