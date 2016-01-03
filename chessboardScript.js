@@ -267,28 +267,27 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x
 			lastRow = row;
 			lastColumn = column;
 			highlightedTiles = [];
-
-			var piecePosition = (row * 8) + column;	//convert 2d indices to 1d for backing array
-			var turnCheck = board.__position__[piecePosition].isWhite === isWhiteTurn;
+			//var piecePosition = (row * 8) + column;	//convert 2d indices to 1d for backing array
+			
+			var turnCheck = lastSelectedPiece.isWhite === isWhiteTurn;
 			//check what kind of highlighting should take place based on the piece type
-			if (board.__position__[piecePosition].type === "Pawn" && turnCheck) {
+			if (lastSelectedPiece.type === "Pawn" && turnCheck) {
 				//if pawn hasn't moved, highlight up to 2 spaces forward
 				var forwardMoves = 2; //how many space the piece can potentially move forward
 				if (lastSelectedPiece.hasMoved) {
 					forwardMoves = 1;
 				}
-				//For some reason the rook couldn't define colourBool when passed board.__position__[piecePosition].isWhite, only left it for the pawn atm.
-				pawnListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition, forwardMoves, board.__position__[piecePosition].isWhite);
-			} else if (board.__position__[piecePosition].type === "Rook" && turnCheck) {
-				rookListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-			} else if (board.__position__[piecePosition].type === "Knight" && turnCheck) {
-				knightListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-			} else if (board.__position__[piecePosition].type === "Bishop" && turnCheck) {
-				bishopListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-			} else if (board.__position__[piecePosition].type === "Queen" && turnCheck) {
-				queenListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-			} else if (board.__position__[piecePosition].type === "King" && turnCheck) {
-				kingListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
+				pawnListener(ctxHighlight, board, row, column, forwardMoves, lastSelectedPiece.isWhite);
+			} else if (lastSelectedPiece.type === "Rook" && turnCheck) {
+				rookListener(ctxHighlight, board, row, column);
+			} else if (lastSelectedPiece.type === "Knight" && turnCheck) {
+				knightListener(ctxHighlight, board, row, column);
+			} else if (lastSelectedPiece.type === "Bishop" && turnCheck) {
+				bishopListener(ctxHighlight, board, row, column);
+			} else if (lastSelectedPiece.type === "Queen" && turnCheck) {
+				queenListener(ctxHighlight, board, row, column);
+			} else if (lastSelectedPiece.type === "King" && turnCheck) {
+				kingListener(ctxHighlight, board, row, column);
 			}
 
 			//DEBUG
