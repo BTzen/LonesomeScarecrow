@@ -12,6 +12,7 @@
    <script type="text/javascript" src="pieceListeners.js"></script>
    <script type="text/javascript" src="ai.js"></script>
    <script type="text/javascript" src="chessboardScript.js" ></script>
+	 <script type="text/javascript" src="minimax.js"></script>	<!-- FOR TESTING PURPOSES -->
 </head>
 
 <body>
@@ -35,13 +36,13 @@
 			
 			<fieldset id="freeplayInfo">
 				<legend>Freeplay</legend>
-				<input type="button" value="Add" 
+				<input id="fpAddPiece" type="button" value="Add" 
 					onclick="addPiece($('select[name=fpIsWhite]').val(), $('select[name=fpPiece]').val(), $('select[name=fpRank]').val(), $('select[name=fpFile]').val())">
-				<select name="fpIsWhite">
+				<select id="fpIsWhite" name="fpIsWhite">
 					<option value="true">White</option>
 					<option value="false">Black</option>
 				</select>
-				<select name="fpPiece">
+				<select id="fpPiece" name="fpPiece">
 					<option value="Pawn">Pawn</option>
 					<option value="Rook">Rook</option>
 					<option value="Knight">Knight</option>
@@ -86,15 +87,26 @@
 	<script>
 		var listitemID = 1;	//so the remove button knows what list element to delete
 		var occupiedTiles = [];
+		var isWhiteKingPlaced = false;
+		var isBlackKingPlaced = false;
+		var whiteKingData = [];
+		var blackKingData = [];
+		
+		// TESTING STUFF
+		heuristic(true);
 		// GAMEPLAY
 		/* Add piece to board for freeplay
-		 * 
+		 * May not need to have isKingPlaced
 		*/
 		function addPiece(isWhite, pieceName, rank, file) {
 			var row = parseInt(rank);
 			var col = parseInt(file);
 			var color = isWhite == "true";
 			var piece;
+			
+			//for adding piece to the div
+			var file = $('select[name=fpFile] option:selected').text();
+			var rank = $('select[name=fpRank] option:selected').text();
 			
 			//add piece to board and backing data structure
 			switch (pieceName) {
@@ -115,25 +127,50 @@
 					break;
 				case "King":
 					piece = new King(color);
+					if (color) {
+						if (isWhiteKingPlaced) {
+							board.removePiece(whiteKingData[1], whiteKingData[2]);	//remove old king from board
+							removePiece(whiteKingData[0], file + rank);	//remove old king from list
+						}
+					
+						isWhiteKingPlaced = true;
+						whiteKingData = [listitemID, row, col];	
+					}
+					else {
+						if (isBlackKingPlaced) {
+							board.removePiece(blackKingData[1], blackKingData[2]);	//remove old king from board
+							removePiece(blackKingData[0], file + rank);	//remove old king from list
+						}
+						isBlackKingPlaced = true;
+						blackKingData = [listitemID, row, col];	
+					}
 					break;
 			}
-			//add piece to div
-			var file = $('select[name=fpFile] option:selected').text();
-			var rank = $('select[name=fpRank] option:selected').text();
 			
 			//make sure there's only 1 list entry per tile (eg. there can't be 2 different pieces at 'a1' simulataneously)
 			var tileIndex = -1;	//store index of the list item that's currently in the desired position
 			for (var i = 0; i < occupiedTiles.length; i++) { //mimic behaviour of .indexOf method, since that method doesn't work for complex arrays
-				if (occupiedTiles[i][1] == (file + rank))	tileIndex = i;
-				else tileIndex = -1;
+				if (occupiedTiles[i][1] == (file + rank))	{
+					tileIndex = i; 
+					break;
+				}
 			}
-			
-			if (tileIndex == -1) {	//may have compatibility issues with older browsers
-				occupiedTiles.push([listitemID, file + rank]);	//add the element to the occupiedTiles list if there's nothing at that tile position
-			}
-			else {
+			if (tileIndex != -1) {	//may have compatibility issues with older browsers
 				removePiece(occupiedTiles[tileIndex][0], occupiedTiles[tileIndex][1]); //remove the old piece and replace the list item currently at that position with the new 1
+				occupiedTiles.splice(tileIndex,1);	//remove item from array at that index
+				
+				//make the appropriate changes if the new piece is booting out a king
+				if (whiteKingData != null && whiteKingData[1] == row && whiteKingData[2] == col) {
+					isWhiteKingPlaced = false;
+					whiteKingData = null;
+				}
+				if (blackKingData != null && blackKingData[1] == row && blackKingData[2] == col) {
+					isBlackKingPlaced = false;
+					blackKingData = null;
+				}
 			}
+			occupiedTiles.push([listitemID, file + rank, pieceName]);		//add the element to the occupiedTiles list
+			console.log(listitemID + ', ' + (file + rank) + ', ' + pieceName);
 			board.placePiece(piece, row, col);	//overwrite the old piece if the user attempts to place another piece on an already occupied tile
 			
 			//append new entry to list
@@ -143,11 +180,20 @@
 			listitemID++;
 		}
 		
+		/* Remove piece from board and from backing data structure
+		*/
 		function removePiece(entryID, fileRankString) {
 			/*alert(entryID + ' ' + fileRankString);*/
 			var row = (8 - parseInt(fileRankString.substring(1,2)));
 			var col = parseInt(fileRankString.charCodeAt(0)) - 97; //97 reduces value of a to 0
-			board.removePiece(row, col);
+			board.removePiece(row, col);	//doesn't do anything if there isn't a piece at that location
+			
+			//remove piece from occupied tile list
+			for (var i = 0; i < occupiedTiles.length; i++) {
+				if (occupiedTiles[i][0] == entryID) {
+					occupiedTiles.splice(i,1);
+				}
+			}
 			$('#freeplayEntry' + entryID).parent().remove();	//delete list item
 		}
 		
@@ -169,6 +215,28 @@
 				alert("You can't give up if you haven't even started yet!");
 			}
 		}
+		
+		/* listener
+		*/
+		
+		/*$('#fpIsWhite').on('change', function() {
+			if ($(this).val() == "true" && !isWhiteKingPlaced)
+					$('#fpAddPiece').prop('disabled', false);
+			else if ($(this).val() == "false" && !isBlackKingPlaced)
+				$('#fpAddPiece').prop('disabled', false);
+			else 
+				$('#fpAddPiece').prop('disabled', true);
+		});
+		
+		$('#fpPiece').on('change', function() {
+			//console.log(isWhiteKingPlaced && $(this).val() == "King");
+			if ((isWhiteKingPlaced || isBlackKingPlaced) && $(this).val() == "King") {
+				$('#fpPiece').prop('disabled', true);
+			}
+			else {
+				$('#fpAddPiece').prop('disabled', false);
+			}
+		});*/
 	</script>
 </body>
 
