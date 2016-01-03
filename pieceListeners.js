@@ -1,57 +1,88 @@
 /*
  * Contains logic for piece behaviour
  */
+var isCheckingBoard = false;
 const ATK = "attack";
 const MOVE = "move"; 
  
 //FILL METHOD
 function fill(ctxHighlight, color, moveType, row, column) {
 	if (column > -1 && column < 8) {
-		if (isWhiteTurn) { //will need some sort of isAI var
-		   ctxHighlight.fillStyle = color;
-		   ctxHighlight.fillRect(column * LENGTH, row * LENGTH, LENGTH, LENGTH);
+		if (!isCheckingBoard) {
+			if (isWhiteTurn) { //will need some sort of isAI var
+				ctxHighlight.fillStyle = color;
+				ctxHighlight.fillRect(column * LENGTH, row * LENGTH, LENGTH, LENGTH);
+			}
+				highlightedTiles.push([moveType, row, column]);		
+		} else {
+			allHighlightedTiles.push([moveType, row, column]);	
 		}
-		highlightedTiles.push([moveType, row, column]);
 	}
 }
 
 //CHECK OPPONENT AND BOUNDS
-/*
- * row 
- * column 
-*/
-function validAttack(index, colourBool) {
-    if  (index > 63 || index < 0) { 
+function validAttack(row,column, colourBool) {
+    if  (row > 7 || row < 0 || column > 7 || column < 0) { 
         return false;
     } else {
-        return board.__position__[index].isWhite === colourBool;
+        return board.getPiece(row,column).isWhite === colourBool;
     }
 }
 
+//CHECK IF KING IS IN CHECK
+function inCheck() {
+	isCheckingBoard = true;
+	for (var i = 0; i < 8; i++) {
+		for (var j = 0; j < 8; j++) {
+			var checkPiece = board.getPiece(i,j);
+			if (checkPiece!==null && checkPiece.type !== "King") {
+				isWhiteTurn = !isWhiteTurn;
+				fakeChessPieceListener(ctxHighlight, ctxPiece, board, j*LENGTH, i*LENGTH);
+				isWhiteTurn = !isWhiteTurn;
+			} 
+			//check if the tiles that get highlightedTiles hits the king in that position
+		}	
+	}
+	allHighlightedTiles.forEach(function(item) {
+		var isAttack = item[0] === ATK;
+		if (isAttack){ //is it an attack tile
+			var isKing = board.getPiece(item[1],item[2]).type === "King";
+			if (isKing) { //is it attacking a king
+				alert("In check");
+				allHighlightedTiles = [];
+				isCheckingBoard = false;
+				return true;
+			}
+		}
+	});
+	allHighlightedTiles = [];
+	isCheckingBoard = false;
+	return false;
+	//if it does he is in check.
+}
+
 //PAWN
-function pawnListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition, forwardMoves, colourBool) {
+function pawnListener(ctxHighlight, board, row, column, forwardMoves, colourBool) {
     var attackFlag1 = false;
     var attackFlag2 = false;
 
     //check direction of pawn travels, same principle can be applied to see what can attack what
-    if (!board.__position__[piecePosition].isWhite) {
+    if (!board.getPiece(row,column).isWhite) {
         for (var i = 1; i <= forwardMoves; i++) {
-            //board represented as 1D array so the row # must be multiplied by the # of tiles in a row
             //tile in front of pawn is empty
 			
             // //next two ifs check for attack moves
-            if (board.__position__[piecePosition + 9] !== null && validAttack(piecePosition + 9, !colourBool) && !attackFlag1) {
-                //somewhere here we should check the team, maybe by passing in the isWhite boolean, 
+            if (board.getPiece(row+1,column+1) !== null && validAttack(row+1,column+1, !colourBool) && !attackFlag1) {
                 //then check if the highlighted piece is the opposite.
                 fill(ctxHighlight, LIGHT_RED, ATK, row + 1, column + 1);
                 attackFlag1 = true;
             }
-            if (board.__position__[piecePosition + 7] !== null && validAttack(piecePosition + 7, !colourBool) && !attackFlag2) {
+            if (board.getPiece(row+1,column-1) !== null && validAttack(row+1,column-1, !colourBool) && !attackFlag2) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row + 1, column - 1);
                 attackFlag2 = true;
             }
 			//move check
-            if (board.__position__[piecePosition + (i * 8)] === null) {
+            if (board.getPiece(row+i,column) === null) {
                 fill(ctxHighlight, MELLOW_YELLOW, MOVE, row + i, column);
             } else {
                 break;
@@ -60,18 +91,18 @@ function pawnListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePos
     } else {	// for white pieces
         for (var i = 1; i <= forwardMoves; i++) { 
 
-            if (board.__position__[piecePosition - 9] !== null && validAttack(piecePosition - 9, !colourBool) && !attackFlag1) {
+            if (board.getPiece(row-1,column-1) !== null && validAttack(row-1,column-1, !colourBool) && !attackFlag1) {
                 //somewhere here we should check the team, maybe by passing in the isWhite boolean, 
                 //then check if the highlighted piece is the opposite.
                 fill(ctxHighlight, LIGHT_RED, ATK, row - 1, column - 1);
                 attackFlag1 = true;
             }
-            if (board.__position__[piecePosition - 7] !== null && validAttack(piecePosition - 7, !colourBool) && !attackFlag2) {
+            if (board.getPiece(row-1,column+1) !== null && validAttack(row-1,column+1, !colourBool) && !attackFlag2) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row - 1, column + 1);
                 attackFlag2 = true;
             }
 
-            if (board.__position__[piecePosition - (i * 8)] === null) {
+            if (board.getPiece(row-i,column) === null) {
                 fill(ctxHighlight, MELLOW_YELLOW, MOVE, row - i, column);
             } else {
                 break;
@@ -81,8 +112,8 @@ function pawnListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePos
 }
 
 //ROOK
-function rookListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition) {
-    var colourBool = !board.__position__[piecePosition].isWhite;
+function rookListener(ctxHighlight, board, row, column) {
+    var colourBool = !board.getPiece(row,column).isWhite;
     var upFlag = false;
     var downFlag = false;
     var rightFlag = false;
@@ -91,38 +122,38 @@ function rookListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePos
     for (var i = 1; i <= 8; i++) {
         //additional boolean condition is in the if statement because without it, it checks 1 tile too far
         //RIGHT
-        if (board.__position__[piecePosition + (i * 8)] === null && !rightFlag) {
+        if (board.getPiece(row+i,column) === null && !rightFlag) {
             fill(ctxHighlight, MELLOW_YELLOW, MOVE, row + i, column);
         } else if (!rightFlag) {
             //ATTACK HIGHLIGHT, this will need to check isWhite
-            if (validAttack(piecePosition + (i * 8), colourBool)) {
+            if (validAttack(row+i,column, colourBool)) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row + i, column);
             }
             rightFlag = true;
         }
         //DOWN
-        if (board.__position__[piecePosition + i] === null && !downFlag) {
+        if (board.getPiece(row,column+i) === null && !downFlag) {
             fill(ctxHighlight, MELLOW_YELLOW, MOVE, row, column + i);
         } else if (!downFlag) {
-            if (validAttack(piecePosition + i, colourBool)) {
+            if (validAttack(row,column+i, colourBool)) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row, column + i);
             }
             downFlag = true;
         }
         //LEFT
-        if (board.__position__[piecePosition - (i * 8)] === null && !leftFlag) {
+        if (board.getPiece(row-i,column) === null && !leftFlag) {
             fill(ctxHighlight, MELLOW_YELLOW, MOVE, row - i, column);
         } else if (!leftFlag) {
-            if (validAttack(piecePosition - (i * 8), colourBool)) {
+            if (validAttack(row-i,column, colourBool)) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row - i, column);
             }
             leftFlag = true;
         }
         //UP
-        if (board.__position__[piecePosition - i] === null && !upFlag) {
+        if (board.getPiece(row,column-i) === null && !upFlag) {
             fill(ctxHighlight, MELLOW_YELLOW, MOVE, row, column - i);
         } else if (!upFlag) {
-            if (validAttack(piecePosition - i, colourBool)) {
+            if (validAttack(row,column-i, colourBool)) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row, column - i);
             }
             upFlag = true;
@@ -135,64 +166,64 @@ function rookListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePos
 }
 
 //KNIGHT
-function knightListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition) {
-    var colourBool = !board.__position__[piecePosition].isWhite;
+function knightListener(ctxHighlight, board, row, column) {
+    var colourBool = !board.getPiece(row,column).isWhite;
     //note to self row + i is down 
     //DOWNRIGHT
-    if (board.__position__[piecePosition + (16) + 1] === null) {
+    if (board.getPiece(row+2,column+1) === null) {
         fill(ctxHighlight, MELLOW_YELLOW, MOVE, row + 2, column + 1);
-    } else if (validAttack(piecePosition + (16) + 1, colourBool)) {
+    } else if (validAttack(row + 2, column+1, colourBool)) {
         //somewhere here we should check the team, maybe by passing in the isWhite boolean, 
         //then check if the highlighted piece is the opposite.
         fill(ctxHighlight, LIGHT_RED, ATK, row + 2, column + 1);
     }
     //DOWNLEFT
-    if (board.__position__[piecePosition + (16) - 1] === null) {
+    if (board.getPiece(row+2,column-1) === null) {
         fill(ctxHighlight, MELLOW_YELLOW, MOVE, row + 2, column - 1);
-    } else if (validAttack(piecePosition + (16) - 1, colourBool)) {
+    } else if (validAttack(row+2, column-1, colourBool)) {
         fill(ctxHighlight, LIGHT_RED, ATK, row + 2, column - 1);
     }
     //RIGHTDOWN
-    if (board.__position__[piecePosition + (8) + 2] === null) {
+    if (board.getPiece(row+1,column+2) === null) {
         fill(ctxHighlight, MELLOW_YELLOW, MOVE, row + 1, column + 2);
-    } else if (validAttack(piecePosition + (8) + 2, colourBool)) {
+    } else if (validAttack(row + 1, column + 2, colourBool)) {
         fill(ctxHighlight, LIGHT_RED, ATK, row + 1, column + 2);
     }
     //LEFTDOWN
-    if (board.__position__[piecePosition + (8) - 2] === null) {
+    if (board.getPiece(row+1,column-2) === null) {
         fill(ctxHighlight, MELLOW_YELLOW, MOVE, row + 1, column - 2);
-    } else if (validAttack(piecePosition + (8) - 2, colourBool)) {
+    } else if (validAttack(row + 1, column - 2, colourBool)) {
         fill(ctxHighlight, LIGHT_RED, ATK, row + 1, column - 2);
     }
     //UPRIGHT
-    if (board.__position__[piecePosition - (16) + 1] === null) {
+    if (board.getPiece(row-2,column+1) === null) {
         fill(ctxHighlight, MELLOW_YELLOW, MOVE, row - 2, column + 1);
-    } else if (validAttack(piecePosition - (16) + 1, colourBool)) {
+    } else if (validAttack(row-2, column + 1, colourBool)) {
         fill(ctxHighlight, LIGHT_RED, ATK, row - 2, column + 1);
     }
     //UPLEFT
-    if (board.__position__[piecePosition - (16) - 1] === null) {
+    if (board.getPiece(row-2,column-1) === null) {
         fill(ctxHighlight, MELLOW_YELLOW, MOVE, row - 2, column - 1);
-    } else if (validAttack(piecePosition - (16) - 1, colourBool)) {
+    } else if (validAttack(row - 2, column-1, colourBool)) {
         fill(ctxHighlight, LIGHT_RED, ATK, row - 2, column - 1);
     }
     //RIGHTUP
-    if (board.__position__[piecePosition - (8) + 2] === null) {
+    if (board.getPiece(row-1,column+2) === null) {
         fill(ctxHighlight, MELLOW_YELLOW, MOVE, row - 1, column + 2);
-    } else if (validAttack(piecePosition - (8) + 2, colourBool)) {
+    } else if (validAttack(row - 1, column + 2, colourBool)) {
         fill(ctxHighlight, LIGHT_RED, ATK, row - 1, column + 2);
     }
     //LEFTUP
-    if (board.__position__[piecePosition - (8) - 2] === null) {
+    if (board.getPiece(row-1,column-2) === null) {
         fill(ctxHighlight, MELLOW_YELLOW, MOVE, row - 1, column - 2);
-    } else if (validAttack(piecePosition - (8) - 2, colourBool)) {
+    } else if (validAttack(row - 1, column-2, colourBool)) {
         fill(ctxHighlight, LIGHT_RED, ATK, row - 1, column - 2);
     }
 }
 
 //BISHOP
-function bishopListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition) {
-    var colourBool = !board.__position__[piecePosition].isWhite;
+function bishopListener(ctxHighlight, board, row, column) {
+    var colourBool = !board.getPiece(row,column).isWhite;
     var uprightFlag = false;
     var downleftFlag = false;
     var downrightFlag = false;
@@ -201,38 +232,38 @@ function bishopListener(ctxHighlight, ctxPiece, board, x, y, row, column, pieceP
     for (var i = 1; i <= 8; i++) {
         //additional boolean condition is in the if statement because without it, it checks 1 tile too far
         //DOWNRIGHT
-        if (board.__position__[piecePosition + (i * 8) + i] === null && !downrightFlag) {
+        if (board.getPiece(row+i,column+i) === null && !downrightFlag) {
             fill(ctxHighlight, MELLOW_YELLOW, MOVE, row + i, column + i);
         } else if (!downrightFlag) {
             //ATTACK HIGHLIGHT, this will need to check isWhite
-            if (validAttack(piecePosition + (i * 8) + i, colourBool)) {
+            if (validAttack(row + i, column + i, colourBool)) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row + i, column + i);
             }
             downrightFlag = true;
         }
         //DOWNLEFT
-        if (board.__position__[piecePosition + (i * 8) - i] === null && !downleftFlag) {
+        if (board.getPiece(row+i,column-i) === null && !downleftFlag) {
             fill(ctxHighlight, MELLOW_YELLOW, MOVE, row + i, column - i);
         } else if (!downleftFlag) {
-            if (validAttack(piecePosition + (i * 8) - i, colourBool)) {
+            if (validAttack(row+i, column-i, colourBool)) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row + i, column - i);
             }
             downleftFlag = true;
         }
         //UPLEFT
-        if (board.__position__[piecePosition - (i * 8) - i] === null && !upleftFlag) {
+        if (board.getPiece(row-i,column-i) === null && !upleftFlag) {
             fill(ctxHighlight, MELLOW_YELLOW, MOVE, row - i, column - i);
         } else if (!upleftFlag) {
-            if (validAttack(piecePosition - (i * 8) - i, colourBool)) {
+            if (validAttack(row - i, column - i, colourBool)) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row - i, column - i);
             }
             upleftFlag = true;
         }
         //UPRIGHT
-        if (board.__position__[piecePosition - (i * 8) + i] === null && !uprightFlag) {
+        if (board.getPiece(row-i,column+i) === null && !uprightFlag) {
             fill(ctxHighlight, MELLOW_YELLOW, MOVE, row - i, column + i);
         } else if (!uprightFlag) {
-            if (validAttack(piecePosition - (i * 8) + i, colourBool)) {
+            if (validAttack(row-i,column+i, colourBool)) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row - i, column + i);
             }
             uprightFlag = true;
@@ -246,15 +277,15 @@ function bishopListener(ctxHighlight, ctxPiece, board, x, y, row, column, pieceP
 
 //QUEEN
 //Note: No special moves as far as I know so it just moves like a bishop + rook.
-function queenListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition) {
-    bishopListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-    rookListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
+function queenListener(ctxHighlight, board, row, column) {
+    bishopListener(ctxHighlight, board, row, column);
+    rookListener(ctxHighlight, board, row, column);
 }
 
 //KING
 //Note: I left all the methods in the king because he will have to have a lot more conditions added in the futre
-function kingListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition) {
-    var colourBool = !board.__position__[piecePosition].isWhite;
+function kingListener(ctxHighlight, board, row, column) {
+    var colourBool = !board.getPiece(row,column).isWhite;
     var uprightFlag = false;
     var downleftFlag = false;
     var downrightFlag = false;
@@ -266,76 +297,76 @@ function kingListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePos
 
     for (var i = 1; i <= 1; i++) { //could hard code it, change all i's to 1's
         //RIGHT
-        if (board.__position__[piecePosition + (i * 8)] === null && !rightFlag) {
+        if (board.getPiece(row+i,column) === null && !rightFlag) {
             fill(ctxHighlight, MELLOW_YELLOW, MOVE, row + i, column);
         } else if (!rightFlag) {
             //ATTACK HIGHLIGHT, this will need to check isWhite
-            if (validAttack(piecePosition + (i * 8), colourBool)) {
+            if (validAttack(row+i,column, colourBool)) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row + i, column);
             }
             rightFlag = true;
         }
         //DOWN
-        if (board.__position__[piecePosition + i] === null && !downFlag) {
+        if (board.getPiece(row,column+i) === null && !downFlag) {
             fill(ctxHighlight, MELLOW_YELLOW, MOVE, row, column + i);
         } else if (!downFlag) {
-            if (validAttack(piecePosition + i, colourBool)) {
+            if (validAttack(row,column+i, colourBool)) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row, column + i);
             }
             downFlag = true;
         }
         //LEFT
-        if (board.__position__[piecePosition - (i * 8)] === null && !leftFlag) {
+        if (board.getPiece(row-i,column) === null && !leftFlag) {
             fill(ctxHighlight, MELLOW_YELLOW, MOVE, row - i, column);
         } else if (!leftFlag) {
-            if (validAttack(piecePosition - (i * 8), colourBool)) {
+            if (validAttack(row-i,column, colourBool)) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row - i, column);
             }
             leftFlag = true;
         }
         //UP
-        if (board.__position__[piecePosition - i] === null && !upFlag) {
+        if (board.getPiece(row,column-i) === null && !upFlag) {
             fill(ctxHighlight, MELLOW_YELLOW, MOVE, row, column - i);
         } else if (!upFlag) {
-            if (validAttack(piecePosition - i, colourBool)) {
+            if (validAttack(row,column-i, colourBool)) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row, column - i);
             }
             upFlag = true;
         }
         //additional boolean condition is in the if statement because without it, it checks 1 tile too far
         //DOWNRIGHT
-        if (board.__position__[piecePosition + (i * 8) + i] === null && !downrightFlag) {
+        if (board.getPiece(row+i,column+i) === null && !downrightFlag) {
             fill(ctxHighlight, MELLOW_YELLOW, MOVE, row + i, column + i);
         } else if (!downrightFlag) {
             //ATTACK HIGHLIGHT, this will need to check isWhite
-            if (validAttack(piecePosition + (i * 8) + i, colourBool)) {
+            if (validAttack(row + i, column + i, colourBool)) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row + i, column + i);
             }
             downrightFlag = true;
         }
         //DOWNLEFT
-        if (board.__position__[piecePosition + (i * 8) - i] === null && !downleftFlag) {
+        if (board.getPiece(row+i,column-i) === null && !downleftFlag) {
             fill(ctxHighlight, MELLOW_YELLOW, MOVE, row + i, column - i);
         } else if (!downleftFlag) {
-            if (validAttack(piecePosition + (i * 8) - i, colourBool)) {
+            if (validAttack(row+i, column-i, colourBool)) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row + i, column - i);
             }
             downleftFlag = true;
         }
         //UPLEFT
-        if (board.__position__[piecePosition - (i * 8) - i] === null && !upleftFlag) {
+        if (board.getPiece(row-i,column-i) === null && !upleftFlag) {
             fill(ctxHighlight, MELLOW_YELLOW, MOVE, row - i, column - i);
         } else if (!upleftFlag) {
-            if (validAttack(piecePosition - (i * 8) - i, colourBool)) {
+            if (validAttack(row - i, column - i, colourBool)) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row - i, column - i);
             }
             upleftFlag = true;
         }
         //UPRIGHT
-        if (board.__position__[piecePosition - (i * 8) + i] === null && !uprightFlag) {
+        if (board.getPiece(row-i,column+i) === null && !uprightFlag) {
             fill(ctxHighlight, MELLOW_YELLOW, MOVE, row - i, column + i);
         } else if (!uprightFlag) {
-            if (validAttack(piecePosition - (i * 8) + i, colourBool)) {
+            if (validAttack(row-i,column+i, colourBool)) {
                 fill(ctxHighlight, LIGHT_RED, ATK, row - i, column + i);
             }
             uprightFlag = true;

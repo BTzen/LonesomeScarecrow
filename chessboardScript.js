@@ -1,6 +1,7 @@
 var isWhiteTurn = true;
 var isGameRunning = false;
 var highlightedTiles = [];
+var allHighlightedTiles = []; //for looking ahead at all possible moves in a ply.
 var lastSelectedPiece; // for moving pieces
 var lastRow, lastColumn; //
 var initialBoardState = [];
@@ -222,6 +223,11 @@ function reinit() {
 /**
 for every piece in the array I check if it has been clicked and do the corresponding highlighting
 */
+function fakeChessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
+	highlightedTiles = [];//reset
+	lastSelectedPiece = null;
+	chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
+}
 
 function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x + ' row col ' + y);
 	if (isGameRunning) {
@@ -256,6 +262,8 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x
 				lastSelectedPiece.hasMoved = true;
 			}
 			highlightedTiles = []; //reset which tiles are hightlighted each time this runs
+			//CHECK INCHECK HERE
+			inCheck();
 			//AI CALL HERE
 			if (!isWhiteTurn) { //prevent the AI from thinking it's its turn everytime. isAI will need to come in
 				//This is where you call the AI, after you make your move!
@@ -267,28 +275,27 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x
 			lastRow = row;
 			lastColumn = column;
 			highlightedTiles = [];
-
-			var piecePosition = (row * 8) + column;	//convert 2d indices to 1d for backing array
-			var turnCheck = board.__position__[piecePosition].isWhite === isWhiteTurn;
+			//var piecePosition = (row * 8) + column;	//convert 2d indices to 1d for backing array
+			
+			var turnCheck = lastSelectedPiece.isWhite === isWhiteTurn;
 			//check what kind of highlighting should take place based on the piece type
-			if (board.__position__[piecePosition].type === "Pawn" && turnCheck) {
+			if (lastSelectedPiece.type === "Pawn" && turnCheck) {
 				//if pawn hasn't moved, highlight up to 2 spaces forward
 				var forwardMoves = 2; //how many space the piece can potentially move forward
 				if (lastSelectedPiece.hasMoved) {
 					forwardMoves = 1;
 				}
-				//For some reason the rook couldn't define colourBool when passed board.__position__[piecePosition].isWhite, only left it for the pawn atm.
-				pawnListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition, forwardMoves, board.__position__[piecePosition].isWhite);
-			} else if (board.__position__[piecePosition].type === "Rook" && turnCheck) {
-				rookListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-			} else if (board.__position__[piecePosition].type === "Knight" && turnCheck) {
-				knightListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-			} else if (board.__position__[piecePosition].type === "Bishop" && turnCheck) {
-				bishopListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-			} else if (board.__position__[piecePosition].type === "Queen" && turnCheck) {
-				queenListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
-			} else if (board.__position__[piecePosition].type === "King" && turnCheck) {
-				kingListener(ctxHighlight, ctxPiece, board, x, y, row, column, piecePosition);
+				pawnListener(ctxHighlight, board, row, column, forwardMoves, lastSelectedPiece.isWhite);
+			} else if (lastSelectedPiece.type === "Rook" && turnCheck) {
+				rookListener(ctxHighlight, board, row, column);
+			} else if (lastSelectedPiece.type === "Knight" && turnCheck) {
+				knightListener(ctxHighlight, board, row, column);
+			} else if (lastSelectedPiece.type === "Bishop" && turnCheck) {
+				bishopListener(ctxHighlight, board, row, column);
+			} else if (lastSelectedPiece.type === "Queen" && turnCheck) {
+				queenListener(ctxHighlight, board, row, column);
+			} else if (lastSelectedPiece.type === "King" && turnCheck) {
+				kingListener(ctxHighlight, board, row, column);
 			}
 
 			//DEBUG
