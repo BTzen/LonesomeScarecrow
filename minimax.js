@@ -1,48 +1,82 @@
 var score;
-var nodeCount = 0;
+var nodeCount = -1;
+var currentScore = 0;
 
 function evaluate() {
-	nodeCount++;
-	/*
-	swtich(nodeCount){
-		case 0:
-			return 3;
+    nodeCount++;
+    switch(nodeCount) {
+        case 0:
+            currentScore = 3;
+			return currentScore;
 			break;
-		case 1:
-			return 4;
+        case 1:
+            currentScore = 12;
+			return currentScore;
 			break;
-	}
-	*/
-	return nodeCount;
+        case 2:
+            currentScore = 8;
+			return currentScore;
+			break;
+        case 3:
+            currentScore = 2;
+			return currentScore;
+			break;
+        case 4:
+            currentScore = 4;
+			return currentScore;
+			break;
+		case 5:
+            currentScore = 6;
+			return currentScore;
+			break;
+		case 6:
+            currentScore = 14;
+			return currentScore;
+			break;
+		case 7:
+            currentScore = 5;
+			return currentScore;
+			break;
+        case 8:
+            currentScore = 2;
+			return currentScore;
+			break;
+		default:
+			break;
+    }
+
+    return 1337;
 }
 
 function maxi(depth) {
-    if ( depth === 0 ){
-		console.log("Depth: " + depth + " || Max: " + nodeCount);
-		return evaluate();
-	}
+    if (depth === 0) {
+		currentScore = evaluate();
+        console.log("Depth: " + depth + " || Max: " + currentScore);
+        return currentScore;
+    }
     var max = Number.NEGATIVE_INFINITY;
-    for (var i = 0; i < 3; i ++) { //set all moves = 3 for dummy tree
-        score = mini( depth - 1 );
-        if( score > max )
+    for (var i = 0; i < 3; i++) { //set all moves = 3 for dummy tree
+        score = mini(depth - 1);
+        if (score > max)
             max = score;
     }
-	//console.log("Depth: " + depth + " || Max: " + max);
+    console.log("Depth: " + depth + " || Max: " + max);
     return max;
 }
- 
+
 function mini(depth) {
-    if ( depth === 0 ){ 
-		console.log("Depth: " + depth + " || Min: " + nodeCount);
-		return -evaluate();
-	}
+    if (depth === 0) {
+		currentScore = evaluate();
+        console.log("Depth: " + depth + " || Min: " + currentScore);
+        return currentScore;
+    }
     var min = Number.POSITIVE_INFINITY;
-    for (var i = 0; i < 3; i ++) {
-        score = maxi( depth - 1 );
-        if( score < min )
+    for (var i = 0; i < 3; i++) {
+        score = maxi(depth - 1);
+        if (score < min)
             min = score;
     }
-	//console.log("Depth: " + depth + " || Min: " + min);
+    console.log("Depth: " + depth + " || Min: " + min);
     return min;
 }
 
