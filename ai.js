@@ -2,6 +2,12 @@ var limit = 0;
 
 //RIGHT NOW ONLY WORKS WHEN AI IS BLACK
 function moveAIPiece(ctxHighlight, ctxPiece, board) {
+	var newBoard = jQuery.extend(true, {}, board);
+	var test = maxi(Number.NEGATIVE_INFINITY,Number.POSITIVE_INFINITY,2,newBoard);
+	//var test = mini(2);
+	//console.log(nodeCount);
+	console.log("Final Value: " + test);
+	
 	//while it's black's turn... will need to generalize this
 	while (!isWhiteTurn) { //NEED AN ISAI VAR I THINK
 		//while we haven't found a set a possible moves

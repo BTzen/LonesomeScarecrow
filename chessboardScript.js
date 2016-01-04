@@ -238,7 +238,8 @@ function fakeChessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 	chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
 }
 
-function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x + ' row col ' + y);
+function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { 
+	//console.log(x + ' row col ' + y); //debug
 	if (isGameRunning) {
 		var column = Math.floor(x / LENGTH);
 		var row = Math.floor(y / LENGTH);
@@ -308,10 +309,11 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x
 			}
 
 			//DEBUG
+			/*
 			highlightedTiles.forEach(function(item) {
 				console.log(item);
 			});
-
+*/
 		} else {	// player clicked off the piece
 			highlightedTiles = [];
 			isHighlighted = false;

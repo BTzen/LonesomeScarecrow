@@ -1,7 +1,10 @@
 var score;
 var nodeCount = -1;
 var currentScore = 0;
+var previousBoard;
 
+/*
+//THE REAL FUNCTIONS ARE COMMENTED OUT FOR NOW
 //COUNTS THE NUMBER OF A PIECE ON THE BOARD
 function countPieces (board, pieceName, isWhite) {
 	var count = 0;
@@ -16,52 +19,56 @@ function countPieces (board, pieceName, isWhite) {
 		}
 	}
 }
+*/
 
 //WEIGHT AND DIFFERENCE WILL BE SUMMED UP
 function evaluate(board) {
+	return Math.floor(Math.random() * (20 - 1 + 1)) + 1;
+	/*
 	var whitePawns = countPieces(board, "Pawn", true);
 	var blackPawns = countPieces(board, "Pawn", false);
 	return whitePawns - blackPawns;
+	*/
 }
 
-function maxi(alpha, beta, depth) {
+function maxi(alpha, beta, depth, board) {
     if (depth === 0) {
-        currentScore = evaluate();
+        currentScore = evaluate(board);
         console.log("Depth: " + depth + " || Max: " + currentScore);
-        return currentScore;
+        return [currentScore,board];
     }
     //var max = Number.NEGATIVE_INFINITY;
-    for (var i = 0; i < 3; i++) { //set all moves = 3 for dummy tree
-        score = mini(alpha, beta, depth - 1);
+    for (var i = 0; i < 3; i++) { //set all moves = 3 for dummy tree, this will be for each possible move
+        score = mini(alpha, beta, depth - 1, board)[0];
         if (score >= beta) {
-            return beta;
+            return [beta, board];
         }
         if (score > alpha) {
             alpha = score;
         }
     }
     console.log("Depth: " + depth + " || Max: " + alpha);
-    return alpha;
+    return [alpha, board];
 }
 
-function mini(alpha, beta, depth) {
+function mini(alpha, beta, depth, board) {
     if (depth === 0) {
-        currentScore = evaluate();
+        currentScore = evaluate(board);
         console.log("Depth: " + depth + " || Min: " + currentScore);
-        return currentScore;
+        return [currentScore,board];
     }
     //var min = Number.POSITIVE_INFINITY;
     for (var i = 0; i < 3; i++) {
-        score = maxi(alpha, beta, depth - 1);
+        score = maxi(alpha, beta, depth - 1,board)[0];
         if (score <= alpha) {
-            return alpha;
+            return [alpha, board];
         }
         if (score < beta) {
             beta = score;
         }
     }
     console.log("Depth: " + depth + " || Min: " + beta);
-    return beta;
+    return [beta, board];
 }
 
 
