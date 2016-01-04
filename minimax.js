@@ -1,3 +1,53 @@
+var score;
+var nodeCount = 0;
+
+function evaluate() {
+	nodeCount++;
+	/*
+	swtich(nodeCount){
+		case 0:
+			return 3;
+			break;
+		case 1:
+			return 4;
+			break;
+	}
+	*/
+	return nodeCount;
+}
+
+function maxi(depth) {
+    if ( depth === 0 ){
+		console.log("Depth: " + depth + " || Max: " + nodeCount);
+		return evaluate();
+	}
+    var max = Number.NEGATIVE_INFINITY;
+    for (var i = 0; i < 3; i ++) { //set all moves = 3 for dummy tree
+        score = mini( depth - 1 );
+        if( score > max )
+            max = score;
+    }
+	//console.log("Depth: " + depth + " || Max: " + max);
+    return max;
+}
+ 
+function mini(depth) {
+    if ( depth === 0 ){ 
+		console.log("Depth: " + depth + " || Min: " + nodeCount);
+		return -evaluate();
+	}
+    var min = Number.POSITIVE_INFINITY;
+    for (var i = 0; i < 3; i ++) {
+        score = maxi( depth - 1 );
+        if( score < min )
+            min = score;
+    }
+	//console.log("Depth: " + depth + " || Min: " + min);
+    return min;
+}
+
+
+/*
 var max; //alpha best explored option along path to root for max
 var min; //beta best explored option along path to root for min
 var ply = 2;	//tree depth + 1
@@ -26,8 +76,8 @@ var blackPieces = {
 //generate all possible states from current states
 //use heuristic to assign each child state a value
 
-/* score the gamestate
-*/
+// score the gamestate
+/*
 function heuristic(playerIsWhite) {
 	var val;	//summation of [pieceValue * (your pawns - their pawns)] for each piece type
 	var yourPieces = (playerIsWhite) ? whitePieces : blackPieces;
@@ -41,5 +91,5 @@ function successor() { //generate valid moves from current moves
 
 function utility() {  //maps end-game state (ie. win/loss/draw) to a score
 }
-
+*/
 //test if game is finished
