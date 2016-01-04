@@ -39,7 +39,20 @@
 	width: auto;
 }
 
+fieldset > * {
+	/*border: 1px dashed purple;*/
+	margin-bottom: 2px;
+	margin-top: 2px;
+}
+
+fieldset legend {	/* override styles for children*/
+	color: black;
+	margin: 0;
+}
+
 #freeplayInfo {
+	display: none;
+	/* margin-top: 600px; */
 	margin-left: 635px;
 	position: absolute;
 	height: 585px;
@@ -49,7 +62,7 @@
 #freeplayPieces {
 	border: 2px solid red;
 	font-size: 200%;
-	height: 500px;
+	height: 400px;
 	overflow: auto;
 }
 
@@ -57,18 +70,22 @@
 	width: 650px;
 }
 
-#gameInfo [type=button] {
+.fill {
 	display: table-cell;
-	margin-bottom: 2px;
 	width: 100%;
 }
 
-#gameInfo fieldset{
-	display: table;
-	margin-top: 620px;
-	/* margin-left: 635px; */
+#gameInfo [type=button] {
+	display: table-cell;
+	width: 100%;
+}
+
+#gameInfo {
+	display: table; /*display: none;*/
+	/* margin-top: 620px; */
+	margin-left: 635px;
 	padding-bottom: 0.75em;
-	padding-top: 0.75em;
+	/* padding-top: 0.75em; */
 	position: absolute;
 	width: 200px;
 }
@@ -78,6 +95,11 @@
 	font-size: 2.0em;
 	margin-left: 50px;	/* space before first letter */
 	letter-spacing: 54px; /* align letters over tiles */
+}
+
+ol {	/* override defaults */
+	margin:0;
+	margin-left: .5em; /* prevent numbers from running out of their container */
 }
 
 #rankNotation {
@@ -91,6 +113,7 @@
 }
 
 #turn {
+	visibility: hidden;
 	font-size: 2.5em;
 	margin-bottom: 10px;
 	margin-top: 0;

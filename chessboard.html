@@ -26,13 +26,14 @@
 			87654321
 		</div>
 		<div id="boardAndInfo">
-			<legend id="gameInfo">
-				<fieldset>
-					<input type="button" value="Surrender" onclick="surrenderListener()">
-					<input type="button" value="Start" onclick="startMatchEvent()">
-				</fieldset>
-			</legend>
 			
+			<fieldset id="gameInfo">
+				<legend>Options</legend>
+				<label>Select ply: </label><input type="number" id="uiPly" min="1" max="4" value="3">
+				<input type="button" value="Surrender" onclick="surrenderListener()">
+				<input type="button" value="Start" onclick="startMatchEvent()">
+				<input type="button" id="uiFreeplay" value="Freeplay" onclick="freeplayListener()">
+			</fieldset>
 			
 			<fieldset id="freeplayInfo">
 				<legend>Freeplay</legend>
@@ -76,7 +77,9 @@
 					<ol>
 					</ol>
 				</div>
+				<input type="button" class="fill" value="Exit Freeplay" onclick="exitFreeplayListener()">
 			</fieldset>
+			
 			<div id="board">
 				<canvas id="chessboard" width="600" height="600"></canvas>
 				<canvas id="highlight" width="600" height="600"></canvas>
@@ -93,7 +96,8 @@
 		var blackKingData = [];
 		
 		// TESTING STUFF
-		heuristic(true);
+		//heuristic(false);
+		
 		// GAMEPLAY
 		/* Add piece to board for freeplay
 		 * May not need to have isKingPlaced
@@ -201,42 +205,48 @@
 			isGameRunning = true;
 			
 			if (isGameRunning) {
-				//alert("The match has started!");
+				placePieces(true);
+				$('#turn').css('visibility', 'visible');
+				$('#uiFreeplay').attr('disabled', true);
+				alert("The match has started!");
 			}
 		}
 		
 		function surrenderListener() {
 			if (isGameRunning) {
 				//reset board to initial state
-				isGameRunning = false;alert("You're a loser!");
-				reinit();  // CALL ON START INSTEAD IN CASE AI SURRENDERS?!?!
+				isGameRunning = false; alert("You're a loser!");
+				$('#uiFreeplay').attr('disabled', false);
+				reinit(true);  // CALL ON START INSTEAD IN CASE AI SURRENDERS?!?!
 			}
 			else {
 				alert("You can't give up if you haven't even started yet!");
 			}
 		}
-		
-		/* listener
+		/* doesn't currently stop the game
 		*/
+		function freeplayListener() {
+			//
+			// hide normal fieldset and show the one for freeplay
+			$('#gameInfo').css('display', 'none');
+			$('#freeplayInfo').css('display', 'initial');
+			
+			// handle switching changes (ie. clear board, stop AI, etc.)
+			$('#turn').prop('display', 'none');
+			
+			board.clear(0, 0, 8, 8);
+		}
 		
-		/*$('#fpIsWhite').on('change', function() {
-			if ($(this).val() == "true" && !isWhiteKingPlaced)
-					$('#fpAddPiece').prop('disabled', false);
-			else if ($(this).val() == "false" && !isBlackKingPlaced)
-				$('#fpAddPiece').prop('disabled', false);
-			else 
-				$('#fpAddPiece').prop('disabled', true);
-		});
-		
-		$('#fpPiece').on('change', function() {
-			//console.log(isWhiteKingPlaced && $(this).val() == "King");
-			if ((isWhiteKingPlaced || isBlackKingPlaced) && $(this).val() == "King") {
-				$('#fpPiece').prop('disabled', true);
-			}
-			else {
-				$('#fpAddPiece').prop('disabled', false);
-			}
-		});*/
+		function exitFreeplayListener() {
+			// hide freeplay fieldset and show the std one
+			$('#freeplayInfo').css('display', 'none');
+			$('#gameInfo').css('display', 'initial');
+			
+			//clear board
+			board.clear(0, 0, 8, 8);
+			
+			$('#turn').css('visibility', 'hidden');
+		}
 	</script>
 </body>
 

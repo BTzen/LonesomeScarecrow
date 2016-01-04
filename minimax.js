@@ -33,7 +33,7 @@ function heuristic(playerIsWhite) {
 	var yourPieces = (playerIsWhite) ? whitePieces : blackPieces;
 	var theirPieces;
 	val = Pawn.prototype.value * (yourPieces["pawns"]);
-	alert(val);
+	//alert(val);
 }	
 
 function successor() { //generate valid moves from current moves

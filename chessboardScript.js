@@ -15,7 +15,7 @@ const LIGHT_RED = "rgba(255, 0, 0, 0.25)"
 
 //BOARD
 var board = {
-    __position__: [], // try not to use this outside that function
+    __position__: [], // try not to use this outside of board functions
 
     initializeBoard: function() {
         for (var i = 0, rankNum = 64; i < rankNum; i++) {
@@ -70,6 +70,15 @@ var board = {
 		ctxPiece.clearRect(column * LENGTH, row * LENGTH, LENGTH, LENGTH);	//remove image
 	},
 	
+	clear(initialRow, initialColumn, row, column) {
+		document.getElementById('chesspieces').getContext('2d').clearRect(initialColumn * LENGTH, initialRow * LENGTH, column * LENGTH, row * LENGTH);
+		//remove list items
+		$('#freeplayPieces ol').empty();
+		//clean the backing data structure
+		for (var i = 0; i < 64; i++) {
+			board.__position__[i] = null;
+		}
+	},
     // Find a piece on the board using row, column indices
     getPiece: function(row, column) {
         return this.__position__[column + row * 8];
@@ -183,7 +192,7 @@ function init() {
 
     //board stuff
     board.initializeBoard();
-    //placePieces(true);
+    
     //On click event will check what piece has been clicked
     canvasPieces.addEventListener('click', function(event) {
         ctxHighlight.clearRect(0, 0, LENGTH * 8, LENGTH * 8);
@@ -194,10 +203,10 @@ function init() {
     });
 }
 
-function reinit() {
+function reinit(playerIsWhite) {
 	// canvas = document.getElementById("chessboard");
-    canvasPieces = document.getElementById("chesspieces");
-    canvasHighlight = document.getElementById("highlight");
+    //canvasPieces = document.getElementById("chesspieces");
+    // canvasHighlight = document.getElementById("highlight");
 
 	/* account for fact that board may not be positioned in the top left corner of the page
 	 * border isn't counted with offset()
@@ -206,16 +215,16 @@ function reinit() {
     canvasTop = $('#board').offset().top;
 
     ctx = document.getElementById("chessboard").getContext('2d');
-    ctxPiece = canvasPieces.getContext('2d');
+    ctxPiece = document.getElementById("chesspieces").getContext('2d');
 	ctxPiece.font = PIECE_FONT;
-    ctxHighlight = canvasHighlight.getContext('2d');
+    ctxHighlight = document.getElementById("highlight").getContext('2d');
 
     //board stuff
 	for (var index = 16; index < 48; index++) {
 		   board.__position__[index] = null;
 	}
 	ctxPiece.clearRect(0, 0, LENGTH * 8, LENGTH * 8);	// remove piece images from board
-    placePieces(true);
+    placePieces(playerIsWhite);
 	
 	isWhiteTurn = true;	//white will always move first
 	document.getElementById('turn').innerHTML = "Turn: White";
