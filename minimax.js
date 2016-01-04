@@ -23,55 +23,65 @@ function countPieces (board, pieceName, isWhite) {
 
 //WEIGHT AND DIFFERENCE WILL BE SUMMED UP
 function evaluate(board) {
-	return Math.floor(Math.random() * (20 - 1 + 1)) + 1;
-	/*
-	var whitePawns = countPieces(board, "Pawn", true);
-	var blackPawns = countPieces(board, "Pawn", false);
-	return whitePawns - blackPawns;
-	*/
+    return Math.floor(Math.random() * (20 - 1 + 1)) + 1;
+    /*
+    var whitePawns = countPieces(board, "Pawn", true);
+    var blackPawns = countPieces(board, "Pawn", false);
+    return whitePawns - blackPawns;
+    */
 }
 
 function maxi(alpha, beta, depth, board) {
     if (depth === 0) {
         currentScore = evaluate(board);
-        console.log("Depth: " + depth + " || Max: " + currentScore);
-        return [currentScore,board];
+        //console.log("Depth: " + depth + " || Max: " + currentScore);
+        return [currentScore, board];
     }
     //var max = Number.NEGATIVE_INFINITY;
-    for (var i = 0; i < 3; i++) { //set all moves = 3 for dummy tree, this will be for each possible move
-        score = mini(alpha, beta, depth - 1, board)[0];
-        if (score >= beta) {
-            return [beta, board];
-        }
-        if (score > alpha) {
-            alpha = score;
+    for (var i = 0; i < 8; i++) { //set all moves = 3 for dummy tree, this will be for each possible move
+        for (var j = 0; j < 8; j++) {
+            if (board.getPiece(i, j) !== null) {
+				//get the highlights for this piece
+				//try the board at each highlight
+                //board.movePiece(i, j); //I need to move the piece here
+                score = mini(alpha, beta, depth - 1, board)[0];
+                if (score >= beta) {
+                    return [beta, board];
+                }
+                if (score > alpha) {
+                    alpha = score;
+                }
+            }
         }
     }
-    console.log("Depth: " + depth + " || Max: " + alpha);
+    //console.log("Depth: " + depth + " || Max: " + alpha);
     return [alpha, board];
 }
 
 function mini(alpha, beta, depth, board) {
     if (depth === 0) {
         currentScore = evaluate(board);
-        console.log("Depth: " + depth + " || Min: " + currentScore);
-        return [currentScore,board];
+        //console.log("Depth: " + depth + " || Min: " + currentScore);
+        return [currentScore, board];
     }
     //var min = Number.POSITIVE_INFINITY;
-    for (var i = 0; i < 3; i++) {
-        score = maxi(alpha, beta, depth - 1,board)[0];
-        if (score <= alpha) {
-            return [alpha, board];
-        }
-        if (score < beta) {
-            beta = score;
+    for (var i = 0; i < 8; i++) {
+        for (var j = 0; j < 8; j++) {
+            if (board.getPiece(i, j) !== null) {
+                //board.movePiece(i, j);
+                score = maxi(alpha, beta, depth - 1, board)[0];
+                if (score <= alpha) {
+                    return [alpha, board];
+                }
+                if (score < beta) {
+                    beta = score;
+                }
+            }
         }
     }
-    console.log("Depth: " + depth + " || Min: " + beta);
+    //console.log("Depth: " + depth + " || Min: " + beta);
     return [beta, board];
 }
-
-
 
 
 
@@ -107,7 +117,8 @@ function evaluate() {
             currentScore = 6;
             return currentScore;
             break;
-		*//*
+		*/
+/*
         case 4:
             currentScore = 14;
             return currentScore;
