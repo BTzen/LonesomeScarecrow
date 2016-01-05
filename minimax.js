@@ -32,6 +32,7 @@ function evaluate(board) {
 }
 
 function maxi(alpha, beta, depth, board) {
+    var board = jQuery.extend(true, {}, board);
     if (depth === 0) {
         currentScore = evaluate(board);
         //console.log("Depth: " + depth + " || Max: " + currentScore);
@@ -40,17 +41,33 @@ function maxi(alpha, beta, depth, board) {
     //var max = Number.NEGATIVE_INFINITY;
     for (var i = 0; i < 8; i++) { //set all moves = 3 for dummy tree, this will be for each possible move
         for (var j = 0; j < 8; j++) {
-            if (board.getPiece(i, j) !== null) {
-				//get the highlights for this piece
-				//try the board at each highlight
-                //board.movePiece(i, j); //I need to move the piece here
-                score = mini(alpha, beta, depth - 1, board)[0];
-                if (score >= beta) {
-                    return [beta, board];
-                }
-                if (score > alpha) {
-                    alpha = score;
-                }
+            var toMove = board.getPiece(i, j);
+			if (i === 0 && j ===0) {
+				console.log(toMove);
+			}
+            if (toMove !== null) {
+                //get the highlights for this piece
+                //try the board at each highlights
+                chessPieceListener(ctxHighlight, ctxPiece, board, i * LENGTH, j * LENGTH);
+                //var row = 0;
+                //var column = 0;
+				//console.log(highlightedTiles.length);
+                highlightedTiles.forEach(function(item) {
+                    var row = item[1] * LENGTH;
+                    var column = item[2] * LENGTH;
+					//move to one of the highlights
+                    board.movePiece(toMove, row, column);
+                    //switch turns next depth maybe
+                    score = mini(alpha, beta, depth - 1, board)[0];
+					board.movePiece(toMove, i, j); //I need to move back from where I came
+					//board.print(); //DEBUG
+                    if (score >= beta) {
+                        return [beta, board];
+                    }
+                    if (score > alpha) {
+                        alpha = score;
+                    }
+                });
             }
         }
     }
@@ -59,23 +76,37 @@ function maxi(alpha, beta, depth, board) {
 }
 
 function mini(alpha, beta, depth, board) {
+    var board = jQuery.extend(true, {}, board);
     if (depth === 0) {
         currentScore = evaluate(board);
         //console.log("Depth: " + depth + " || Min: " + currentScore);
         return [currentScore, board];
     }
-    //var min = Number.POSITIVE_INFINITY;
     for (var i = 0; i < 8; i++) {
         for (var j = 0; j < 8; j++) {
-            if (board.getPiece(i, j) !== null) {
-                //board.movePiece(i, j);
-                score = maxi(alpha, beta, depth - 1, board)[0];
-                if (score <= alpha) {
-                    return [alpha, board];
-                }
-                if (score < beta) {
-                    beta = score;
-                }
+            var toMove = board.getPiece(i, j);
+			if (i === 0 && j ===0) {
+				console.log(toMove);
+			}
+            if (toMove !== null) {
+                chessPieceListener(ctxHighlight, ctxPiece, board, i * LENGTH, j * LENGTH);
+                //var row = 0;
+                //var column = 0;
+                highlightedTiles.forEach(function(item) {
+                    var row = item[1] * LENGTH;
+                    var column = item[2] * LENGTH;
+                    board.movePiece(toMove, row, column);
+                    //might have to switch turns, doesn't look like it
+                    score = maxi(alpha, beta, depth - 1, board)[0];
+					board.movePiece(toMove, i, j);
+					//board.print(); //DEBUG
+                    if (score <= alpha) {
+                        return [alpha, board];
+                    }
+                    if (score < beta) {
+                        beta = score;
+                    }
+                });
             }
         }
     }
