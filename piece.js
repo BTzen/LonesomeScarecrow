@@ -1,5 +1,5 @@
 //object constructor
-var Piece = function(type, isWhite, unicode, x, y) {
+var Piece = function(type, isWhite, unicode) {
 	//warns the user if a Piece object is instantiated
 	if (this.__proto__ === Piece.prototype) {
 		alert("Piece is intended as an abstract class and should not be instantiated.");
@@ -16,80 +16,48 @@ Piece.prototype.toString = function() {
 	return ((this.isWhite) ? "White " : "Black ") + this.type;
 }
 
-//PAWN
-function Pawn(isWhite, x, y) {
+function Pawn(isWhite) {
 	//call superclass constructor.  Note that the constructor must pass the child object's context (ie. this)
-	Piece.call(this, "Pawn", isWhite, (isWhite) ? "9817" : "9823", x, y);
+	Piece.call(this, "Pawn", isWhite, (isWhite) ? "9817" : "9823");
 	this.hasMoved = false;
 }
-
-//PAWN METHODS 
-
 //make Pawn inherit from Piece (might only be necessary if we want piece to have functions)
 Pawn.prototype = Object.create(Piece.prototype);	//creates empty object with given prototype
 Pawn.prototype.value = 1;	//make all chess pieces share same value (ie. what the piece is worth)
 
-Pawn.prototype.move = function(x, y) {
-	//move pawn
-	// if (Piece.isValidMove(newRow, newColumn) && ) {
-		// alert("");
-	// }	
-};
-//KNIGHT
-
-function Knight(isWhite, x, y) {
-	Piece.call(this, "Knight", isWhite, (isWhite) ? "9816" : "9822", x, y);
+function Knight(isWhite) {
+	Piece.call(this, "Knight", isWhite, (isWhite) ? "9816" : "9822");
 }
-
 Knight.prototype = Object.create(Piece.prototype);
 Knight.prototype.value = 3;
 
-//KNIGHT METHODS
-
-//BISHOP
-
-function Bishop(isWhite, x, y) {
-	Piece.call(this, "Bishop", isWhite, (isWhite) ? "9815" : "9821", x, y);
+function Bishop(isWhite) {
+	Piece.call(this, "Bishop", isWhite, (isWhite) ? "9815" : "9821");
 }
 
 Bishop.prototype = Object.create(Piece.prototype);
 Bishop.prototype.value = 3;
 
-//BISHOP METHODS
-Bishop.prototype.move = function () {};
-
-//ROOK
-
-function Rook(isWhite, x, y) {
-	Piece.call(this, "Rook", isWhite, (isWhite) ? "9814": "9820", x, y);
+function Rook(isWhite) {
+	Piece.call(this, "Rook", isWhite, (isWhite) ? "9814": "9820");
+	this.hasMoved = false;
 }
 
 Rook.prototype = Object.create(Piece.prototype);
 Rook.prototype.value = 5;
 
-//ROOK METHODS
-Rook.prototype.move = function () {};
-
-//QUEEN
-
-function Queen(isWhite, x, y) {
-	Piece.call(this, "Queen", isWhite, (isWhite) ? "9813": "9819", x, y);
+function Queen(isWhite) {
+	Piece.call(this, "Queen", isWhite, (isWhite) ? "9813": "9819");
 }
 
 Queen.prototype = Object.create(Piece.prototype);
 Queen.prototype.value = 9;
 
-//QUEEN METHODS
-Queen.prototype.move = function () {};
-
-//KING
-
-function King(isWhite, x, y) {
-	Piece.call(this, "King", isWhite, (isWhite) ? "9812" : "9818", x, y); 
+function King(isWhite) {
+	Piece.call(this, "King", isWhite, (isWhite) ? "9812" : "9818");
+	this.hasMoved = false;
+	this.isInCheck = false;
 }
 
 King.prototype = Object.create(Piece.prototype);
 King.prototype.value = Number.MAX_VALUE;
-
-//KING METHODS
-King.prototype.move = function() {};

@@ -23,7 +23,8 @@ function moveAIPiece(ctxHighlight, ctxPiece, board) {
 			var piecePosition = (y * 8) + x;
 			//look for a piece on the board, at least a 1/64 of getting one
 			//while we haven't found a piece
-			while (board.__position__[piecePosition]=== null) {
+			var piecePosLimit = 100;
+			while (board.__position__[piecePosition] === null && limit++ < piecePosLimit) {
 				x = Math.floor(Math.random() * 8);
 				y = Math.floor(Math.random() * 8);
 				piecePosition = (y * 8) + x;
@@ -38,10 +39,10 @@ function moveAIPiece(ctxHighlight, ctxPiece, board) {
 				x = item[2] * LENGTH;
 			});
 			
-			if (limit > 10000) {
-				alert("I give up");
+			if (limit > 100) { //was 10k
+				// alert("I give up");
 				isWhiteTurn= !isWhiteTurn; //CHANGE THIS TO AN AI VAR
-				isGameRunning = false;
+				/*isGameRunning = false;*/
 				//init(); //RESET HERE
 				break;
 			}
@@ -49,8 +50,9 @@ function moveAIPiece(ctxHighlight, ctxPiece, board) {
 		limit = 0;
 		
 		//depending on the piece type take the greedy move! (which is the furthest highlighted tile)
-		if (board.__position__[piecePosition].type === "Pawn") {
-				chessPieceListener(ctxHighlight, ctxPiece, board, x, y);	
+		if (board.__position__[piecePosition] !== null) {
+			if (board.__position__[piecePosition].type === "Pawn") {
+			chessPieceListener(ctxHighlight, ctxPiece, board, x, y);	
 			} else if (board.__position__[piecePosition].type === "Rook") {
 				chessPieceListener(ctxHighlight, ctxPiece, board, x, y);	
 			} else if (board.__position__[piecePosition].type === "Knight") {
@@ -62,7 +64,7 @@ function moveAIPiece(ctxHighlight, ctxPiece, board) {
 			} else if (board.__position__[piecePosition].type === "King") {
 				chessPieceListener(ctxHighlight, ctxPiece, board, x, y);	
 			}
-		
+		}
 	}
 	
 }
