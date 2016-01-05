@@ -1,11 +1,10 @@
-/*
- * Contains logic for piece behaviour
+/* Contains logic for piece behaviour
+ * 
  */
 var isCheckingBoard = false;
 const ATK = "attack";
 const MOVE = "move"; 
  
-//FILL METHOD
 function fill(ctxHighlight, color, moveType, row, column) {
 	if (column > -1 && column < 8 && row > -1 && row < 8) {
 		if (!isCheckingBoard) {
@@ -21,9 +20,9 @@ function fill(ctxHighlight, color, moveType, row, column) {
 }
 
 //CHECK OPPONENT AND BOUNDS
-function validAttack(row,column, colourBool) {
+function validAttack(row, column, colourBool) {
 	var toAttack = board.getPiece(row,column);
-	if (toAttack!== null) {
+	if (toAttack !== null) {
 		if  (row > 7 || row < 0 || column > 7 || column < 0) { 
 			return false;
 		} else {
@@ -52,15 +51,17 @@ function inCheck(kingIsWhite) {
 	
 	for (var index = 0; index < allHighlightedTiles.length; index++) {
 		var currentElement = allHighlightedTiles[index];
-		if (currentElement[0] === ATK){ //is it an attack tile
-			var isKing = board.getPiece(currentElement[1], currentElement[2]).type === "King";
-			if (isKing) { //is it attacking a king
-				alert("In check");
-				//board.getPiece(item[1],item[2]).isInCheck = true; //may not even use this
-				allHighlightedTiles = [];
-				isCheckingBoard = false;
-				isInCheck = true;
-				break;
+		if (currentElement !== null && currentElement[0] === ATK) { //is it an attack tile
+
+			if ((board.getPiece(currentElement[1], currentElement[2])) !== null) {	
+				if (boardboard.getPiece(currentElement[1], currentElement[2]).type === "King") { //is it attacking a king
+					alert("In check");
+					//board.getPiece(item[1],item[2]).isInCheck = true; //may not even use this
+					allHighlightedTiles = [];
+					isCheckingBoard = false;
+					isInCheck = true;
+					break;
+				}
 			}
 		}
 	}
@@ -70,7 +71,7 @@ function inCheck(kingIsWhite) {
 	return isInCheck;
 }
 
-/* Checks both rooks
+/* Checks if castling is possible with rook at given position
  * technically a king move
 */
 function castlingCheck(rookRow, rookCol) {
@@ -144,54 +145,60 @@ function castlingCheck(rookRow, rookCol) {
 	return canCastle;
 }
 
+/*
+ * row the row of the pawn that moves 2 spaces forward, post move(and the one that is potentially vulnerable to en passant)
+ * col the column of said pawn
+*/
+function enPassantCheck(row, column) {
+	//capturing pawn must be on its 5th rank before executing the maneuver
+	//check for pawns immediate to the right and left of the pawn that moved
+	var rightAdjacentPiece = board.getPiece(row, col + 1);
+	var leftAdjacentPiece = board.getPiece(row, col + 1);
+	
+	if (leftAdjacentPiece !== null && leftAdjacentPiece.type === "Pawn") {
+		
+	}
+	//must be done on turn immediately after captured pawn moves 2 spaces forward
+	
+	//move capturing pawn to same position it would be in if the captured pawn only moved one square forward
+}
+
 //PAWN
 function pawnListener(ctxHighlight, board, row, column, forwardMoves, colourBool) {
     var attackFlag1 = false;
     var attackFlag2 = false;
 
     //check direction of pawn travels, same principle can be applied to see what can attack what
-    if (!board.getPiece(row,column).isWhite) {
-        for (var i = 1; i <= forwardMoves; i++) {
-            //tile in front of pawn is empty
-			
-            // //next two ifs check for attack moves
-            if (board.getPiece(row+1,column+1) !== null && validAttack(row+1,column+1, !colourBool) && !attackFlag1) {
-                //then check if the highlighted piece is the opposite.
-                fill(ctxHighlight, LIGHT_RED, ATK, row + 1, column + 1);
-                attackFlag1 = true;
-            }
-            if (board.getPiece(row+1,column-1) !== null && validAttack(row+1,column-1, !colourBool) && !attackFlag2) {
-                fill(ctxHighlight, LIGHT_RED, ATK, row + 1, column - 1);
-                attackFlag2 = true;
-            }
-			//move check
-            if (board.getPiece(row+i,column) === null) {
-                fill(ctxHighlight, MELLOW_YELLOW, MOVE, row + i, column);
-            } else {
-                break;
-            }
-        }
-    } else {	// for white pieces
-        for (var i = 1; i <= forwardMoves; i++) { 
+    var sign = 1;	// allows reuse of code for different colours. -ve sign for white and +ve for black
+	if (board.getPiece(row,column).isWhite) { sign *= -1; }
+		
+	for (var i = 1; i <= forwardMoves; i++) {
+		//tile in front of pawn is empty
+		
+		/* next two ifs check for attack moves
+		 * 1st if for attacking right, 2nd for left
+		 * condition following OR is for en passant
+		*/
+		if ((board.getPiece(row+(1*sign),column+1) !== null && validAttack(row+(1*sign),column+1, !colourBool) && !attackFlag1) || 
+		(board.getPiece(row, column+1) !== null && pawnTwoSquaresRowCol !== null && pawnTwoSquaresRowCol[0] === row && pawnTwoSquaresRowCol[1] === column+1))
+		{
+			fill(ctxHighlight, LIGHT_RED, ATK, row + (1 * sign), column + 1);
+			attackFlag1 = true;
+		}
+		if ((board.getPiece(row + (1*sign),column-1) !== null && validAttack(row + (1*sign), column-1, !colourBool) && !attackFlag2) || 
+		(board.getPiece(row, column-1) !== null && pawnTwoSquaresRowCol !== null && pawnTwoSquaresRowCol[0] === row && pawnTwoSquaresRowCol[1] === column-1))
+		{
+			fill(ctxHighlight, LIGHT_RED, ATK, row + (1*sign), column - 1);
+			attackFlag2 = true;
+		}
 
-            if (board.getPiece(row-1,column-1) !== null && validAttack(row-1,column-1, !colourBool) && !attackFlag1) {
-                //somewhere here we should check the team, maybe by passing in the isWhite boolean, 
-                //then check if the highlighted piece is the opposite.
-                fill(ctxHighlight, LIGHT_RED, ATK, row - 1, column - 1);
-                attackFlag1 = true;
-            }
-            if (board.getPiece(row-1,column+1) !== null && validAttack(row-1,column+1, !colourBool) && !attackFlag2) {
-                fill(ctxHighlight, LIGHT_RED, ATK, row - 1, column + 1);
-                attackFlag2 = true;
-            }
-
-            if (board.getPiece(row-i,column) === null) {
-                fill(ctxHighlight, MELLOW_YELLOW, MOVE, row - i, column);
-            } else {
-                break;
-            }
-        }
-    }
+		//move check
+		if (board.getPiece(row+(i*sign),column) === null) {
+			fill(ctxHighlight, MELLOW_YELLOW, MOVE, row + (i*sign), column);
+		} else {
+			break;
+		}
+	}
 }
 
 //ROOK

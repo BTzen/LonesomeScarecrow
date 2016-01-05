@@ -8,6 +8,7 @@ var lastSelectedPiece; // for moving pieces
 var lastRow, lastColumn; //
 var initialBoardState = [];
 var ctxPieces;// = document.getElementById('chesspieces').getContext('2d');	//the context that the pieces are drawn on - used EVERYWHERE
+var pawnTwoSquaresRowCol = null;	//array to hold pos of last pawn that moved 2 squares after moving
 
 const LENGTH = 75;
 const OFFSET = 10;
@@ -81,7 +82,7 @@ var board = {
 	/* Convenience method to remove the image and update the array on piece removal
 	*/
 	removePiece(row, column) {
-		ctxPiece = document.getElementById('chesspieces').getContext('2d');
+		//ctxPiece = document.getElementById('chesspieces').getContext('2d');
 		board.__position__[column + row * 8] = null;	//remove from data structure
 		ctxPiece.clearRect(column * LENGTH, row * LENGTH, LENGTH, LENGTH);	//remove image
 	},
@@ -292,15 +293,30 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 		});
 		//console.log('prev. coords ' + lastRow + ' ' + lastColumn);
 
-		//deal with movement
+		//deal with movement - piece selected last turn; time to move!
 		if (isHighlighted && !isMiniMaxCheckingBoard) {
 			
 			if (isHighlighted[0] == ATK) {
-				 ctxPiece.clearRect(isHighlighted[2] * LENGTH, isHighlighted[1] * LENGTH, LENGTH, LENGTH); 
+				// if the attack square is empty then en passant must have just occured
+				if (board.getPiece(isHighlighted[1], isHighlighted[2]) === null)
+					board.removePiece(row-1, column);
+				else
+					ctxPiece.clearRect(isHighlighted[2] * LENGTH, isHighlighted[1] * LENGTH, LENGTH, LENGTH); //remove old piece image
 			}
 			//move the piece corresponding to that highlighted pattern to the selected location 
 			board.movePiece(lastSelectedPiece, row, column);
 			
+			if (pawnTwoSquaresRowCol !== null) pawnTwoSquaresRowCol = null;
+			// en passant check
+			if (lastSelectedPiece !== null && lastSelectedPiece.type == "Pawn") {
+				//check for 2 square move
+				if (Math.abs(lastRow - row) === 2) {
+					lastSelectedPiece.hasMovedTwoSquaresLastTurn = true;
+					pawnTwoSquaresRowCol = [row, column];
+				}
+			}
+			
+			// Castling check
 			if (lastSelectedPiece.type === "King") {
 				if (isCastlingLeft) {
 					//castle only if the castling square was selected ie. king was moved 2 spaces towards rook
@@ -320,6 +336,7 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 					}
 				}
 			}
+			
 			//works for rooks at least
 			if (lastSelectedPiece.type === "Pawn" || lastSelectedPiece.type === "Rook" || lastSelectedPiece.type === "King") {
 				lastSelectedPiece.hasMoved = true;
@@ -357,7 +374,6 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 			lastRow = row;
 			lastColumn = column;
 			highlightedTiles = [];
-			//var piecePosition = (row * 8) + column;	//convert 2d indices to 1d for backing array
 			
 			var turnCheck = true;//lastSelectedPiece.isWhite === isWhiteTurn;
 			//check what kind of highlighting should take place based on the piece type
