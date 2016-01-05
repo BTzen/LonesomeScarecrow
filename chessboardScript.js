@@ -49,11 +49,13 @@ var board = {
             }
         }
         board.__position__[y + x * 8] = piece; //update array that backs the piece canvas
-        var canvasPieces = document.getElementById('chesspieces');
-        var ctxPiece = canvasPieces.getContext('2d');
-        ctxPiece.clearRect(lastColumn * LENGTH, lastRow * LENGTH, LENGTH, LENGTH); //erase old piece
-        ctxPiece.fillText(String.fromCharCode(piece.unicode), y * LENGTH, (x + 1) * LENGTH - OFFSET); //draw piece at required spot
-		isWhiteTurn = !isWhiteTurn;
+		if (!isMiniMaxCheckingBoard){
+			var canvasPieces = document.getElementById('chesspieces');
+			var ctxPiece = canvasPieces.getContext('2d');
+			ctxPiece.clearRect(lastColumn * LENGTH, lastRow * LENGTH, LENGTH, LENGTH); //erase old piece
+			ctxPiece.fillText(String.fromCharCode(piece.unicode), y * LENGTH, (x + 1) * LENGTH - OFFSET); //draw piece at required spot
+			isWhiteTurn = !isWhiteTurn;
+		}
 		
 		//update turn info on HTML page
 		if (isWhiteTurn) { 
@@ -94,6 +96,14 @@ var board = {
         //console.log(this.getPiece(rank,file));
         return (this.getPiece(row, column));
     },
+	
+	print: function() {
+		for (var i = 0; i < 64; i++){
+			if (board.__position__[i] !== null && board.__position__[i].type === "Rook") {
+				console.log(board.__position__[i]);
+			}
+		}
+	}
 	
 	/* Convert std. chess notation into something that can be used to index the positions of the backing data structure
 	 * 
@@ -238,7 +248,8 @@ function fakeChessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 	chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
 }
 
-function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x + ' row col ' + y);
+function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { 
+	//console.log(x + ' row col ' + y); //debug
 	if (isGameRunning) {
 		var column = Math.floor(x / LENGTH);
 		var row = Math.floor(y / LENGTH);
@@ -254,7 +265,7 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x
 		//console.log('prev. coords ' + lastRow + ' ' + lastColumn);
 
 		//deal with movement
-		if (isHighlighted) {
+		if (isHighlighted && !isMiniMaxCheckingBoard) {
 			
 			if (isHighlighted[0] == ATK) {
 				//alert(ATK);
@@ -308,10 +319,11 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { console.log(x
 			}
 
 			//DEBUG
+			/*
 			highlightedTiles.forEach(function(item) {
 				console.log(item);
 			});
-
+*/
 		} else {	// player clicked off the piece
 			highlightedTiles = [];
 			isHighlighted = false;
