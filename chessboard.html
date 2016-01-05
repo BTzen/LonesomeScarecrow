@@ -10,9 +10,9 @@
 	 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> <!--for crossbrowser compatibility-->
    <script type="text/javascript" src="piece.js"></script>
    <script type="text/javascript" src="pieceListeners.js"></script>
+   <script type="text/javascript" src="minimax.js"></script>
    <script type="text/javascript" src="ai.js"></script>
    <script type="text/javascript" src="chessboardScript.js" ></script>
-	 <script type="text/javascript" src="minimax.js"></script>	<!-- FOR TESTING PURPOSES -->
 </head>
 
 <body>
@@ -174,7 +174,7 @@
 				}
 			}
 			occupiedTiles.push([listitemID, file + rank, pieceName]);		//add the element to the occupiedTiles list
-			console.log(listitemID + ', ' + (file + rank) + ', ' + pieceName);
+			//console.log(listitemID + ', ' + (file + rank) + ', ' + pieceName); //debug
 			board.placePiece(piece, row, col);	//overwrite the old piece if the user attempts to place another piece on an already occupied tile
 			
 			//append new entry to list
@@ -247,6 +247,15 @@
 			
 			$('#turn').css('visibility', 'hidden');
 		}
+	</script>
+	<script>
+	/*
+		var newBoard = jQuery.extend(true, {}, board);
+		var test = maxi(Number.NEGATIVE_INFINITY,Number.POSITIVE_INFINITY,2,newBoard);
+		//var test = mini(2);
+		//console.log(nodeCount);
+		console.log("Final Value: " + test);
+		*/
 	</script>
 </body>
 

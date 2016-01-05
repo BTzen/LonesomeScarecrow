@@ -1,7 +1,17 @@
 var limit = 0;
+var isMiniMaxCheckingBoard = false;
 
 //RIGHT NOW ONLY WORKS WHEN AI IS BLACK
 function moveAIPiece(ctxHighlight, ctxPiece, board) {
+	isMiniMaxCheckingBoard = true;
+	var newBoard = jQuery.extend(true, {}, board);
+	var test = maxi(Number.NEGATIVE_INFINITY,Number.POSITIVE_INFINITY,2,newBoard);
+	//var test = mini(2);
+	//console.log(nodeCount);
+	console.log("Final Value: " + test);
+	isMiniMaxCheckingBoard = false;
+	ctxHighlight.clearRect(0, 0, LENGTH * 8, LENGTH * 8);
+	
 	//while it's black's turn... will need to generalize this
 	while (!isWhiteTurn) { //NEED AN ISAI VAR I THINK
 		//while we haven't found a set a possible moves
@@ -54,4 +64,5 @@ function moveAIPiece(ctxHighlight, ctxPiece, board) {
 			}
 		
 	}
+	
 }

@@ -22,11 +22,14 @@ function fill(ctxHighlight, color, moveType, row, column) {
 
 //CHECK OPPONENT AND BOUNDS
 function validAttack(row,column, colourBool) {
-    if  (row > 7 || row < 0 || column > 7 || column < 0) { 
-        return false;
-    } else {
-        return board.getPiece(row,column).isWhite === colourBool;
-    }
+	var toAttack = board.getPiece(row,column);
+	if (toAttack!== null) {
+		if  (row > 7 || row < 0 || column > 7 || column < 0) { 
+			return false;
+		} else {
+			return board.getPiece(row,column).isWhite === colourBool;
+		}		
+	}
 }
 
 //CHECK IF KING IS IN CHECK
