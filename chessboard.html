@@ -80,7 +80,7 @@
 				</div>
 				<input type="radio" name="fpPlayerMovesBlack" value="true" checked="checked">Player controls black
 				<input type="radio" name="fpPlayerMovesBlack" value="false">AI controls black
-				<input type="button" class="uiStart fill" value="Start" onclick="freeplayStart()">
+				<input type="button" id="fpStart" class="uiStart fill" value="Start" onclick="freeplayStart()">
 				<input type="button" class="uiSurrender fill" value="Surrender" onclick="surrenderListener()" disabled>
 				<input type="button" class="fill alignBottom" value="Exit Freeplay" onclick="exitFreeplayListener()">
 			</fieldset>
@@ -265,6 +265,13 @@
 				//reset board to initial state
 				isGameRunning = false; alert("You're a loser!");
 				$('#uiPly').attr('disabled', false);
+				
+				//freeplay options
+				if ($('#freeplayInfo').css('display') == "initial") {
+					$('#fpAddPiece').attr('disabled', false);
+					$('#fpStart').attr('disabled', false);
+				}
+				
 				$('#uiFreeplay').attr('disabled', false);
 				$('.uiSurrender').attr('disabled', true);
 				$('.uiStart').attr('disabled', false);	//error
@@ -289,12 +296,18 @@
 		}
 		
 		function freeplayStart() {
+			//disable piece adding functionality
+			$('#fpAddPiece').prop('disabled', true);
+			$('#fpStart').attr('disabled', true);
+			
 			var playerMovesBlack = ($('input[name=fpPlayerMovesBlack]:checked').val() == "true");
 			if (playerMovesBlack) {
-				
+				isFreeplayTest = true;
+				isGameRunning = true;	//required to prevent start match alert from popping up
+				alert("freeplay testing has begun")
 			}
 			else {
-				
+				alert("freeplay match has begun");
 			}
 		}
 		

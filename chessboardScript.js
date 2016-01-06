@@ -2,6 +2,7 @@ var isWhiteTurn = true;
 var isGameRunning = false;
 var isCastlingLeft = false;
 var isCastlingRight = false;
+var isFreeplayTest = false;		//allows user to move both white and black pieces in freeplay with highlighting for both pieces
 var highlightedTiles = [];
 var allHighlightedTiles = []; //for looking ahead at all possible moves in a ply.
 var lastSelectedPiece; // for moving pieces
@@ -59,7 +60,8 @@ var board = {
 			var ctxPiece = canvasPieces.getContext('2d');
 			ctxPiece.clearRect(lastColumn * LENGTH, lastRow * LENGTH, LENGTH, LENGTH); //erase old piece
 			ctxPiece.fillText(String.fromCharCode(piece.unicode), column * LENGTH, (row + 1) * LENGTH - OFFSET); //draw piece at required spot
-		    isWhiteTurn = !isWhiteTurn;
+		    //if (!playerMovesBlack)
+				isWhiteTurn = !isWhiteTurn;
 		}
 		
 		//update turn info on HTML page
@@ -361,7 +363,7 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 			lastColumn = column;
 			highlightedTiles = [];
 			
-			var turnCheck = lastSelectedPiece.isWhite === isWhiteTurn;
+			var turnCheck = true;//lastSelectedPiece.isWhite === isWhiteTurn;
 			//check what kind of highlighting should take place based on the piece type
 			if (lastSelectedPiece.type === "Pawn" && turnCheck) {
 				//if pawn hasn't moved, highlight up to 2 spaces forward
