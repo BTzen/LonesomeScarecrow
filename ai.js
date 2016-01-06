@@ -1,15 +1,16 @@
 var isMiniMaxCheckingBoard = false;
 
 //RIGHT NOW ONLY WORKS WHEN AI IS BLACK
-function moveAIPiece(ctxHighlight, ctxPiece, board) {
+function moveAIPiece(ctxHighlight, ctxPiece, testBoard) {
     isMiniMaxCheckingBoard = true;
-    var newBoard = jQuery.extend(true, {}, board);
+    var newBoard = jQuery.extend(true, {}, testBoard);
     var test = maxi(Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, 1, newBoard);
     //var test = mini(Number.NEGATIVE_INFINITY,Number.POSITIVE_INFINITY,2,newBoard);
     //I sometimes lose a piece at 0,0
     //var test = mini(2);
     //console.log(nodeCount);
     console.log("Value: " + test + ", and piece is:" + newBoard.getPiece(test[2], test[3]));
+	testBoard = jQuery.extend(true, {}, newBoard);
     isMiniMaxCheckingBoard = false;
     //ctxHighlight.clearRect(0, 0, LENGTH * 8, LENGTH * 8);
 	isWhiteTurn = false;
@@ -34,7 +35,7 @@ function moveAIPiece(ctxHighlight, ctxPiece, board) {
 			*/
 			
             //try this piece once you see that is exists
-            chessPieceListener(ctxHighlight, ctxPiece, board, y * LENGTH, x * LENGTH);
+            chessPieceListener(ctxHighlight, ctxPiece, testBoard, y * LENGTH, x * LENGTH);
 			x = test[4] * LENGTH;
 			y = test[5] * LENGTH;
 			//piecePosition = (x * 8) + y;
@@ -57,7 +58,9 @@ function moveAIPiece(ctxHighlight, ctxPiece, board) {
 			
         //}
 
-		chessPieceListener(ctxHighlight, ctxPiece, board, y, x);
+		chessPieceListener(ctxHighlight, ctxPiece, testBoard, y, x);
+		console.log("testBoard!!");
+		
         //depending on the piece type take the greedy move! (which is the furthest highlighted tile)
 		/*
         if (board.__position__[piecePosition].type === "Pawn") {

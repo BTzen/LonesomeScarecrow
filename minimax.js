@@ -37,7 +37,8 @@ function evaluate(board) {
 }
 
 function maxi(alpha, beta, depth, board) {
-    var board = jQuery.extend(true, {}, board);
+	var oldBoard = jQuery.extend(true, {}, board);
+    var newBoard = jQuery.extend(true, {}, oldBoard);
     if (depth === 0) {
         currentScore = evaluate(board);
         //console.log("Depth: " + depth + " || Max: " + currentScore);
@@ -50,12 +51,12 @@ function maxi(alpha, beta, depth, board) {
             if (toMove !== null && !toMove.isWhite) { //Maximize black
                 //get the highlights for this piece
                 //try the board at each highlights
-                chessPieceListener(ctxHighlight, ctxPiece, board, j * LENGTH, i * LENGTH);
+                chessPieceListener(ctxHighlight, ctxPiece, newBoard, j * LENGTH, i * LENGTH);
                 highlightedTiles.forEach(function(item) {
                     nextRow = item[1];
                     nextColumn = item[2];
 					//move to one of the highlights
-                    board.movePiece(toMove, nextRow, nextColumn);
+                    newBoard.movePiece(toMove, nextRow, nextColumn);
 					//Check the mini depth
                     score = mini(alpha, beta, depth - 1, board)[0];
 					//Reset to return the proper next move
@@ -64,7 +65,8 @@ function maxi(alpha, beta, depth, board) {
 					currentRow = i;
 					currentColumn = j;
 					//I NEED TO DO UNDO ATTACK
-					board.movePiece(toMove, currentRow, currentColumn); //I need to move back from where I came
+					//board.movePiece(toMove, currentRow, currentColumn); //I need to move back from where I came
+					board = jQuery.extend(true, {}, oldBoard);
 					//board.print(); //DEBUG
                     if (score >= beta) {
                         return [beta, board, currentRow, currentColumn, nextRow, nextColumn];
@@ -81,7 +83,8 @@ function maxi(alpha, beta, depth, board) {
 }
 
 function mini(alpha, beta, depth, board) {
-    var board = jQuery.extend(true, {}, board);
+	var oldBoard = jQuery.extend(true, {}, board);
+    var board = jQuery.extend(true, {}, oldBoard);
     if (depth === 0) {
         currentScore = -evaluate(board);
         //console.log("Depth: " + depth + " || Min: " + currentScore);
@@ -91,19 +94,20 @@ function mini(alpha, beta, depth, board) {
         for (var j = 0; j < 8; j++) {
             var toMove = board.getPiece(i, j);
             if (toMove !== null && toMove.isWhite) {
-                chessPieceListener(ctxHighlight, ctxPiece, board, j * LENGTH, i * LENGTH);
+                chessPieceListener(ctxHighlight, ctxPiece, newBoard, j * LENGTH, i * LENGTH);
                 highlightedTiles.forEach(function(item) {
                     nextRow = item[1];
                     nextColumn = item[2];
 					//move to one of the highlights
-                    board.movePiece(toMove, nextRow, nextColumn);
+                    newBoard.movePiece(toMove, nextRow, nextColumn);
                     //might have to switch turns, doesn't look like it
                     score = maxi(alpha, beta, depth - 1, board)[0];
 					nextRow = item[1];
                     nextColumn = item[2];
 					currentRow = i;
 					currentColumn = j;
-					board.movePiece(toMove, currentRow, currentColumn); //I need to move back from where I came
+					//board.movePiece(toMove, currentRow, currentColumn); //I need to move back from where I came
+					board = jQuery.extend(true, {}, oldBoard);
 					//board.print(); //DEBUG
                     if (score <= alpha) {
                         return [alpha, board, currentRow, currentColumn, nextRow, nextColumn];
