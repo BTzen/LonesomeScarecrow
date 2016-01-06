@@ -20,6 +20,7 @@ function Pawn(isWhite) {
 	//call superclass constructor.  Note that the constructor must pass the child object's context (ie. this)
 	Piece.call(this, "Pawn", isWhite, (isWhite) ? "9817" : "9823");
 	this.hasMoved = false;
+	this.movedTwoSquaresLastTurn = false;
 }
 //make Pawn inherit from Piece (might only be necessary if we want piece to have functions)
 Pawn.prototype = Object.create(Piece.prototype);	//creates empty object with given prototype
