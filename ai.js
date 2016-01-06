@@ -4,7 +4,7 @@ var isMiniMaxCheckingBoard = false;
 function moveAIPiece(ctxHighlight, ctxPiece, testBoard) {
     isMiniMaxCheckingBoard = true;
     var newBoard = jQuery.extend(true, {}, testBoard);
-	var test = maxi(Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, 3);
+	var test = maxi(Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, 3, testBoard);
     //I sometimes lose a piece at 0,0
     //var test = mini(2);
 	console.log(nodeCount);
