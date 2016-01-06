@@ -260,20 +260,21 @@
 		function surrenderListener() {
 			if (isGameRunning) {
 				//reset board to initial state
-				isGameRunning = false; alert("You're a loser!");
+				isGameRunning = false;
 				$('#uiPly').attr('disabled', false);
-				
-				//freeplay options
-				if ($('#freeplayInfo').css('display') == "initial") {
-					$('#fpAddPiece').attr('disabled', false);
-					$('#fpStart').attr('disabled', false);
-				}
-				
 				$('#uiFreeplay').attr('disabled', false);
 				$('.uiSurrender').attr('disabled', true);
 				$('.uiStart').attr('disabled', false);
+				//alert($('#freeplayInfo').css('display'));
+				//freeplay options
+				if ($('#freeplayInfo').css('display') == "block") {
+					$('#fpAddPiece').attr('disabled', false);
+				}
+				else {
+					reinit(true);  // CALL ON START INSTEAD IN CASE AI SURRENDERS?!?!
+				  alert("You're a loser!");
+				}
 				document.getElementById('highlight').getContext('2d').clearRect(0,0, LENGTH * 8, LENGTH * 8);
-				reinit(true);  // CALL ON START INSTEAD IN CASE AI SURRENDERS?!?!
 			}
 			else {
 				alert("You can't give up if you haven't even started yet!");
