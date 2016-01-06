@@ -4,7 +4,7 @@ var isMiniMaxCheckingBoard = false;
 function moveAIPiece(ctxHighlight, ctxPiece, testBoard) {
     isMiniMaxCheckingBoard = true;
     var newBoard = jQuery.extend(true, {}, testBoard);
-    var test = maxi(Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, 3, newBoard);
+    var test = maxi(Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, 2, newBoard);
     //var test = mini(Number.NEGATIVE_INFINITY,Number.POSITIVE_INFINITY,2,newBoard);
     //I sometimes lose a piece at 0,0
     //var test = mini(2);
@@ -16,7 +16,7 @@ function moveAIPiece(ctxHighlight, ctxPiece, testBoard) {
 	isWhiteTurn = false;
 	var limit = 0;
     //while it's black's turn... will need to generalize this
-    while (!isWhiteTurn) { //NEED AN ISAI VAR I THINK
+    //while (!isWhiteTurn) { //NEED AN ISAI VAR I THINK
         //while we haven't found a set a possible moves
         //while (highlightedTiles.length == 0) {
             limit++;
@@ -33,7 +33,7 @@ function moveAIPiece(ctxHighlight, ctxPiece, testBoard) {
                 piecePosition = (y * 8) + x;
             }
 			*/
-			
+			//reset clicker
             //try this piece once you see that is exists
             chessPieceListener(ctxHighlight, ctxPiece, board, y * LENGTH, x * LENGTH);
 			x = test[4] * LENGTH;
@@ -47,7 +47,7 @@ function moveAIPiece(ctxHighlight, ctxPiece, testBoard) {
                 x = item[2] * LENGTH;
             });
 			*/
-			
+			/*
             if (limit > 10000) {
                 alert("I give up");
                 isWhiteTurn = !isWhiteTurn; //CHANGE THIS TO AN AI VAR
@@ -55,7 +55,7 @@ function moveAIPiece(ctxHighlight, ctxPiece, testBoard) {
                 //init(); //RESET HERE
                 break;
             }
-			
+			*/
         //}
 
 		chessPieceListener(ctxHighlight, ctxPiece, board, y, x);
@@ -79,6 +79,6 @@ function moveAIPiece(ctxHighlight, ctxPiece, testBoard) {
 		}
 		*/
 
-    }
+    //}
 
 }

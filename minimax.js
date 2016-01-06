@@ -47,7 +47,7 @@ function maxi(alpha, beta, depth, testboard) {
     //var max = Number.NEGATIVE_INFINITY;
     for (var i = 0; i < 8; i++) { //for each possible move
         for (var j = 0; j < 8; j++) {
-            var toMove = testboard.getPiece(i, j);
+            var toMove = newBoard.getPiece(i, j);
             if (toMove !== null && !toMove.isWhite) { //Maximize black
                 //get the highlights for this piece
                 //try the board at each highlights
@@ -58,7 +58,7 @@ function maxi(alpha, beta, depth, testboard) {
 					//move to one of the highlights
                     newBoard.movePiece(toMove, nextRow, nextColumn);
 					//Check the mini depth
-                    score = mini(alpha, beta, depth - 1, testboard)[0];
+                    score = mini(alpha, beta, depth - 1, newBoard)[0];
 					//Reset to return the proper next move
 					nextRow = item[1];
                     nextColumn = item[2];
@@ -101,7 +101,7 @@ function mini(alpha, beta, depth, testboard) {
 					//move to one of the highlights
                     newBoard.movePiece(toMove, nextRow, nextColumn);
                     //might have to switch turns, doesn't look like it
-                    score = maxi(alpha, beta, depth - 1, testboard)[0];
+                    score = maxi(alpha, beta, depth - 1, newBoard)[0];
 					nextRow = item[1];
                     nextColumn = item[2];
 					currentRow = i;
