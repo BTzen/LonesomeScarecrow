@@ -294,8 +294,7 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 		//console.log('prev. coords ' + lastRow + ' ' + lastColumn);
 
 		//deal with movement - piece selected last turn; time to move!
-		if (isHighlighted && !isMiniMaxCheckingBoard) {
-			
+		if (isHighlighted && !isMiniMaxCheckingBoard) {		
 			if (isHighlighted[0] == ATK) {
 				// if the attack square is empty then en passant must have just occured
 				if (board.getPiece(isHighlighted[1], isHighlighted[2]) === null)
