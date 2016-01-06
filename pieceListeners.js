@@ -41,9 +41,9 @@ function inCheck(kingIsWhite) {
 		for (var j = 0; j < 8; j++) {
 			var checkPiece = board.getPiece(i,j);	//do I need to check em all if I have even 1?
 			if (checkPiece !== null && checkPiece.isWhite !== kingIsWhite && checkPiece.type !== "King") {
-				isWhiteTurn = !isWhiteTurn;
+				//isWhiteTurn = !isWhiteTurn;
 				fakeChessPieceListener(ctxHighlight, ctxPiece, board, i*LENGTH, j*LENGTH);	//indirectly pushes all the moves of every piece that can put the king in check into allHighlightedTiles
-				isWhiteTurn = !isWhiteTurn;
+				//isWhiteTurn = !isWhiteTurn;
 			} 
 			//check if the tiles that get highlightedTiles hits the king in that position
 		}	
