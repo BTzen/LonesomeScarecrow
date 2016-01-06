@@ -47,14 +47,14 @@ var board = {
         var temp;
         var i = 0;
         for (; i < 64; i++) {
-            if (piece == board.__position__[i]) {
-                temp = board.__position__[i];
-                board.__position__[i] = null; //remove that piece from its old index
+            if (piece == this.__position__[i]) {
+                temp = this.__position__[i];
+                this.__position__[i] = null; //remove that piece from its old index
 				break;
             }
         }
 // <<<<<<< Updated upstream
-        board.__position__[column + row * 8] = piece; //update array that backs the piece canvas
+        this.__position__[column + row * 8] = piece; //update array that backs the piece canvas
 		if (!isMiniMaxCheckingBoard){
 			var canvasPieces = document.getElementById('chesspieces');
 			var ctxPiece = canvasPieces.getContext('2d');
@@ -93,7 +93,7 @@ var board = {
 		$('#freeplayPieces ol').empty();
 		//clean the backing data structure
 		for (var i = 0; i < 64; i++) {
-			board.__position__[i] = null;
+			this.__position__[i] = null;
 		}
 	},
     // Find a piece on the board using row, column indices
@@ -117,14 +117,15 @@ var board = {
         return (this.__position__[column + row * 8]);
     },
 	
+	/*
 	print: function() {
 		for (var i = 0; i < 64; i++){
-			if (board.__position__[i] !== null && board.__position__[i].type === "Rook") {
+			if (this.__position__[i] !== null && board.__position__[i].type === "Rook") {
 				console.log(board.__position__[i]);
 			}
 		}
 	}
-	
+	*/
 	/* Convert std. chess notation into something that can be used to index the positions of the backing data structure
 	 * 
 	*/
@@ -365,7 +366,10 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 			//AI CALL HERE
 			 if (!isWhiteTurn) { //prevent the AI from thinking it's its turn everytime. isAI will need to come in
 				// //This is where you call the AI, after you make your move!
-				 moveAIPiece(ctxHighlight, ctxPiece, board);
+				 console.log("break one");
+			     var oldBoard = jQuery.extend(true, {}, board);
+				 moveAIPiece(ctxHighlight, ctxPiece, oldBoard);
+				 console.log("break");
 			 }
 		}
 		//check if player clicked on a piece and highlight the appropriate tiles in response

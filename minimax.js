@@ -27,7 +27,7 @@ function countPieces (board, pieceName, isWhite) {
 */
 
 //WEIGHT AND DIFFERENCE WILL BE SUMMED UP
-function evaluate(board) {
+function evaluate(testboard) {
     return Math.floor(Math.random() * (20 - 1 + 1)) + 1;
     /*
     var whitePawns = countPieces(board, "Pawn", true);
@@ -36,18 +36,18 @@ function evaluate(board) {
     */
 }
 
-function maxi(alpha, beta, depth, board) {
-	var oldBoard = jQuery.extend(true, {}, board);
+function maxi(alpha, beta, depth, testboard) {
+	var oldBoard = jQuery.extend(true, {}, testboard);
     var newBoard = jQuery.extend(true, {}, oldBoard);
     if (depth === 0) {
-        currentScore = evaluate(board);
+        currentScore = evaluate(testboard);
         //console.log("Depth: " + depth + " || Max: " + currentScore);
-        return [currentScore, board, currentRow, currentColumn, nextRow, nextColumn];
+        return [currentScore, testboard, currentRow, currentColumn, nextRow, nextColumn];
     }
     //var max = Number.NEGATIVE_INFINITY;
     for (var i = 0; i < 8; i++) { //for each possible move
         for (var j = 0; j < 8; j++) {
-            var toMove = board.getPiece(i, j);
+            var toMove = testboard.getPiece(i, j);
             if (toMove !== null && !toMove.isWhite) { //Maximize black
                 //get the highlights for this piece
                 //try the board at each highlights
@@ -58,7 +58,7 @@ function maxi(alpha, beta, depth, board) {
 					//move to one of the highlights
                     newBoard.movePiece(toMove, nextRow, nextColumn);
 					//Check the mini depth
-                    score = mini(alpha, beta, depth - 1, board)[0];
+                    score = mini(alpha, beta, depth - 1, testboard)[0];
 					//Reset to return the proper next move
 					nextRow = item[1];
                     nextColumn = item[2];
@@ -69,7 +69,7 @@ function maxi(alpha, beta, depth, board) {
 					board = jQuery.extend(true, {}, oldBoard);
 					//board.print(); //DEBUG
                     if (score >= beta) {
-                        return [beta, board, currentRow, currentColumn, nextRow, nextColumn];
+                        return [beta, testboard, currentRow, currentColumn, nextRow, nextColumn];
                     }
                     if (score > alpha) {
                         alpha = score;
@@ -79,20 +79,20 @@ function maxi(alpha, beta, depth, board) {
         }
     }
     //console.log("Depth: " + depth + " || Max: " + alpha);
-    return [alpha, board, currentRow, currentColumn, nextRow, nextColumn];
+    return [alpha, testboard, currentRow, currentColumn, nextRow, nextColumn];
 }
 
-function mini(alpha, beta, depth, board) {
-	var oldBoard = jQuery.extend(true, {}, board);
-    var board = jQuery.extend(true, {}, oldBoard);
+function mini(alpha, beta, depth, testboard) {
+	var oldBoard = jQuery.extend(true, {}, testboard);
+    var newBoard = jQuery.extend(true, {}, oldBoard);
     if (depth === 0) {
-        currentScore = -evaluate(board);
+        currentScore = evaluate(testboard);
         //console.log("Depth: " + depth + " || Min: " + currentScore);
-        return [currentScore, board, currentRow, currentColumn, nextRow, nextColumn];
+        return [currentScore, testboard, currentRow, currentColumn, nextRow, nextColumn];
     }
     for (var i = 0; i < 8; i++) {
         for (var j = 0; j < 8; j++) {
-            var toMove = board.getPiece(i, j);
+            var toMove = testboard.getPiece(i, j);
             if (toMove !== null && toMove.isWhite) {
                 chessPieceListener(ctxHighlight, ctxPiece, newBoard, j * LENGTH, i * LENGTH);
                 highlightedTiles.forEach(function(item) {
@@ -101,7 +101,7 @@ function mini(alpha, beta, depth, board) {
 					//move to one of the highlights
                     newBoard.movePiece(toMove, nextRow, nextColumn);
                     //might have to switch turns, doesn't look like it
-                    score = maxi(alpha, beta, depth - 1, board)[0];
+                    score = maxi(alpha, beta, depth - 1, testboard)[0];
 					nextRow = item[1];
                     nextColumn = item[2];
 					currentRow = i;
@@ -110,7 +110,7 @@ function mini(alpha, beta, depth, board) {
 					board = jQuery.extend(true, {}, oldBoard);
 					//board.print(); //DEBUG
                     if (score <= alpha) {
-                        return [alpha, board, currentRow, currentColumn, nextRow, nextColumn];
+                        return [alpha, testboard, currentRow, currentColumn, nextRow, nextColumn];
                     }
                     if (score < beta) {
                         beta = score;
@@ -120,5 +120,5 @@ function mini(alpha, beta, depth, board) {
         }
     }
     //console.log("Depth: " + depth + " || Min: " + beta);
-    return [beta, board, currentRow, currentColumn, nextRow, nextColumn];
+    return [beta, testboard, currentRow, currentColumn, nextRow, nextColumn];
 }

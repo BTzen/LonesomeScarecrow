@@ -4,7 +4,7 @@ var isMiniMaxCheckingBoard = false;
 function moveAIPiece(ctxHighlight, ctxPiece, testBoard) {
     isMiniMaxCheckingBoard = true;
     var newBoard = jQuery.extend(true, {}, testBoard);
-    var test = maxi(Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, 1, newBoard);
+    var test = maxi(Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, 3, newBoard);
     //var test = mini(Number.NEGATIVE_INFINITY,Number.POSITIVE_INFINITY,2,newBoard);
     //I sometimes lose a piece at 0,0
     //var test = mini(2);
@@ -35,7 +35,7 @@ function moveAIPiece(ctxHighlight, ctxPiece, testBoard) {
 			*/
 			
             //try this piece once you see that is exists
-            chessPieceListener(ctxHighlight, ctxPiece, testBoard, y * LENGTH, x * LENGTH);
+            chessPieceListener(ctxHighlight, ctxPiece, board, y * LENGTH, x * LENGTH);
 			x = test[4] * LENGTH;
 			y = test[5] * LENGTH;
 			//piecePosition = (x * 8) + y;
@@ -58,7 +58,7 @@ function moveAIPiece(ctxHighlight, ctxPiece, testBoard) {
 			
         //}
 
-		chessPieceListener(ctxHighlight, ctxPiece, testBoard, y, x);
+		chessPieceListener(ctxHighlight, ctxPiece, board, y, x);
 		console.log("testBoard!!");
 		
         //depending on the piece type take the greedy move! (which is the furthest highlighted tile)
