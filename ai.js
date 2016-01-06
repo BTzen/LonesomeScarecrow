@@ -1,17 +1,15 @@
 var isMiniMaxCheckingBoard = false;
+var treeDepth = null;
 
 //RIGHT NOW ONLY WORKS WHEN AI IS BLACK
 function moveAIPiece(ctxHighlight, ctxPiece, testBoard) {
     isMiniMaxCheckingBoard = true;
     var newBoard = jQuery.extend(true, {}, testBoard);
 	var test = maxi(Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, 3, testBoard);
-    //I sometimes lose a piece at 0,0
-    //var test = mini(2);
 	console.log(nodeCount);
 	console.log("Final Value: " + test);
 	testBoard = jQuery.extend(true, {}, newBoard);
     isMiniMaxCheckingBoard = false;
-    //ctxHighlight.clearRect(0, 0, LENGTH * 8, LENGTH * 8);
 	isWhiteTurn = false;
 	var limit = 0;
     //while it's black's turn... will need to generalize this
@@ -59,5 +57,4 @@ function moveAIPiece(ctxHighlight, ctxPiece, testBoard) {
 
 		chessPieceListener(ctxHighlight, ctxPiece, board, y, x);
 		console.log("testBoard!!");
-
 }

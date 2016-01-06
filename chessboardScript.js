@@ -348,11 +348,11 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 			inCheck(lastSelectedPiece.isWhite);
 			//AI CALL HERE
 			 if (!isWhiteTurn) { //prevent the AI from thinking it's its turn everytime. isAI will need to come in
-				// //This is where you call the AI, after you make your move!
-				 console.log("break one");
-			     var oldBoard = jQuery.extend(true, {}, board);
-				 moveAIPiece(ctxHighlight, ctxPiece, oldBoard);
-				 console.log("break");
+				//This is where you call the AI, after you make your move!
+				//console.log("break one");
+			    var oldBoard = jQuery.extend(true, {}, board);
+				moveAIPiece(ctxHighlight, ctxPiece, oldBoard);
+				//console.log("break");
 			 }
 		}
 		//check if player clicked on a piece and highlight the appropriate tiles in response
