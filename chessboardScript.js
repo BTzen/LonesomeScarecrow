@@ -1,10 +1,14 @@
 var isWhiteTurn = true;
 var isGameRunning = false;
+var isCastlingLeft = false;
+var isCastlingRight = false;
 var highlightedTiles = [];
 var allHighlightedTiles = []; //for looking ahead at all possible moves in a ply.
 var lastSelectedPiece; // for moving pieces
 var lastRow, lastColumn; //
 var initialBoardState = [];
+var ctxPieces;// = document.getElementById('chesspieces').getContext('2d');	//the context that the pieces are drawn on - used EVERYWHERE
+var pawnTwoSquaresRowCol = null;	//array to hold pos of last pawn that moved 2 squares after moving
 
 const LENGTH = 75;
 const OFFSET = 10;
@@ -38,24 +42,34 @@ var board = {
         //console.log('Piece drawn at ' + x + ', ' + y + ' and added at index ' + (column + row * 8));
     },
     // Move an already placed pieced from one location on the board to another 
-    movePiece: function(piece, x, y) {
+    movePiece: function(piece, row, column) {
         //iterate through board to find which piece we're moving
-        var piece;
+        var temp;
         var i = 0;
-        for (; i < LENGTH * LENGTH; i++) {
+        for (; i < 64; i++) {
             if (piece == board.__position__[i]) {
-                piece = board.__position__[i];
+                temp = board.__position__[i];
                 board.__position__[i] = null; //remove that piece from its old index
+				break;
             }
         }
-        board.__position__[y + x * 8] = piece; //update array that backs the piece canvas
+// <<<<<<< Updated upstream
+        board.__position__[column + row * 8] = piece; //update array that backs the piece canvas
 		if (!isMiniMaxCheckingBoard){
 			var canvasPieces = document.getElementById('chesspieces');
 			var ctxPiece = canvasPieces.getContext('2d');
 			ctxPiece.clearRect(lastColumn * LENGTH, lastRow * LENGTH, LENGTH, LENGTH); //erase old piece
-			ctxPiece.fillText(String.fromCharCode(piece.unicode), y * LENGTH, (x + 1) * LENGTH - OFFSET); //draw piece at required spot
-			isWhiteTurn = !isWhiteTurn;
+			ctxPiece.fillText(String.fromCharCode(piece.unicode), column * LENGTH, (row + 1) * LENGTH - OFFSET); //draw piece at required spot
+			// isWhiteTurn = !isWhiteTurn;
 		}
+// =======
+        // board.__position__[column + row * 8] = piece; //update array that backs the piece canvas
+        // var canvasPieces = document.getElementById('chesspieces');
+        // var ctxPiece = canvasPieces.getContext('2d');
+        // ctxPiece.clearRect(lastColumn * LENGTH, lastRow * LENGTH, LENGTH, LENGTH); //erase old piece
+        // ctxPiece.fillText(String.fromCharCode(piece.unicode), column * LENGTH, (row + 1) * LENGTH - OFFSET); //draw piece at required spot
+		// //isWhiteTurn = !isWhiteTurn;
+// >>>>>>> Stashed changes
 		
 		//update turn info on HTML page
 		if (isWhiteTurn) { 
@@ -64,10 +78,11 @@ var board = {
 			document.getElementById('turn').innerHTML = "Turn: Black";
 		}
     },
+	
 	/* Convenience method to remove the image and update the array on piece removal
 	*/
 	removePiece(row, column) {
-		ctxPiece = document.getElementById('chesspieces').getContext('2d');
+		//ctxPiece = document.getElementById('chesspieces').getContext('2d');
 		board.__position__[column + row * 8] = null;	//remove from data structure
 		ctxPiece.clearRect(column * LENGTH, row * LENGTH, LENGTH, LENGTH);	//remove image
 	},
@@ -83,7 +98,13 @@ var board = {
 	},
     // Find a piece on the board using row, column indices
     getPiece: function(row, column) {
-        return this.__position__[column + row * 8];
+		if (row > -1 && row < 8 && column > -1 && column < 0) {
+			//console.log("getPiece(): arguments exceed bounds of board");
+			return null;
+		}
+		else {
+			return this.__position__[column + row * 8];
+		}
     },
 
     /* Find a piece on the board using pixel coordinates on the canvas
@@ -93,8 +114,7 @@ var board = {
     getPieceWithCoords: function(x, y) {
         var column = Math.floor(x / LENGTH);
         var row = Math.floor(y / LENGTH);
-        //console.log(this.getPiece(rank,file));
-        return (this.getPiece(row, column));
+        return (this.__position__[column + row * 8]);
     },
 	
 	print: function() {
@@ -138,6 +158,7 @@ function drawBoard(canvas, ctx) {
         white = !white;
     }
 }
+
 /* Adds all the pieces to the board
 */
 function placePieces(playerIsWhite) {
@@ -212,6 +233,14 @@ function init() {
         chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
     });
 }
+/* Promote a piece to another
+ * created outside of board because it doesn't feel like the board stuff should contain the rules (ie. encapsulation)
+*/
+function promotePiece(piece) {
+	//display promotion choice to user
+	$('#promotionWindow').css('display', 'initial');
+	//replace existing piece with a piece of that type
+}
 
 function reinit(playerIsWhite) {
 	// canvas = document.getElementById("chessboard");
@@ -254,8 +283,8 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 		var column = Math.floor(x / LENGTH);
 		var row = Math.floor(y / LENGTH);
 		var isHighlighted = null; // not null if tile selected is highlighted in someway, ie. can the piece be moved there
-		var pieceRow, pieceColumn; // tracking piece info
-		//console.log('row col ' + row + ' ' + column);
+		//var pieceRow = (lastSelectedPiece !== null) ? getPiece(row, column) :
+		//pieceColumn; // tracking piece info
 
 		//check if selected tile is highlighted
 		highlightedTiles.forEach(function(item) {
@@ -264,40 +293,88 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 		});
 		//console.log('prev. coords ' + lastRow + ' ' + lastColumn);
 
-		//deal with movement
-		if (isHighlighted) {
-			
+		//deal with movement - piece selected last turn; time to move!
+		if (isHighlighted && !isMiniMaxCheckingBoard) {		
 			if (isHighlighted[0] == ATK) {
-				//alert(ATK);
-				//remove piece at that position
-				//board.__position__[isHighlighted[1] * 8 + isHighlighted[2]] = null;
-				 ctxPiece.clearRect(isHighlighted[2] * LENGTH, isHighlighted[1] * LENGTH, LENGTH, LENGTH); 
+				// if the attack square is empty then en passant must have just occured
+				if (board.getPiece(isHighlighted[1], isHighlighted[2]) === null)
+					board.removePiece(row-1, column);
+				else
+					ctxPiece.clearRect(isHighlighted[2] * LENGTH, isHighlighted[1] * LENGTH, LENGTH, LENGTH); //remove old piece image
 			}
 			//move the piece corresponding to that highlighted pattern to the selected location 
 			board.movePiece(lastSelectedPiece, row, column);
 			
+			if (pawnTwoSquaresRowCol !== null) pawnTwoSquaresRowCol = null;
+			// en passant check
+			if (lastSelectedPiece !== null && lastSelectedPiece.type == "Pawn") {
+				//check for 2 square move
+				if (Math.abs(lastRow - row) === 2) {
+					lastSelectedPiece.hasMovedTwoSquaresLastTurn = true;
+					pawnTwoSquaresRowCol = [row, column];
+				}
+			}
+			
+			// Castling check
+			if (lastSelectedPiece.type === "King") {
+				if (isCastlingLeft) {
+					//castle only if the castling square was selected ie. king was moved 2 spaces towards rook
+					if (column === 2) {
+						var rookToMove = board.getPiece(lastRow, 0);
+						board.movePiece(rookToMove, lastRow, 3);
+						ctxPiece.clearRect(0, lastRow * LENGTH, LENGTH, LENGTH);	//remove image of old piece from board
+						isCastlingLeft = false;
+					}
+				}
+				else if (isCastlingRight) {
+					if (column === 6) {
+						var rookToMove = board.getPiece(lastRow, 7);
+						board.movePiece(rookToMove, lastRow, 5);
+						ctxPiece.clearRect(7 * LENGTH, lastRow * LENGTH, LENGTH, LENGTH);	//remove image of old piece from board
+						isCastlingRight = false;
+					}
+				}
+			}
+			
+			//works for rooks at least
+			if (lastSelectedPiece.type === "Pawn" || lastSelectedPiece.type === "Rook" || lastSelectedPiece.type === "King") {
+				lastSelectedPiece.hasMoved = true;
+			}
+			
 			//update tracking variables
 			isHighlighted = null;
-			if (lastSelectedPiece.type == "Pawn") {
+			if (lastSelectedPiece.type === "Pawn") {
 				lastSelectedPiece.hasMoved = true;
+				
+				//check if it's in a promotion tile ONLY WORKS FOR WHITE
+				if (lastSelectedPiece.isWhite) {
+					if (row == 0) {
+					//call promotion fn
+						$('#promotion')
+							.data( {isWhite: true, row: row, column: column} )	//2nd 'row' is the variable
+							.dialog({
+							modal: true,
+							title: "Promote piece"
+						});
+					}
+				}
 			}
 			highlightedTiles = []; //reset which tiles are hightlighted each time this runs
 			//CHECK INCHECK HERE
-			inCheck();
+			inCheck(lastSelectedPiece.isWhite);
 			//AI CALL HERE
-			if (!isWhiteTurn) { //prevent the AI from thinking it's its turn everytime. isAI will need to come in
-				//This is where you call the AI, after you make your move!
-				moveAIPiece(ctxHighlight, ctxPiece, board);
-			}
+			// if (!isWhiteTurn) { //prevent the AI from thinking it's its turn everytime. isAI will need to come in
+				// //This is where you call the AI, after you make your move!
+				// moveAIPiece(ctxHighlight, ctxPiece, board);
+			// }
 		}
 		//check if player clicked on a piece and highlight the appropriate tiles in response
 		else if (lastSelectedPiece = board.getPieceWithCoords(x, y)) {
 			lastRow = row;
 			lastColumn = column;
 			highlightedTiles = [];
-			//var piecePosition = (row * 8) + column;	//convert 2d indices to 1d for backing array
 			
-			var turnCheck = lastSelectedPiece.isWhite === isWhiteTurn;
+			var turnCheck = true;//lastSelectedPiece.isWhite === isWhiteTurn;
 			//check what kind of highlighting should take place based on the piece type
 			if (lastSelectedPiece.type === "Pawn" && turnCheck) {
 				//if pawn hasn't moved, highlight up to 2 spaces forward
@@ -329,7 +406,7 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 			isHighlighted = false;
 		}
 	} else {
-		alert("Press the 'Start' button to begin your chess adventure!");
+		// alert("Press the 'Start' button to begin your chess adventure!");
 	}
 }
 
