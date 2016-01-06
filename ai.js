@@ -4,12 +4,11 @@ var isMiniMaxCheckingBoard = false;
 function moveAIPiece(ctxHighlight, ctxPiece, testBoard) {
     isMiniMaxCheckingBoard = true;
     var newBoard = jQuery.extend(true, {}, testBoard);
-    var test = maxi(Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, 2, newBoard);
-    //var test = mini(Number.NEGATIVE_INFINITY,Number.POSITIVE_INFINITY,2,newBoard);
+	var test = maxi(Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, 3);
     //I sometimes lose a piece at 0,0
     //var test = mini(2);
-    //console.log(nodeCount);
-    console.log("Value: " + test + ", and piece is:" + newBoard.getPiece(test[2], test[3]));
+	console.log(nodeCount);
+	console.log("Final Value: " + test);
 	testBoard = jQuery.extend(true, {}, newBoard);
     isMiniMaxCheckingBoard = false;
     //ctxHighlight.clearRect(0, 0, LENGTH * 8, LENGTH * 8);
