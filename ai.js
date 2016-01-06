@@ -15,7 +15,7 @@ function moveAIPiece(ctxHighlight, ctxPiece, testBoard) {
 	isWhiteTurn = false;
 	var limit = 0;
     //while it's black's turn... will need to generalize this
-    //while (!isWhiteTurn) { //NEED AN ISAI VAR I THINK
+    //while (!isWhiteTurn)  //NEED AN ISAI VAR I THINK
         //while we haven't found a set a possible moves
         //while (highlightedTiles.length == 0) {
             limit++;
@@ -59,25 +59,5 @@ function moveAIPiece(ctxHighlight, ctxPiece, testBoard) {
 
 		chessPieceListener(ctxHighlight, ctxPiece, board, y, x);
 		console.log("testBoard!!");
-		
-        //depending on the piece type take the greedy move! (which is the furthest highlighted tile)
-		/*
-        if (board.__position__[piecePosition].type === "Pawn") {
-            chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
-        } else if (board.__position__[piecePosition].type === "Rook") {
-            chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
-        } else if (board.__position__[piecePosition].type === "Knight") {
-            chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
-        } else if (board.__position__[piecePosition].type === "Bishop") {
-            chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
-        } else if (board.__position__[piecePosition].type === "Queen") {
-            chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
-        } else if (board.__position__[piecePosition].type === "King") {
-            chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
-        } else {
-		}
-		*/
-
-    //}
 
 }

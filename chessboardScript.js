@@ -53,7 +53,6 @@ var board = {
 				break;
             }
         }
-// <<<<<<< Updated upstream
         this.__position__[column + row * 8] = piece; //update array that backs the piece canvas
 		if (!isMiniMaxCheckingBoard){
 			var canvasPieces = document.getElementById('chesspieces');
@@ -62,14 +61,6 @@ var board = {
 			ctxPiece.fillText(String.fromCharCode(piece.unicode), column * LENGTH, (row + 1) * LENGTH - OFFSET); //draw piece at required spot
 		    isWhiteTurn = !isWhiteTurn;
 		}
-// =======
-        // board.__position__[column + row * 8] = piece; //update array that backs the piece canvas
-        // var canvasPieces = document.getElementById('chesspieces');
-        // var ctxPiece = canvasPieces.getContext('2d');
-        // ctxPiece.clearRect(lastColumn * LENGTH, lastRow * LENGTH, LENGTH, LENGTH); //erase old piece
-        // ctxPiece.fillText(String.fromCharCode(piece.unicode), column * LENGTH, (row + 1) * LENGTH - OFFSET); //draw piece at required spot
-		// //isWhiteTurn = !isWhiteTurn;
-// >>>>>>> Stashed changes
 		
 		//update turn info on HTML page
 		if (isWhiteTurn) { 
@@ -126,14 +117,6 @@ var board = {
 		}
 	}
 	*/
-	/* Convert std. chess notation into something that can be used to index the positions of the backing data structure
-	 * 
-	*/
-	/*algebraicNotationToIndex: function(fileRankString) {
-		var file = fileRankString.substring(0,1);
-		var rank = fileRankString.substring(1,2);
-		return file * 8 + rank;
-	}*/
 };
 
 /* Draws the actual representation of the physical board
@@ -410,7 +393,7 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 			isHighlighted = false;
 		}
 	} else {
-		// alert("Press the 'Start' button to begin your chess adventure!");
+		alert("Press the 'Start' button to begin your chess adventure!");
 	}
 }
 
