@@ -1,73 +1,78 @@
 var score;
-var nodeCount = -1;
-var currentScore = 0;
-var previousBoard;
-
-var currentRow = 0;
-var currentColumn = 0;
 var nextRow = 0;
 var nextColumn = 0;
+var nodeCount = -1;
+var currentScore = 0;
 
-/*
-//THE REAL FUNCTIONS ARE COMMENTED OUT FOR NOW
 //COUNTS THE NUMBER OF A PIECE ON THE BOARD
-function countPieces (board, pieceName, isWhite) {
-	var count = 0;
-	for (var i = 0; i < 8; i++) {
-		for (var j = 0; j < 8; j++) {
-			var toCheck = board.getPiece(i,j);
-			if (toCheck !== null) {
-				if (toCheck.type === pieceName && toCheck.isWhite == isWhite) {
-					count++;
-				}
-			}
-		}
-	}
+function countPieces(board, pieceName, isWhite) {
+    var count = 0;
+    for (var i = 0; i < 8; i++) {
+        for (var j = 0; j < 8; j++) {
+            var toCheck = board.getPiece(i, j);
+            if (toCheck !== null) {
+                if (toCheck.type === pieceName && toCheck.isWhite == isWhite) {
+                    count++;
+                }
+            }
+        }
+    }
+	return count;
 }
-*/
 
 //WEIGHT AND DIFFERENCE WILL BE SUMMED UP
+
 function evaluate(board) {
-    return Math.floor(Math.random() * (20 - 1 + 1)) + 1;
-    /*
-    var whitePawns = countPieces(board, "Pawn", true);
-    var blackPawns = countPieces(board, "Pawn", false);
-    return whitePawns - blackPawns;
-    */
+	var whitePawns = countPieces(board, "Pawn", true);
+	var blackPawns = countPieces(board, "Pawn", false);
+	var whiteRooks = countPieces(board, "Rook", true);
+	var blackRooks = countPieces(board, "Rook", false);
+	var whiteKnights = countPieces(board, "Knight", true);
+	var blackKnights = countPieces(board, "Knight", false);
+	var whiteBishop = countPieces(board, "Bishop", true);
+	var blackBishop = countPieces(board, "Bishop", false);
+	var whiteQueen = countPieces(board, "Queen", true);
+	var blackQueen = countPieces(board, "Queen", false);
+	var whiteKing = countPieces(board, "King", true);
+	var blackKing = countPieces(board, "King", false);
+	
+	//Weight sums, pawns = 1, bishops = knights = 3, queen = 9, king = close to infinite
+	var value = 1*(blackPawns - whitePawns) + 3*(blackKnights - whiteKnights) 
+	+ 3*(blackBishop-whiteBishop) + 5*(blackRooks-whiteRooks) 
+	+ 9*(blackQueen-whiteQueen) + 1000000000*(blackKing-whiteKing);
+	return value;
 }
 
+/*
+function evaluate() {
+    nodeCount++;
+    return Math.floor(Math.random() * (100 - 1 + 1)) + 1;
+}
+*/
 function maxi(alpha, beta, depth, board) {
-    var board = jQuery.extend(true, {}, board);
+    var newBoard = jQuery.extend(true, {}, board);
     if (depth === 0) {
-        currentScore = evaluate(board);
-        //console.log("Depth: " + depth + " || Max: " + currentScore);
-        return [currentScore, board, currentRow, currentColumn, nextRow, nextColumn];
+        currentScore = evaluate(newBoard);
+        console.log("Depth: " + depth + " || Max: " + currentScore);
+        return [currentScore,row,column,nextRow,nextColumn];
     }
     //var max = Number.NEGATIVE_INFINITY;
-    for (var i = 0; i < 8; i++) { //for each possible move
-        for (var j = 0; j < 8; j++) {
-            var toMove = board.getPiece(i, j);
-            if (toMove !== null && !toMove.isWhite) { //Maximize black
-                //get the highlights for this piece
-                //try the board at each highlights
-                chessPieceListener(ctxHighlight, ctxPiece, board, j * LENGTH, i * LENGTH);
+	//for each possible move
+    for (var row = 0; row < 8; row++) {
+        for (var column = 0; column < 8; column++) {
+            var toMove = newBoard.getPiece(column, row);
+            if (toMove !== null && !toMove.isWhite) {
+                chessPieceListener(ctxHighlight, ctxPiece, newBoard, column * LENGTH, row * LENGTH);
                 highlightedTiles.forEach(function(item) {
-                    nextRow = item[1];
-                    nextColumn = item[2];
-					//move to one of the highlights
-                    board.movePiece(toMove, nextRow, nextColumn);
-					//Check the mini depth
-                    score = mini(alpha, beta, depth - 1, board)[0];
-					//Reset to return the proper next move
 					nextRow = item[1];
                     nextColumn = item[2];
-					currentRow = i;
-					currentColumn = j;
-					//I NEED TO DO UNDO ATTACK
-					board.movePiece(toMove, currentRow, currentColumn); //I need to move back from where I came
-					//board.print(); //DEBUG
+					//move to one of the highlights
+                    newBoard.movePiece(toMove, nextRow, nextColumn);
+					//get the score with that board
+                    score = mini(alpha, beta, depth - 1, newBoard)[0];
+					newBoard = jQuery.extend(true, {}, board);
                     if (score >= beta) {
-                        return [beta, board, currentRow, currentColumn, nextRow, nextColumn];
+                        return [beta,row,column,nextRow,nextColumn];
                     }
                     if (score > alpha) {
                         alpha = score;
@@ -76,37 +81,32 @@ function maxi(alpha, beta, depth, board) {
             }
         }
     }
-    //console.log("Depth: " + depth + " || Max: " + alpha);
-    return [alpha, board, currentRow, currentColumn, nextRow, nextColumn];
+    console.log("Depth: " + depth + " || Max: " + alpha);
+    return [alpha,row,column,nextRow,nextColumn];
 }
 
 function mini(alpha, beta, depth, board) {
-    var board = jQuery.extend(true, {}, board);
+    var newBoard = jQuery.extend(true, {}, board);
     if (depth === 0) {
-        currentScore = -evaluate(board);
-        //console.log("Depth: " + depth + " || Min: " + currentScore);
-        return [currentScore, board, currentRow, currentColumn, nextRow, nextColumn];
+        currentScore = evaluate(newBoard);
+        console.log("Depth: " + depth + " || Min: " + currentScore);
+        return [currentScore,row,column,nextRow,nextColumn];
     }
-    for (var i = 0; i < 8; i++) {
-        for (var j = 0; j < 8; j++) {
-            var toMove = board.getPiece(i, j);
+    //var min = Number.POSITIVE_INFINITY;
+    for (var row = 0; row < 8; row++) {
+        for (var column = 0; column < 8; column++) {
+            var toMove = newBoard.getPiece(column, row);
             if (toMove !== null && toMove.isWhite) {
-                chessPieceListener(ctxHighlight, ctxPiece, board, j * LENGTH, i * LENGTH);
+                chessPieceListener(ctxHighlight, ctxPiece, newBoard, column * LENGTH, row * LENGTH);
                 highlightedTiles.forEach(function(item) {
                     nextRow = item[1];
                     nextColumn = item[2];
 					//move to one of the highlights
-                    board.movePiece(toMove, nextRow, nextColumn);
-                    //might have to switch turns, doesn't look like it
-                    score = maxi(alpha, beta, depth - 1, board)[0];
-					nextRow = item[1];
-                    nextColumn = item[2];
-					currentRow = i;
-					currentColumn = j;
-					board.movePiece(toMove, currentRow, currentColumn); //I need to move back from where I came
-					//board.print(); //DEBUG
+                    newBoard.movePiece(toMove, nextRow, nextColumn);
+                    score = maxi(alpha, beta, depth - 1, newBoard)[0];
+					newBoard = jQuery.extend(true, {}, board);
                     if (score <= alpha) {
-                        return [alpha, board, currentRow, currentColumn, nextRow, nextColumn];
+                        return [alpha,row,column,nextRow,nextColumn];
                     }
                     if (score < beta) {
                         beta = score;
@@ -115,6 +115,6 @@ function mini(alpha, beta, depth, board) {
             }
         }
     }
-    //console.log("Depth: " + depth + " || Min: " + beta);
-    return [beta, board, currentRow, currentColumn, nextRow, nextColumn];
+    console.log("Depth: " + depth + " || Min: " + beta);
+    return [beta,row,column,nextRow,nextColumn];
 }
