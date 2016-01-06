@@ -54,7 +54,7 @@ function inCheck(kingIsWhite) {
 		if (currentElement !== null && currentElement[0] === ATK) { //is it an attack tile
 
 			if ((board.getPiece(currentElement[1], currentElement[2])) !== null) {	
-				if (boardboard.getPiece(currentElement[1], currentElement[2]).type === "King") { //is it attacking a king
+				if (board.getPiece(currentElement[1], currentElement[2]).type === "King") { //is it attacking a king
 					alert("In check");
 					//board.getPiece(item[1],item[2]).isInCheck = true; //may not even use this
 					allHighlightedTiles = [];
