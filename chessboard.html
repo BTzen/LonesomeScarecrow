@@ -81,7 +81,7 @@
 				<input type="radio" name="fpPlayerMovesBlack" value="true" checked="checked">Player controls black
 				<input type="radio" name="fpPlayerMovesBlack" value="false">AI controls black
 				<input type="button" id="fpStart" class="uiStart fill" value="Start" onclick="freeplayStart()">
-				<input type="button" class="uiSurrender fill" value="Surrender" onclick="surrenderListener()" disabled>
+				<input type="button" id="fpReset" class="uiSurrender fill" value="Reset" onclick="surrenderListener()" disabled>
 				<input type="button" class="fill alignBottom" value="Exit Freeplay" onclick="exitFreeplayListener()">
 			</fieldset>
 			
@@ -110,9 +110,6 @@
 		var isBlackKingPlaced = false;
 		var whiteKingData = [];
 		var blackKingData = [];
-		
-		// TESTING STUFF
-		//isGameRunning = true;
 		
 		// GAMEPLAY
 		/* show promotion dialog
@@ -274,7 +271,7 @@
 				
 				$('#uiFreeplay').attr('disabled', false);
 				$('.uiSurrender').attr('disabled', true);
-				$('.uiStart').attr('disabled', false);	//error
+				$('.uiStart').attr('disabled', false);
 				document.getElementById('highlight').getContext('2d').clearRect(0,0, LENGTH * 8, LENGTH * 8);
 				reinit(true);  // CALL ON START INSTEAD IN CASE AI SURRENDERS?!?!
 			}
@@ -299,6 +296,7 @@
 			//disable piece adding functionality
 			$('#fpAddPiece').prop('disabled', true);
 			$('#fpStart').attr('disabled', true);
+			$('#fpReset').attr('disabled', false);
 			
 			var playerMovesBlack = ($('input[name=fpPlayerMovesBlack]:checked').val() == "true");
 			if (playerMovesBlack) {
