@@ -265,7 +265,7 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 		//console.log('prev. coords ' + lastRow + ' ' + lastColumn);
 
 		//deal with movement
-		if (isHighlighted && !isMiniMaxCheckingBoard) {
+		if (isHighlighted) {
 			
 			if (isHighlighted[0] == ATK) {
 				//alert(ATK);

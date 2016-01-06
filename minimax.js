@@ -3,6 +3,11 @@ var nodeCount = -1;
 var currentScore = 0;
 var previousBoard;
 
+var currentRow = 0;
+var currentColumn = 0;
+var nextRow = 0;
+var nextColumn = 0;
+
 /*
 //THE REAL FUNCTIONS ARE COMMENTED OUT FOR NOW
 //COUNTS THE NUMBER OF A PIECE ON THE BOARD
@@ -36,33 +41,33 @@ function maxi(alpha, beta, depth, board) {
     if (depth === 0) {
         currentScore = evaluate(board);
         //console.log("Depth: " + depth + " || Max: " + currentScore);
-        return [currentScore, board];
+        return [currentScore, board, currentRow, currentColumn, nextRow, nextColumn];
     }
     //var max = Number.NEGATIVE_INFINITY;
-    for (var i = 0; i < 8; i++) { //set all moves = 3 for dummy tree, this will be for each possible move
+    for (var i = 0; i < 8; i++) { //for each possible move
         for (var j = 0; j < 8; j++) {
             var toMove = board.getPiece(i, j);
-			if (i === 0 && j ===0) {
-				console.log(toMove);
-			}
-            if (toMove !== null) {
+            if (toMove !== null && !toMove.isWhite) { //Maximize black
                 //get the highlights for this piece
                 //try the board at each highlights
-                chessPieceListener(ctxHighlight, ctxPiece, board, i * LENGTH, j * LENGTH);
-                //var row = 0;
-                //var column = 0;
-				//console.log(highlightedTiles.length);
+                chessPieceListener(ctxHighlight, ctxPiece, board, j * LENGTH, i * LENGTH);
                 highlightedTiles.forEach(function(item) {
-                    var row = item[1] * LENGTH;
-                    var column = item[2] * LENGTH;
+                    nextRow = item[1];
+                    nextColumn = item[2];
 					//move to one of the highlights
-                    board.movePiece(toMove, row, column);
-                    //switch turns next depth maybe
+                    board.movePiece(toMove, nextRow, nextColumn);
+					//Check the mini depth
                     score = mini(alpha, beta, depth - 1, board)[0];
-					board.movePiece(toMove, i, j); //I need to move back from where I came
+					//Reset to return the proper next move
+					nextRow = item[1];
+                    nextColumn = item[2];
+					currentRow = i;
+					currentColumn = j;
+					//I NEED TO DO UNDO ATTACK
+					board.movePiece(toMove, currentRow, currentColumn); //I need to move back from where I came
 					//board.print(); //DEBUG
                     if (score >= beta) {
-                        return [beta, board];
+                        return [beta, board, currentRow, currentColumn, nextRow, nextColumn];
                     }
                     if (score > alpha) {
                         alpha = score;
@@ -72,36 +77,36 @@ function maxi(alpha, beta, depth, board) {
         }
     }
     //console.log("Depth: " + depth + " || Max: " + alpha);
-    return [alpha, board];
+    return [alpha, board, currentRow, currentColumn, nextRow, nextColumn];
 }
 
 function mini(alpha, beta, depth, board) {
     var board = jQuery.extend(true, {}, board);
     if (depth === 0) {
-        currentScore = evaluate(board);
+        currentScore = -evaluate(board);
         //console.log("Depth: " + depth + " || Min: " + currentScore);
-        return [currentScore, board];
+        return [currentScore, board, currentRow, currentColumn, nextRow, nextColumn];
     }
     for (var i = 0; i < 8; i++) {
         for (var j = 0; j < 8; j++) {
             var toMove = board.getPiece(i, j);
-			if (i === 0 && j ===0) {
-				console.log(toMove);
-			}
-            if (toMove !== null) {
-                chessPieceListener(ctxHighlight, ctxPiece, board, i * LENGTH, j * LENGTH);
-                //var row = 0;
-                //var column = 0;
+            if (toMove !== null && toMove.isWhite) {
+                chessPieceListener(ctxHighlight, ctxPiece, board, j * LENGTH, i * LENGTH);
                 highlightedTiles.forEach(function(item) {
-                    var row = item[1] * LENGTH;
-                    var column = item[2] * LENGTH;
-                    board.movePiece(toMove, row, column);
+                    nextRow = item[1];
+                    nextColumn = item[2];
+					//move to one of the highlights
+                    board.movePiece(toMove, nextRow, nextColumn);
                     //might have to switch turns, doesn't look like it
                     score = maxi(alpha, beta, depth - 1, board)[0];
-					board.movePiece(toMove, i, j);
+					nextRow = item[1];
+                    nextColumn = item[2];
+					currentRow = i;
+					currentColumn = j;
+					board.movePiece(toMove, currentRow, currentColumn); //I need to move back from where I came
 					//board.print(); //DEBUG
                     if (score <= alpha) {
-                        return [alpha, board];
+                        return [alpha, board, currentRow, currentColumn, nextRow, nextColumn];
                     }
                     if (score < beta) {
                         beta = score;
@@ -111,109 +116,5 @@ function mini(alpha, beta, depth, board) {
         }
     }
     //console.log("Depth: " + depth + " || Min: " + beta);
-    return [beta, board];
+    return [beta, board, currentRow, currentColumn, nextRow, nextColumn];
 }
-
-
-
-
-//Hardcoded example eval
-/*
-function evaluate() {
-    nodeCount++;
-    switch (nodeCount) {
-        case 0:
-            currentScore = 3;
-            return currentScore;
-            break;
-        case 1:
-            currentScore = 12;
-            return currentScore;
-            break;
-        case 2:
-            currentScore = 8;
-            return currentScore;
-            break;
-        case 3:
-            currentScore = 2;
-            return currentScore;
-            break;
-		/*
-        case 4:
-		//these get pruned
-            currentScore = 4;
-            return currentScore;
-            break;
-        case 5:
-            currentScore = 6;
-            return currentScore;
-            break;
-		*/
-/*
-        case 4:
-            currentScore = 14;
-            return currentScore;
-            break;
-        case 5:
-            currentScore = 5;
-            return currentScore;
-            break;
-        case 6:
-            currentScore = 2;
-            return currentScore;
-            break;
-        default:
-            break;
-    }
-
-    return 1337;
-}
-*/
-
-
-/*
-var max; //alpha best explored option along path to root for max
-var min; //beta best explored option along path to root for min
-var ply = 2;	//tree depth + 1
-var isMaxTurn = true;
-var whitePieces = { //hold all the white pieces on the board (should maybe be set upt in chessboardScript when game is initialized)
-	pawns: 8,
-	rooks: 2,
-	knights: 2,
-	bishops: 2,
-	queens: 1,
-	kings: 1
-};
-var blackPieces = {
-	pawns: 6,
-	rooks: 2,
-	knights: 2,
-	bishops: 2,
-	queens: 1,
-	kings: 1
-};
-
-/*each node has children, a worst-case value (max starts at -infinity), and an alpha and beta value, ply
-
-*/
-/*max = player who's turn it is
-//generate all possible states from current states
-//use heuristic to assign each child state a value
-
-// score the gamestate
-/*
-function heuristic(playerIsWhite) {
-	var val;	//summation of [pieceValue * (your pawns - their pawns)] for each piece type
-	var yourPieces = (playerIsWhite) ? whitePieces : blackPieces;
-	var theirPieces;
-	val = Pawn.prototype.value * (yourPieces["pawns"]);
-	//alert(val);
-}	
-
-function successor() { //generate valid moves from current moves
-}
-
-function utility() {  //maps end-game state (ie. win/loss/draw) to a score
-}
-*/
-//test if game is finished
