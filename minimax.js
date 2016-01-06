@@ -57,20 +57,37 @@ function maxi(alpha, beta, depth, board) {
         return [currentScore,row,column,nextRow,nextColumn];
     }
     //var max = Number.NEGATIVE_INFINITY;
+// <<<<<<< 6dd444307fed0977f66ff8d2888a58e65a696667
 	//for each possible move
     for (var row = 0; row < 8; row++) {
         for (var column = 0; column < 8; column++) {
             var toMove = newBoard.getPiece(column, row);
             if (toMove !== null && !toMove.isWhite) {
                 chessPieceListener(ctxHighlight, ctxPiece, newBoard, column * LENGTH, row * LENGTH);
+// =======
+    // for (var row = 0; row < 8; row++) { //for each possible move
+        // for (var column = 0; column < 8; column++) {
+            // var toMove = board.getPiece(row, column);
+            // if (toMove !== null && !toMove.isWhite) { //Maximize black
+                // //get the highlights for this piece & try the board at each highlights
+                // chessPieceListener(ctxHighlight, ctxPiece, board, column * LENGTH, row * LENGTH);
+// >>>>>>> minor tweaks
                 highlightedTiles.forEach(function(item) {
 					nextRow = item[1];
                     nextColumn = item[2];
+// <<<<<<< 6dd444307fed0977f66ff8d2888a58e65a696667
 					//move to one of the highlights
                     newBoard.movePiece(toMove, nextRow, nextColumn);
 					//get the score with that board
                     score = mini(alpha, beta, depth - 1, newBoard)[0];
 					newBoard = jQuery.extend(true, {}, board);
+// =======
+					// currentRow = row;
+					// currentColumn = column;
+					// //I NEED TO DO UNDO ATTACK
+					// board.movePiece(toMove, currentRow, currentColumn); //I need to move back from where I came
+					// //board.print(); //DEBUG
+// >>>>>>> minor tweaks
                     if (score >= beta) {
                         return [beta,row,column,nextRow,nextColumn];
                     }
