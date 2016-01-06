@@ -39,12 +39,13 @@ function evaluate(board) {
 	//Weight sums, pawns = 1, bishops = knights = 3, queen = 9, king = close to infinite
 	var value = 1*(blackPawns - whitePawns) + 3*(blackKnights - whiteKnights) 
 	+ 3*(blackBishop-whiteBishop) + 5*(blackRooks-whiteRooks) 
-	+ 9*(blackQueen-whiteQueen) + 1000000000*(blackKing-whiteKing);
+	+ 9*(blackQueen-whiteQueen) + 10000*(blackKing-whiteKing);
 	return value;
 }
 
+//testing, shows that the minimax structure is there and working.
 /*
-function evaluate() {
+function evaluate(board) {
     nodeCount++;
     return Math.floor(Math.random() * (100 - 1 + 1)) + 1;
 }
