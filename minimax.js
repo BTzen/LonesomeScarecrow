@@ -44,13 +44,12 @@ function maxi(alpha, beta, depth, board) {
         return [currentScore, board, currentRow, currentColumn, nextRow, nextColumn];
     }
     //var max = Number.NEGATIVE_INFINITY;
-    for (var i = 0; i < 8; i++) { //for each possible move
-        for (var j = 0; j < 8; j++) {
-            var toMove = board.getPiece(i, j);
+    for (var row = 0; row < 8; row++) { //for each possible move
+        for (var column = 0; column < 8; column++) {
+            var toMove = board.getPiece(row, column);
             if (toMove !== null && !toMove.isWhite) { //Maximize black
-                //get the highlights for this piece
-                //try the board at each highlights
-                chessPieceListener(ctxHighlight, ctxPiece, board, j * LENGTH, i * LENGTH);
+                //get the highlights for this piece & try the board at each highlights
+                chessPieceListener(ctxHighlight, ctxPiece, board, column * LENGTH, row * LENGTH);
                 highlightedTiles.forEach(function(item) {
                     nextRow = item[1];
                     nextColumn = item[2];
@@ -61,8 +60,8 @@ function maxi(alpha, beta, depth, board) {
 					//Reset to return the proper next move
 					nextRow = item[1];
                     nextColumn = item[2];
-					currentRow = i;
-					currentColumn = j;
+					currentRow = row;
+					currentColumn = column;
 					//I NEED TO DO UNDO ATTACK
 					board.movePiece(toMove, currentRow, currentColumn); //I need to move back from where I came
 					//board.print(); //DEBUG

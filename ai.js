@@ -57,11 +57,11 @@ function moveAIPiece(ctxHighlight, ctxPiece, board) {
 			if (limit > 100) { //was 10k
 				// alert("I give up");
 				isWhiteTurn= !isWhiteTurn; //CHANGE THIS TO AN AI VAR
-				/*isGameRunning = false;*/
+				isGameRunning = false;
 				//init(); //RESET HERE
 				break;
 			}
-		}
+		
 		limit = 0;
 		
 		//depending on the piece type take the greedy move! (which is the furthest highlighted tile)
@@ -81,6 +81,7 @@ function moveAIPiece(ctxHighlight, ctxPiece, board) {
 			}
 		}
 	}
+}
 	
 // =======
             // //try this piece once you see that is exists
@@ -129,4 +130,3 @@ function moveAIPiece(ctxHighlight, ctxPiece, board) {
     // }
 
 // >>>>>>> 0e36a013438fcf94f496d6852509a734e5b3e9c7
-}

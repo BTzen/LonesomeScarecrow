@@ -92,7 +92,7 @@
 					<ol>
 					</ol>
 				</div>
-				<input type="button" class="uiStart fill" value="Start" onclick="startAI()">
+				<input type="button" class="uiStart fill" value="Start" onclick="startMatchEvent()">
 				<input type="button" class="uiSurrender fill" value="Surrender" onclick="surrenderListener()" disabled>
 				<input type="button" class="fill alignBottom" value="Exit Freeplay" onclick="exitFreeplayListener()">
 			</fieldset>
@@ -106,7 +106,6 @@
 	</div>
 	
 	<div id="promotion">
-		<!-- <p>Select the piece to promote to</p> -->
 		<label>&#9819;&#9820;&#9821;&#9822;</label>
 		<div id="promoteOptions">
 			<input type="radio" name="promotionPick" value="Queen">Queen
@@ -125,13 +124,19 @@
 		var blackKingData = [];
 		
 		// TESTING STUFF
-		isGameRunning = true;
+		//isGameRunning = true;
+		/*placePieces(true);
+		var board1 = jQuery.extend(true, {}, board);
+		console.log(board1 === board);
+		board1.__position__[38] = new King(true);
+		console.log(board1 === board);
+		changeboard(board);
+		changeboard(board1);
 		
-		/*board.placePiece(new Rook(true), 7,0);
-		board.placePiece(new King(true), 7, 4);
-		board.placePiece(new Knight(false), 0, 4);
-		*/
-		
+		function changeboard(board) {
+			var board2 = jQuery.extend(true, {}, board);
+			board2.__position__[39] = new Queen(false);
+		}*/
 		// GAMEPLAY
 		/*
 		 *
@@ -270,7 +275,6 @@
 				placePieces(true);
 				//$('#turn').css('visibility', 'visible');
 				$('#uiFreeplay').attr('disabled', true);
-				//alert("The match has started!");
 			}
 		}
 		
@@ -311,13 +315,15 @@
 			
 			$('#turn').css('visibility', 'hidden');
 		}
-		
+		/* changes UI and gameRunning bool
+		 * 
+		*/
 		function startAI() {
 			isGameRunning = true;
 			$('#turn').css('visibility', 'visible');
 			$('.uiSurrender').attr('disabled', false);
 			$('.uiStart').attr('disabled', true);
-			alert("The match has started!");
+			//alert("The match has started!");
 		}
 	</script>
 	<script>

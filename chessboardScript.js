@@ -47,29 +47,20 @@ var board = {
         var temp;
         var i = 0;
         for (; i < 64; i++) {
-            if (piece == board.__position__[i]) {
-                temp = board.__position__[i];
-                board.__position__[i] = null; //remove that piece from its old index
+            if (piece == this.__position__[i]) {
+                temp = this.__position__[i];
+                this.__position__[i] = null; //remove that piece from its old index
 				break;
             }
         }
-// <<<<<<< Updated upstream
-        board.__position__[column + row * 8] = piece; //update array that backs the piece canvas
+        this.__position__[column + row * 8] = piece; //update array that backs the piece canvas
 		if (!isMiniMaxCheckingBoard){
 			var canvasPieces = document.getElementById('chesspieces');
 			var ctxPiece = canvasPieces.getContext('2d');
 			ctxPiece.clearRect(lastColumn * LENGTH, lastRow * LENGTH, LENGTH, LENGTH); //erase old piece
 			ctxPiece.fillText(String.fromCharCode(piece.unicode), column * LENGTH, (row + 1) * LENGTH - OFFSET); //draw piece at required spot
-			// isWhiteTurn = !isWhiteTurn;
+			isWhiteTurn = !isWhiteTurn;
 		}
-// =======
-        // board.__position__[column + row * 8] = piece; //update array that backs the piece canvas
-        // var canvasPieces = document.getElementById('chesspieces');
-        // var ctxPiece = canvasPieces.getContext('2d');
-        // ctxPiece.clearRect(lastColumn * LENGTH, lastRow * LENGTH, LENGTH, LENGTH); //erase old piece
-        // ctxPiece.fillText(String.fromCharCode(piece.unicode), column * LENGTH, (row + 1) * LENGTH - OFFSET); //draw piece at required spot
-		// //isWhiteTurn = !isWhiteTurn;
-// >>>>>>> Stashed changes
 		
 		//update turn info on HTML page
 		if (isWhiteTurn) { 
@@ -83,7 +74,7 @@ var board = {
 	*/
 	removePiece(row, column) {
 		//ctxPiece = document.getElementById('chesspieces').getContext('2d');
-		board.__position__[column + row * 8] = null;	//remove from data structure
+		this.__position__[column + row * 8] = null;	//remove from data structure
 		ctxPiece.clearRect(column * LENGTH, row * LENGTH, LENGTH, LENGTH);	//remove image
 	},
 	
@@ -93,7 +84,7 @@ var board = {
 		$('#freeplayPieces ol').empty();
 		//clean the backing data structure
 		for (var i = 0; i < 64; i++) {
-			board.__position__[i] = null;
+			this.__position__[i] = null;
 		}
 	},
     // Find a piece on the board using row, column indices
@@ -119,8 +110,8 @@ var board = {
 	
 	print: function() {
 		for (var i = 0; i < 64; i++){
-			if (board.__position__[i] !== null && board.__position__[i].type === "Rook") {
-				console.log(board.__position__[i]);
+			if (this.__position__[i] !== null && this.__position__[i].type === "Rook") {
+				console.log(this.__position__[i]);
 			}
 		}
 	}
@@ -243,10 +234,6 @@ function promotePiece(piece) {
 }
 
 function reinit(playerIsWhite) {
-	// canvas = document.getElementById("chessboard");
-    //canvasPieces = document.getElementById("chesspieces");
-    // canvasHighlight = document.getElementById("highlight");
-
 	/* account for fact that board may not be positioned in the top left corner of the page
 	 * border isn't counted with offset()
 	*/
@@ -278,13 +265,12 @@ function fakeChessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 }
 
 function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { 
+	DEBUG_HIGHLIGHT();
 	//console.log(x + ' row col ' + y); //debug
 	if (isGameRunning) {
 		var column = Math.floor(x / LENGTH);
 		var row = Math.floor(y / LENGTH);
 		var isHighlighted = null; // not null if tile selected is highlighted in someway, ie. can the piece be moved there
-		//var pieceRow = (lastSelectedPiece !== null) ? getPiece(row, column) :
-		//pieceColumn; // tracking piece info
 
 		//check if selected tile is highlighted
 		highlightedTiles.forEach(function(item) {
@@ -363,10 +349,10 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 			//CHECK INCHECK HERE
 			inCheck(lastSelectedPiece.isWhite);
 			//AI CALL HERE
-			// if (!isWhiteTurn) { //prevent the AI from thinking it's its turn everytime. isAI will need to come in
-				// //This is where you call the AI, after you make your move!
-				// moveAIPiece(ctxHighlight, ctxPiece, board);
-			// }
+			if (!isWhiteTurn) { //prevent the AI from thinking it's its turn everytime. isAI will need to come in
+				//This is where you call the AI, after you make your move!
+				moveAIPiece(ctxHighlight, ctxPiece, board);
+			}
 		}
 		//check if player clicked on a piece and highlight the appropriate tiles in response
 		else if (lastSelectedPiece = board.getPieceWithCoords(x, y)) {
@@ -374,7 +360,7 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 			lastColumn = column;
 			highlightedTiles = [];
 			
-			var turnCheck = true;//lastSelectedPiece.isWhite === isWhiteTurn;
+			var turnCheck = lastSelectedPiece.isWhite === isWhiteTurn;
 			//check what kind of highlighting should take place based on the piece type
 			if (lastSelectedPiece.type === "Pawn" && turnCheck) {
 				//if pawn hasn't moved, highlight up to 2 spaces forward
@@ -410,4 +396,14 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 	}
 }
 
+function DEBUG_HIGHLIGHT() {
+	for (var row=0; row<8; row++) {
+		for (var col=0; col<8; col++) {
+			if (board.getPiece(row, col) !== null) {
+				ctxHighlight.fillStyle = "rgb(0,153,0)";
+				ctxHighlight.fillRect(col * LENGTH, row * LENGTH, LENGTH, LENGTH);
+			}
+		}
+	}
+}
 window.onload = init;

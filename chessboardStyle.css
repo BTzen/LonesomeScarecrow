@@ -40,7 +40,7 @@ fieldset legend {	/* override styles for children*/
 }
 
 #freeplayInfo {
-	/*display: none;*/
+	display: none;
 	/* margin-top: 600px; */
 	margin-left: 635px;
 	position: absolute;
@@ -66,7 +66,7 @@ fieldset legend {	/* override styles for children*/
 }
 
 #gameInfo {
-	display: none;
+	/* display: none; */
 	margin-left: 635px;
 	padding-bottom: 0.75em;
 	position: absolute;
