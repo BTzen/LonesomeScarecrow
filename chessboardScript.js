@@ -59,7 +59,11 @@ var board = {
 			var ctxPiece = canvasPieces.getContext('2d');
 			ctxPiece.clearRect(lastColumn * LENGTH, lastRow * LENGTH, LENGTH, LENGTH); //erase old piece
 			ctxPiece.fillText(String.fromCharCode(piece.unicode), column * LENGTH, (row + 1) * LENGTH - OFFSET); //draw piece at required spot
+// <<<<<<< HEAD
 		    isWhiteTurn = !isWhiteTurn;
+// =======
+			// isWhiteTurn = !isWhiteTurn;
+// >>>>>>> b9717ff764dbd192ddf16adedcc65f68e223c969
 		}
 		
 		//update turn info on HTML page
@@ -111,6 +115,7 @@ var board = {
 	/*
 	print: function() {
 		for (var i = 0; i < 64; i++){
+<<<<<<< HEAD
 <<<<<<< 6dd444307fed0977f66ff8d2888a58e65a696667
 			if (this.__position__[i] !== null && board.__position__[i].type === "Rook") {
 				console.log(board.__position__[i]);
@@ -118,6 +123,10 @@ var board = {
 			if (this.__position__[i] !== null && this.__position__[i].type === "Rook") {
 				console.log(this.__position__[i]);
 >>>>>>> minor tweaks
+=======
+			if (this.__position__[i] !== null && this.__position__[i].type === "Rook") {
+				console.log(this.__position__[i]);
+>>>>>>> b9717ff764dbd192ddf16adedcc65f68e223c969
 			}
 		}
 	}
@@ -355,6 +364,7 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 			//CHECK INCHECK HERE
 			inCheck(lastSelectedPiece.isWhite);
 			//AI CALL HERE
+// <<<<<<< HEAD
 			 if (!isWhiteTurn) { //prevent the AI from thinking it's its turn everytime. isAI will need to come in
 				// //This is where you call the AI, after you make your move!
 				 console.log("break one");
@@ -362,6 +372,12 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 				 moveAIPiece(ctxHighlight, ctxPiece, oldBoard);
 				 console.log("break");
 			 }
+// =======
+			// if (!isWhiteTurn) { //prevent the AI from thinking it's its turn everytime. isAI will need to come in
+				// //This is where you call the AI, after you make your move!
+				// moveAIPiece(ctxHighlight, ctxPiece, board);
+			// }
+// >>>>>>> b9717ff764dbd192ddf16adedcc65f68e223c969
 		}
 		//check if player clicked on a piece and highlight the appropriate tiles in response
 		else if (lastSelectedPiece = board.getPieceWithCoords(x, y)) {

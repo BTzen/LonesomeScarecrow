@@ -39,49 +39,6 @@ function moveAIPiece(ctxHighlight, ctxPiece, testBoard) {
 			y = test[5] * LENGTH;
 			//piecePosition = (x * 8) + y;
 			
-// <<<<<<< 6dd444307fed0977f66ff8d2888a58e65a696667
-            //look at the valid moves, get the last highlighted tile
-			/*
-            highlightedTiles.forEach(function(item) {
-                y = item[1] * LENGTH;
-                x = item[2] * LENGTH;
-            });
-			*/
-			/*
-            if (limit > 10000) {
-                alert("I give up");
-                isWhiteTurn = !isWhiteTurn; //CHANGE THIS TO AN AI VAR
-                isGameRunning = false;
-                //init(); //RESET HERE
-                break;
-            }
-			*/
-        //}
-
 		chessPieceListener(ctxHighlight, ctxPiece, board, y, x);
 		console.log("testBoard!!");
-
-		
-        //depending on the piece type take the greedy move! (which is the furthest highlighted tile)
-		/*
-        if (board.__position__[piecePosition].type === "Pawn") {
-            chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
-        } else if (board.__position__[piecePosition].type === "Rook") {
-            chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
-        } else if (board.__position__[piecePosition].type === "Knight") {
-            chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
-        } else if (board.__position__[piecePosition].type === "Bishop") {
-            chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
-        } else if (board.__position__[piecePosition].type === "Queen") {
-            chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
-        } else if (board.__position__[piecePosition].type === "King") {
-            chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
-        } else {
-		}
-<<<<<<< 6dd444307fed0977f66ff8d2888a58e65a696667
-		*/
-    //}
-
-// <<<<<<< 6dd444307fed0977f66ff8d2888a58e65a696667
 }
-
