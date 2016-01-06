@@ -78,8 +78,8 @@
 					<ol>
 					</ol>
 				</div>
-				<input type="radio" name="fpPlayerMovesBlack" value="true" checked="checked">Player controls black
-				<input type="radio" name="fpPlayerMovesBlack" value="false">AI controls black
+				<!-- <input type="radio" name="fpPlayerMovesBlack" value="true" checked="checked">Player controls black
+				<input type="radio" name="fpPlayerMovesBlack" value="false">AI controls black -->
 				<input type="button" id="fpStart" class="uiStart fill" value="Start" onclick="freeplayStart()">
 				<input type="button" id="fpReset" class="uiSurrender fill" value="Reset" onclick="surrenderListener()" disabled>
 				<input type="button" class="fill alignBottom" value="Exit Freeplay" onclick="exitFreeplayListener()">
@@ -229,18 +229,22 @@
 		/* Remove piece from board and from backing data structure
 		*/
 		function removePiece(entryID, fileRankString) {
-			/*alert(entryID + ' ' + fileRankString);*/
-			var row = (8 - parseInt(fileRankString.substring(1,2)));
-			var col = parseInt(fileRankString.charCodeAt(0)) - 97; //97 reduces value of a to 0
-			board.removePiece(row, col);	//doesn't do anything if there isn't a piece at that location
-			
-			//remove piece from occupied tile list
-			for (var i = 0; i < occupiedTiles.length; i++) {
-				if (occupiedTiles[i][0] == entryID) {
-					occupiedTiles.splice(i,1);
-				}
+			if (isFreeplayTest) {	
+				//do nothing
 			}
-			$('#freeplayEntry' + entryID).parent().remove();	//delete list item
+			else {
+				var row = (8 - parseInt(fileRankString.substring(1,2)));
+				var col = parseInt(fileRankString.charCodeAt(0)) - 97; //97 reduces value of a to 0
+				board.removePiece(row, col);	//doesn't do anything if there isn't a piece at that location
+				
+				//remove piece from occupied tile list
+				for (var i = 0; i < occupiedTiles.length; i++) {
+					if (occupiedTiles[i][0] == entryID) {
+						occupiedTiles.splice(i,1);
+					}
+				}
+				$('#freeplayEntry' + entryID).parent().remove();	//delete list item
+			}
 		}
 		
 		function startMatchEvent() {
@@ -266,14 +270,17 @@
 				$('.uiSurrender').attr('disabled', true);
 				$('.uiStart').attr('disabled', false);
 				//alert($('#freeplayInfo').css('display'));
+				board.clear(0, 0, 8, 8);
 				//freeplay options
 				if ($('#freeplayInfo').css('display') == "block") {
 					$('#fpAddPiece').attr('disabled', false);
+					isFreeplayTest = false;
 				}
 				else {
 					reinit(true);  // CALL ON START INSTEAD IN CASE AI SURRENDERS?!?!
 				  alert("You're a loser!");
 				}
+				
 				document.getElementById('highlight').getContext('2d').clearRect(0,0, LENGTH * 8, LENGTH * 8);
 			}
 			else {
@@ -299,6 +306,10 @@
 			$('#fpStart').attr('disabled', true);
 			$('#fpReset').attr('disabled', false);
 			
+			isFreeplayTest = true;
+			isGameRunning = true;
+			alert("freeplay testing has begun");
+			/*
 			var playerMovesBlack = ($('input[name=fpPlayerMovesBlack]:checked').val() == "true");
 			if (playerMovesBlack) {
 				isFreeplayTest = true;
@@ -308,6 +319,7 @@
 			else {
 				alert("freeplay match has begun");
 			}
+			*/
 		}
 		
 		function exitFreeplayListener() {

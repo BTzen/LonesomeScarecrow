@@ -89,7 +89,7 @@ function mini(alpha, beta, depth, board) {
     var newBoard = jQuery.extend(true, {}, board);
     if (depth === 0) {
         currentScore = evaluate(newBoard);
-        console.log("Depth: " + depth + " || Min: " + currentScore);
+        // console.log("Depth: " + depth + " || Min: " + currentScore);
         return [currentScore,row,column,nextRow,nextColumn];
     }
     //var min = Number.POSITIVE_INFINITY;
@@ -115,6 +115,6 @@ function mini(alpha, beta, depth, board) {
             }
         }
     }
-    console.log("Depth: " + depth + " || Min: " + beta);
+    // console.log("Depth: " + depth + " || Min: " + beta);
     return [beta,row,column,nextRow,nextColumn];
 }

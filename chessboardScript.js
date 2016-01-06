@@ -60,7 +60,7 @@ var board = {
 			var ctxPiece = canvasPieces.getContext('2d');
 			ctxPiece.clearRect(lastColumn * LENGTH, lastRow * LENGTH, LENGTH, LENGTH); //erase old piece
 			ctxPiece.fillText(String.fromCharCode(piece.unicode), column * LENGTH, (row + 1) * LENGTH - OFFSET); //draw piece at required spot
-		    //if (!playerMovesBlack)
+		    if (!isFreeplayTest)
 				isWhiteTurn = !isWhiteTurn;
 		}
 		
