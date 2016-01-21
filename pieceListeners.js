@@ -1,17 +1,10 @@
-/* Contains logic for piece behaviour
- * 
- */
-var isCheckingBoard = false;
-const ATK = "attack";
-const MOVE = "move"; 
- 
-function fill(ctxHighlight, color, moveType, row, column) {
+//Contains logic for piece behaviour
+
+ function fill(ctxHighlight, color, moveType, row, column) {
 	if (column > -1 && column < 8 && row > -1 && row < 8) {
 		if (!isCheckingBoard) {
-			if (isWhiteTurn) { //will need some sort of isAI var
-				ctxHighlight.fillStyle = color;
-				ctxHighlight.fillRect(column * LENGTH, row * LENGTH, LENGTH, LENGTH);
-			}
+			ctxHighlight.fillStyle = color;
+			ctxHighlight.fillRect(column * LENGTH, row * LENGTH, LENGTH, LENGTH);
 			highlightedTiles.push([moveType, row, column]);		
 		} else {
 			allHighlightedTiles.push([moveType, row, column]);	
@@ -35,40 +28,7 @@ function validAttack(row, column, colourBool) {
  *
 */
 function inCheck(kingIsWhite) {
-	var isInCheck = false;
-	isCheckingBoard = true;
-	for (var i = 0; i < 8; i++) {
-		for (var j = 0; j < 8; j++) {
-			var checkPiece = board.getPiece(i,j);	//do I need to check em all if I have even 1?
-			if (checkPiece !== null && checkPiece.isWhite !== kingIsWhite && checkPiece.type !== "King") {
-				//isWhiteTurn = !isWhiteTurn;
-				fakeChessPieceListener(ctxHighlight, ctxPiece, board, i*LENGTH, j*LENGTH);	//indirectly pushes all the moves of every piece that can put the king in check into allHighlightedTiles
-				//isWhiteTurn = !isWhiteTurn;
-			} 
-			//check if the tiles that get highlightedTiles hits the king in that position
-		}	
-	}
-	
-	for (var index = 0; index < allHighlightedTiles.length; index++) {
-		var currentElement = allHighlightedTiles[index];
-		if (currentElement !== null && currentElement[0] === ATK) { //is it an attack tile
-
-			if ((board.getPiece(currentElement[1], currentElement[2])) !== null) {	
-				if (board.getPiece(currentElement[1], currentElement[2]).type === "King") { //is it attacking a king
-					alert("In check");
-					//board.getPiece(item[1],item[2]).isInCheck = true; //may not even use this
-					allHighlightedTiles = [];
-					isCheckingBoard = false;
-					isInCheck = true;
-					break;
-				}
-			}
-		}
-	}
-	allHighlightedTiles = [];
-	isCheckingBoard = false;
-	
-	return isInCheck;
+	//REDO THIS METHOD
 }
 
 /* Checks if castling is possible with rook at given position

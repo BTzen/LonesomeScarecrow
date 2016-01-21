@@ -3,6 +3,7 @@ var isGameRunning = false;
 var isCastlingLeft = false;
 var isCastlingRight = false;
 var isFreeplayTest = false;		//allows user to move both white and black pieces in freeplay with highlighting for both pieces
+var isCheckingBoard = false;
 var highlightedTiles = [];
 var allHighlightedTiles = []; //for looking ahead at all possible moves in a ply.
 var lastSelectedPiece; // for moving pieces
@@ -17,6 +18,8 @@ const PIECE_FONT = "70px Arial unicode MS";
 const BLACK = "rgb(0,0,0)";
 const MELLOW_YELLOW = "rgba(255, 255, 102, 0.7)";
 const LIGHT_RED = "rgba(255, 0, 0, 0.25)"
+const ATK = "attack";
+const MOVE = "move"; 
 
 //BOARD
 var board = {
@@ -55,14 +58,12 @@ var board = {
             }
         }
         this.__position__[column + row * 8] = piece; //update array that backs the piece canvas
-		if (!isMiniMaxCheckingBoard){
 			var canvasPieces = document.getElementById('chesspieces');
 			var ctxPiece = canvasPieces.getContext('2d');
 			ctxPiece.clearRect(lastColumn * LENGTH, lastRow * LENGTH, LENGTH, LENGTH); //erase old piece
 			ctxPiece.fillText(String.fromCharCode(piece.unicode), column * LENGTH, (row + 1) * LENGTH - OFFSET); //draw piece at required spot
 		    if (!isFreeplayTest)
 				isWhiteTurn = !isWhiteTurn;
-		}
 		
 		//update turn info on HTML page
 		if (isWhiteTurn) { 
@@ -280,7 +281,7 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 		//console.log('prev. coords ' + lastRow + ' ' + lastColumn);
 
 		//deal with movement - piece selected last turn; time to move!
-		if (isHighlighted && !isMiniMaxCheckingBoard) {		
+		if (isHighlighted) {		
 			if (isHighlighted[0] == ATK) {
 				// if the attack square is empty then en passant must have just occured
 				if (board.getPiece(isHighlighted[1], isHighlighted[2]) === null)
@@ -349,29 +350,6 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 			//CHECK INCHECK HERE
 			inCheck(lastSelectedPiece.isWhite);
 			//AI CALL HERE
-			 var countKings = 0;
-			 for (var i = 0; i < 8; i++) {
-				for (var j = 0; j < 8; j++) {
-					var checkKing = board.getPiece(i,j);
-					if (checkKing !==null && checkKing.type === "King"){
-						countKings++;
-					}
-				} 
-			 }
-			 if (countKings < 2) {
-				 alert("Game Over, King is Dead");
-				 isGameRunning = false;
-				$('#uiFreeplay').attr('disabled', false);
-				$('.uiSurrender').attr('disabled', true);
-				$('.uiStart').attr('disabled', false);
-				isWhiteTurn = true;
-			 } else if (!isWhiteTurn) { 
-			 //AI CALL HERE
-			 //prevent the AI from thinking it's its turn everytime. isAI will need to come in
-				//This is where you call the AI, after you make your move!
-			    var oldBoard = jQuery.extend(true, {}, board);
-				moveAIPiece(ctxHighlight, ctxPiece, oldBoard);
-			 }
 		}
 		//check if player clicked on a piece and highlight the appropriate tiles in response
 		else if (lastSelectedPiece = board.getPieceWithCoords(x, y)) {
