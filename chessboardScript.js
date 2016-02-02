@@ -2,8 +2,8 @@ var isWhiteTurn = true;
 var isGameRunning = false;
 var isCastlingLeft = false;
 var isCastlingRight = false;
-var isFreeplayTest = false;		//allows user to move both white and black pieces in freeplay with highlighting for both pieces
-var isCheckingBoard = false;
+var isFreeplayTest = false;  //allows user to move both white and black pieces in freeplay with highlighting for both pieces
+var isCheckingBoard = false; //use this boolean to check what moves are possible, without actually making highlights. 
 var highlightedTiles = [];
 var allHighlightedTiles = []; //for looking ahead at all possible moves in a ply.
 var lastSelectedPiece; // for moving pieces
