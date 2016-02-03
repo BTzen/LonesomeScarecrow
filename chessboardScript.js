@@ -4,6 +4,7 @@ var isCastlingLeft = false;
 var isCastlingRight = false;
 var isFreeplayTest = false;  //allows user to move both white and black pieces in freeplay with highlighting for both pieces
 var isCheckingBoard = false; //use this boolean to check what moves are possible, without actually making highlights. 
+var isKingInCheck = false; //this will get changed to true hopefully once, and after alerting the user, should which back to false (if they can get out of check)
 var highlightedTiles = [];
 var allHighlightedTiles = []; //for looking ahead at all possible moves in a ply.
 var lastSelectedPiece; // for moving pieces
@@ -252,7 +253,7 @@ function fakeChessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 }
 
 function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { 
-	DEBUG_HIGHLIGHT();
+	//DEBUG_HIGHLIGHT();
 	//console.log(x + ' row col ' + y); //debug
 	if (isGameRunning) {
 		var column = Math.floor(x / LENGTH);

@@ -29,10 +29,22 @@ function validAttack(row, column, colourBool) {
 	}
 }
 
-/* CHECK IF KING IS IN CHECK
+/* new Method that will check if a piece is attacking a King.
  *
  */
-function inCheck(kingIsWhite) {
+function isAttackingKing (row, column, colourBool) {
+	if (validAttack(row, column, colourBool) && board.getPiece(row,column).type === "King") {
+		return true;
+	}
+}
+
+/* CHECK IF KING IS IN CHECK
+ * I think this will have to be called inside each listener.
+ * Meaning after a piece is moved it will automatically check the condition
+ * Once the turn is over it should output some sort of message.
+ * Should require a global variable
+ */
+function inCheck(row, column, colourBool) {
 	//REDO THIS METHOD
 	/* 
 	Go through each piece.
@@ -44,6 +56,16 @@ function inCheck(kingIsWhite) {
 	We also need to see if by moving one of our pieces will save the king.
 	If neither of these types of moves are possible then we are in checkmate.
 	*/
+	
+	// check if every piece is attacking or not? might not use this logic.
+	// may delgate this to validAttack
+	for (var checkRow = 0; checkRow < 64; checkRow++) {
+		for (var checkCol = 0; checkCol < 64; checkCol++) {
+			if (isAttackingKing (row, column, colourBool)) {
+				return true;
+			}
+		}		
+	}
 }
 
 /* Checks if castling is possible with rook at given position
