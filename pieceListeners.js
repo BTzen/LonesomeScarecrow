@@ -1,6 +1,10 @@
+//Billings, Kurylovich
 //Contains logic for piece behaviour
 
- function fill(ctxHighlight, color, moveType, row, column) {
+/*
+ *
+*/
+function fill(ctxHighlight, color, moveType, row, column) {
 	if (column > -1 && column < 8 && row > -1 && row < 8) {
 		if (!isCheckingBoard) {
 			ctxHighlight.fillStyle = color;
@@ -12,7 +16,9 @@
 	}
 }
 
-//CHECK OPPONENT AND BOUNDS
+/* check for opponent and board boundaries
+ *
+*/
 function validAttack(row, column, colourBool) {
 	var toAttack = board.getPiece(row,column);
 	if (toAttack !== null) {
@@ -24,7 +30,7 @@ function validAttack(row, column, colourBool) {
 	}
 }
 
-/* CHECK IF KING IS IN CHECK
+/* checks if king is in check
  *
 */
 function inCheck(kingIsWhite) {

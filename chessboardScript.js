@@ -1,3 +1,5 @@
+//Billings, Kurylovich
+
 var isWhiteTurn = true;
 var isGameRunning = false;
 var isCastlingLeft = false;
@@ -11,6 +13,14 @@ var lastRow, lastColumn; //
 var initialBoardState = [];
 var ctxPieces;// = document.getElementById('chesspieces').getContext('2d');	//the context that the pieces are drawn on - used EVERYWHERE
 var pawnTwoSquaresRowCol = null;	//array to hold pos of last pawn that moved 2 squares after moving
+
+//from html
+		var listitemID = 1;	//index used to allow remove button to reference the list element it's attached to for deletion
+		var occupiedTiles = [];
+		var isWhiteKingPlaced = false;
+		var isBlackKingPlaced = false;
+		var whiteKingData = [];
+		var blackKingData = [];
 
 const LENGTH = 75;
 const OFFSET = 10;
@@ -251,8 +261,10 @@ function fakeChessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 	chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
 }
 
+/* 
+ * majority of game logic occurs here
+*/
 function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { 
-	DEBUG_HIGHLIGHT();
 	//console.log(x + ' row col ' + y); //debug
 	if (isGameRunning) {
 		var column = Math.floor(x / LENGTH);
@@ -380,14 +392,14 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 	}
 }
 
-function DEBUG_HIGHLIGHT() {
-	for (var row=0; row<8; row++) {
-		for (var col=0; col<8; col++) {
-			if (board.getPiece(row, col) !== null) {
-				ctxHighlight.fillStyle = "rgb(0,153,0)";
-				ctxHighlight.fillRect(col * LENGTH, row * LENGTH, LENGTH, LENGTH);
-			}
-		}
-	}
-}
+// function DEBUG_HIGHLIGHT() {
+	// for (var row=0; row<8; row++) {
+		// for (var col=0; col<8; col++) {
+			// if (board.getPiece(row, col) !== null) {
+				// ctxHighlight.fillStyle = "rgb(0,153,0)";
+				// ctxHighlight.fillRect(col * LENGTH, row * LENGTH, LENGTH, LENGTH);
+			// }
+		// }
+	// }
+// }
 window.onload = init;
