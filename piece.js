@@ -1,3 +1,9 @@
+/* Billings, Kurylovich */
+
+/* outlines basic functionality for chess pieces
+ *
+*/
+
 //object constructor
 var Piece = function(type, isWhite, unicode) {
 	//warns the user if a Piece object is instantiated

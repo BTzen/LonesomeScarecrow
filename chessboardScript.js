@@ -1,3 +1,6 @@
+/* Billings, Kurylovich */
+
+// GLOBALS
 var isWhiteTurn = true;
 var isGameRunning = false;
 var isCastlingLeft = false;
@@ -33,7 +36,7 @@ var board = {
     },
 
     /* Put a piece in its initial position on the board
-     *row expects row index
+     * row expects row index
      */
     placePiece: function(piece, row, column) {
         var x = column * LENGTH;
@@ -104,9 +107,9 @@ var board = {
     },
 
     /* Find a piece on the board using pixel coordinates on the canvas
-     *x the horizontal component of the 2d coordinate 
-     *y the vertical component of the 2d coordinate
-     */
+     * x the horizontal component of the 2d coordinate 
+     * y the vertical component of the 2d coordinate
+    */
     getPieceWithCoords: function(x, y) {
         var column = Math.floor(x / LENGTH);
         var row = Math.floor(y / LENGTH);
@@ -243,9 +246,9 @@ function reinit(playerIsWhite) {
 	isWhiteTurn = true;	//white will always move first
 	document.getElementById('turn').innerHTML = "Turn: White";
 }
-/**
-for every piece in the array I check if it has been clicked and do the corresponding highlighting
-*/
+/* for every piece in the array I check if it has been clicked and do the corresponding highlighting
+ *
+ */
 function fakeChessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 	highlightedTiles = [];//reset
 	lastSelectedPiece = null;
@@ -253,8 +256,6 @@ function fakeChessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 }
 
 function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) { 
-	//DEBUG_HIGHLIGHT();
-	//console.log(x + ' row col ' + y); //debug
 	if (isGameRunning) {
 		var column = Math.floor(x / LENGTH);
 		var row = Math.floor(y / LENGTH);
@@ -280,11 +281,12 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 			board.movePiece(lastSelectedPiece, row, column);
 			
 			if (pawnTwoSquaresRowCol !== null) pawnTwoSquaresRowCol = null;
+			
 			// en passant check
 			if (lastSelectedPiece !== null && lastSelectedPiece.type == "Pawn") {
 				//check for 2 square move
 				if (Math.abs(lastRow - row) === 2) {
-					lastSelectedPiece.hasMovedTwoSquaresLastTurn = true;
+					lastSelectedPiece.hasMovedTwoSquaresLastTurn = true;	//do we ever clear this variable?
 					pawnTwoSquaresRowCol = [row, column];
 				}
 			}

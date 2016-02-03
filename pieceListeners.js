@@ -1,3 +1,4 @@
+/* Billings, Kurylovich */
 //Contains logic for piece behaviour
 
 /* if this method is not just cheking the board it will display
@@ -24,7 +25,7 @@ function validAttack(row, column, colourBool) {
 		if  (row > 7 || row < 0 || column > 7 || column < 0) { 
 			return false;
 		} else {
-			return board.getPiece(row,column).isWhite === colourBool;
+			return board.getPiece(row,column).isWhite === colourBool;  //Uncaught TypeError: Cannot read property 'isWhite' of undefined
 		}		
 	}
 }
