@@ -1,8 +1,11 @@
+<<<<<<< HEAD
 <!-- Billings, Kurylovich -->
+=======
+<!--Billings, Kurylovich-->
+>>>>>>> 1763609f383faa8b04341bcf111ed274b044e937
 
 <!DOCTYPE html>
 <html>
-
 <head>
   <title>Chess</title>
    <link rel="stylesheet" type="text/css" href="chessboardStyle.css">
@@ -19,7 +22,11 @@
    <script src="jquery-ui/jquery-ui.js"></script>
    <script type="text/javascript" src="piece.js"></script>
    <script type="text/javascript" src="pieceListeners.js"></script>
+<<<<<<< HEAD
 >>>>>>> 024e0b85f9bacd6d5cb15683c57ea377116dc91c
+=======
+	 <script type="text/javascript" src="listeners.js"></script>
+>>>>>>> 1763609f383faa8b04341bcf111ed274b044e937
    <script type="text/javascript" src="chessboardScript.js" ></script>
 </head>
 
@@ -40,7 +47,7 @@
 				<legend>Options</legend>
 				<label>Select ply: </label><input type="number" id="uiPly" min="2" max="4" value="3">
 				<input type="button" class="uiSurrender fill" value="Surrender" onclick="surrenderListener()" disabled>
-				<input type="button" class="uiStart" value="Start" onclick="startMatchEvent()">
+				<input type="button" class="uiStart" value="Start" onclick="matchStartListener()">
 				<input type="button" id="uiFreeplay" value="Freeplay" onclick="freeplayListener()">
 			</fieldset>
 			<fieldset id="freeplayInfo">
@@ -85,14 +92,20 @@
 					<ol>
 					</ol>
 				</div>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 1763609f383faa8b04341bcf111ed274b044e937
 				<!-- <input type="radio" name="fpPlayerMovesBlack" value="true" checked="checked">Player controls black
 				<input type="radio" name="fpPlayerMovesBlack" value="false">AI controls black -->
 				<input type="button" id="fpStart" class="uiStart fill" value="Start" onclick="freeplayStartListener()">
 				<input type="button" id="fpReset" class="uiSurrender fill" value="Reset" onclick="surrenderListener()" disabled>
+<<<<<<< HEAD
 <!-- =======
 				<input type="button" class="uiSurrender fill" value="Surrender" onclick="surrenderListener()" disabled>
 >>>>>>> .merge_file_a02240 -->
+=======
+>>>>>>> 1763609f383faa8b04341bcf111ed274b044e937
 				<input type="button" class="fill alignBottom" value="Exit Freeplay" onclick="exitFreeplayListener()">
 			</fieldset>
 			
@@ -114,6 +127,19 @@
 		</div>
 		<input type="button" id="acceptPromotion" value="Accept" onclick="acceptPromotionListener()">
 	</div>
+<<<<<<< HEAD
+=======
+	<script>
+		var listitemID = 1;	//so the remove button knows what list element to delete
+		var occupiedTiles = [];
+		var isWhiteKingPlaced = false;
+		var isBlackKingPlaced = false;
+		var whiteKingData = [];
+		var blackKingData = [];
+		
+		
+	</script>
+>>>>>>> 1763609f383faa8b04341bcf111ed274b044e937
 </body>
 
 </html>

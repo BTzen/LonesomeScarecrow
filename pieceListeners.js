@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 //Billings, Kurylovich
+=======
+/* Billings, Kurylovich */
+>>>>>>> 1763609f383faa8b04341bcf111ed274b044e937
 //Contains logic for piece behaviour
 
 <<<<<<< HEAD
@@ -38,7 +42,7 @@ function validAttack(row, column, colourBool) {
 		if  (row > 7 || row < 0 || column > 7 || column < 0) { 
 			return false;
 		} else {
-			return board.getPiece(row,column).isWhite === colourBool;
+			return board.getPiece(row,column).isWhite === colourBool;  //Uncaught TypeError: Cannot read property 'isWhite' of undefined
 		}		
 	}
 }
