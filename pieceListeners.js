@@ -1,10 +1,18 @@
 //Billings, Kurylovich
 //Contains logic for piece behaviour
 
+<<<<<<< HEAD
 /*
  *
 */
 function fill(ctxHighlight, color, moveType, row, column) {
+=======
+/* if this method is not just cheking the board it will display
+ * the tiles with your possible moves, otherwise it will push the possible moves
+ * to the highlighted tiles 
+ */
+ function fill(ctxHighlight, color, moveType, row, column) {
+>>>>>>> 024e0b85f9bacd6d5cb15683c57ea377116dc91c
 	if (column > -1 && column < 8 && row > -1 && row < 8) {
 		if (!isCheckingBoard) {
 			ctxHighlight.fillStyle = color;
@@ -16,9 +24,14 @@ function fill(ctxHighlight, color, moveType, row, column) {
 	}
 }
 
+<<<<<<< HEAD
 /* check for opponent and board boundaries
  *
 */
+=======
+/*this will check if there is a possible attack to be made.
+ */
+>>>>>>> 024e0b85f9bacd6d5cb15683c57ea377116dc91c
 function validAttack(row, column, colourBool) {
 	var toAttack = board.getPiece(row,column);
 	if (toAttack !== null) {
@@ -30,16 +43,52 @@ function validAttack(row, column, colourBool) {
 	}
 }
 
+<<<<<<< HEAD
 /* checks if king is in check
+=======
+/* new Method that will check if a piece is attacking a King.
+>>>>>>> 024e0b85f9bacd6d5cb15683c57ea377116dc91c
  *
-*/
-function inCheck(kingIsWhite) {
+ */
+function isAttackingKing (row, column, colourBool) {
+	if (validAttack(row, column, colourBool) && board.getPiece(row,column).type === "King") {
+		return true;
+	}
+}
+
+/* CHECK IF KING IS IN CHECK
+ * I think this will have to be called inside each listener.
+ * Meaning after a piece is moved it will automatically check the condition
+ * Once the turn is over it should output some sort of message.
+ * Should require a global variable
+ */
+function inCheck(row, column, colourBool) {
 	//REDO THIS METHOD
+	/* 
+	Go through each piece.
+	Check the highlighted tiles.
+	see if it is attacking the king.
+	if the king is being under attack then he is in check.
+	-----------------------------------------------------
+	Now we want to check where the king can move.
+	We also need to see if by moving one of our pieces will save the king.
+	If neither of these types of moves are possible then we are in checkmate.
+	*/
+	
+	// check if every piece is attacking or not? might not use this logic.
+	// may delgate this to validAttack
+	for (var checkRow = 0; checkRow < 64; checkRow++) {
+		for (var checkCol = 0; checkCol < 64; checkCol++) {
+			if (isAttackingKing (row, column, colourBool)) {
+				return true;
+			}
+		}		
+	}
 }
 
 /* Checks if castling is possible with rook at given position
  * technically a king move
-*/
+ */
 function castlingCheck(rookRow, rookCol) {
 	var canCastle = true;
 	var rookToCheck = board.getPiece(rookRow, rookCol);
@@ -114,7 +163,7 @@ function castlingCheck(rookRow, rookCol) {
 /*
  * row the row of the pawn that moves 2 spaces forward, post move(and the one that is potentially vulnerable to en passant)
  * col the column of said pawn
-*/
+ */
 function enPassantCheck(row, column) {
 	//capturing pawn must be on its 5th rank before executing the maneuver
 	//check for pawns immediate to the right and left of the pawn that moved
