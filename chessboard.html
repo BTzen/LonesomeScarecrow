@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 <!-- Billings, Kurylovich -->
-=======
-<!--Billings, Kurylovich-->
->>>>>>> 1763609f383faa8b04341bcf111ed274b044e937
 
 <!DOCTYPE html>
 <html>
@@ -11,23 +7,19 @@
    <link rel="stylesheet" type="text/css" href="chessboardStyle.css">
    <link rel="stylesheet" href="jquery-ui/jquery-ui.css">				<!-- for dialog -->
    <script src="jquery-ui/external/jquery/jquery.js"></script>
-<<<<<<< HEAD
+	 <script type="text/javascript" src="global.js"></script>
 	 <script src="jquery-ui/jquery-ui.js"></script>
-	 <script type="text/javascript" src="listeners.js"></script>
-	 <script type="text/javascript" src="piece.js"></script>
-   <script type="text/javascript" src="pieceListeners.js"></script>
+	 <script type="text/javascript" src="AI.js"></script>
+	 <script type="text/javascript" src="Board.js"></script>
+	 <script type="text/javascript" src="Canvas.js"></script>
+	 <script type="text/javascript" src="Listeners.js"></script>
+	 <script type="text/javascript" src="Piece.js"></script>
+	 <script type="text/javascript" src="Move.js"></script>
+   <script type="text/javascript" src="PieceListeners.js"></script>
+	 <script type="text/javascript" src="Rules.js"></script>
    <!-- <script type="text/javascript" src="minimax.js"></script> -->
    <!-- <script type="text/javascript" src="ai.js"></script> -->
-=======
-   <script src="jquery-ui/jquery-ui.js"></script>
-   <script type="text/javascript" src="piece.js"></script>
-   <script type="text/javascript" src="pieceListeners.js"></script>
-<<<<<<< HEAD
->>>>>>> 024e0b85f9bacd6d5cb15683c57ea377116dc91c
-=======
-	 <script type="text/javascript" src="listeners.js"></script>
->>>>>>> 1763609f383faa8b04341bcf111ed274b044e937
-   <script type="text/javascript" src="chessboardScript.js" ></script>
+   <script type="text/javascript" src="ChessboardScript.js" ></script>
 </head>
 
 <body>
@@ -46,8 +38,8 @@
 			<fieldset id="gameInfo">
 				<legend>Options</legend>
 				<label>Select ply: </label><input type="number" id="uiPly" min="2" max="4" value="3">
-				<input type="button" class="uiSurrender fill" value="Surrender" onclick="surrenderListener()" disabled>
-				<input type="button" class="uiStart" value="Start" onclick="matchStartListener()">
+				<input type="button" id="uiSurrender" class="uiSurrender fill" value="Surrender" disabled>
+				<input type="button" id="uiStart" class="uiStart" value="Start">
 				<input type="button" id="uiFreeplay" value="Freeplay" onclick="freeplayListener()">
 			</fieldset>
 			<fieldset id="freeplayInfo">
@@ -88,31 +80,25 @@
 					<option value="0">8</option>
 				</select>
 				
-				<div id="freeplayPieces">
+				<div id="freeplayPieces">						<!--contains list of pieces added to the board in freeplay mode-->
 					<ol>
 					</ol>
 				</div>
-<<<<<<< HEAD
 
-=======
->>>>>>> 1763609f383faa8b04341bcf111ed274b044e937
 				<!-- <input type="radio" name="fpPlayerMovesBlack" value="true" checked="checked">Player controls black
 				<input type="radio" name="fpPlayerMovesBlack" value="false">AI controls black -->
-				<input type="button" id="fpStart" class="uiStart fill" value="Start" onclick="freeplayStartListener()">
-				<input type="button" id="fpReset" class="uiSurrender fill" value="Reset" onclick="surrenderListener()" disabled>
-<<<<<<< HEAD
-<!-- =======
-				<input type="button" class="uiSurrender fill" value="Surrender" onclick="surrenderListener()" disabled>
->>>>>>> .merge_file_a02240 -->
-=======
->>>>>>> 1763609f383faa8b04341bcf111ed274b044e937
+				<input type="button" id="fpStart" class="uistart fill" value="Start" onclick="freeplayStartListener()">
+				<input type="button" id="fpSaveLayout" class="fill" value="Save Layout" onclick="saveLayoutListener()">
+				<input type="button" id="fpLoadLayout" class="fill" value="Load Layout" onclick="loadLayoutListener()">
+
+				<input type="button" id="fpReset" class="uiSurrender fill" value="Reset" onclick="resetListener()" disabled>
 				<input type="button" class="fill alignBottom" value="Exit Freeplay" onclick="exitFreeplayListener()">
 			</fieldset>
 			
 			<div id="board">
 				<canvas id="chessboard" width="600" height="600"></canvas>
 				<canvas id="highlight" width="600" height="600"></canvas>
-				<canvas id="chesspieces" width="600" height="600"></canvas>
+				<canvas id="chesspieceCanvas" width="600" height="600"></canvas>
 			</div>
 		</div>
 	</div>
@@ -127,8 +113,6 @@
 		</div>
 		<input type="button" id="acceptPromotion" value="Accept" onclick="acceptPromotionListener()">
 	</div>
-<<<<<<< HEAD
-=======
 	<script>
 		var listitemID = 1;	//so the remove button knows what list element to delete
 		var occupiedTiles = [];
@@ -139,7 +123,5 @@
 		
 		
 	</script>
->>>>>>> 1763609f383faa8b04341bcf111ed274b044e937
 </body>
-
 </html>

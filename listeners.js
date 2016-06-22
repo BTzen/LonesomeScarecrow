@@ -1,8 +1,11 @@
 /* Billings, Kurylovich */
 
-/* 
- * removes listeners from HTML for maintainability and readability
-*/
+$(window).load(function() {
+	document.getElementById('uiStart').addEventListener('click', startMatchListener);
+	document.getElementById('uiSurrender').addEventListener('click', surrenderListener);
+	
+
+});
 
 /*
  *
@@ -29,7 +32,7 @@ function freeplayStartListener() {
 	
 	isFreeplayTest = true;
 	isGameRunning = true;
-	alert("freeplay testing has begun");
+	console.log("freeplay testing has begun");
 	/*
 	var playerMovesBlack = ($('input[name=fpPlayerMovesBlack]:checked').val() == "true");
 	if (playerMovesBlack) {
@@ -42,61 +45,45 @@ function freeplayStartListener() {
 	}
 	*/
 }
-		
-/* changes UI and gameRunning bool
- * 
-*/
-function startAI() {
-	isGameRunning = true;
-	$('#turn').css('visibility', 'visible');
-	$('.uiSurrender').attr('disabled', false);
-	$('.uiStart').attr('disabled', true);
+
+function saveLayoutListener() {
+	savedBoard = $.extend(true, {}, oldObject);			//make a deep copy of the board	
 }
 
-/* begin a match against AI on "Start" button click
- *
-*/
-function matchStartListener() {
-	var enteredPly = $('#uiPly').val();
-	treeDepth = (enteredPly > 4 || enteredPly < 2) ? 4 : enteredPly;
-	$('#uiPly').attr('disabled', true);
+function loadLayoutListener() {
+	if (savedBoard != undefined)
+		board = savedBoard;
 	
-	startAI();
-	if (isGameRunning) {
-		board.clear(0,0,8,8); //clean up the board
-		placePieces(true);
-		$('#uiFreeplay').attr('disabled', true);
-		// alert("The match has started!");
-	}
+	board.drawPieces();
+	//freeplayStartListener();
 }
-
 /* show promotion dialog when pawn reaches opposite side of board
  *
-*/
+ */
 function acceptPromotionListener() {
 	var newPiece;
 	var isWhite = $('#promotion').data('isWhite');
 	var row = $('#promotion').data('row');
 	var col = $('#promotion').data('column');
-	board.removePiece(row, col);
 	//alert($('#promotion').data('isWhite') + ' ' + $('#promotion').data('row') + ' ' + $('#promotion').data('column'));
 	switch ($('input[name=promotionPick]:checked').val()) {
 		case "Queen":
-			newPiece = new Queen(isWhite, row, col);
+			newPiece = new Queen(isWhite);
 			break;
 		case "Rook":
-			newPiece = new Rook(isWhite, row, col);
+			newPiece = new Rook(isWhite);
 			break;
 		case "Bishop":
-			newPiece = new Bishop(isWhite, row, col);
+			newPiece = new Bishop(isWhite);
 			break;
 		case "Knight":
-			newPiece = new Knight(isWhite, row, col);
+			newPiece = new Knight(isWhite);
 			break;
 	}
 	
-	board.placePiece(newPiece, row, col);
+	board.addPiece(newPiece, row, col);
 	$('#promotion').dialog("close");	//close dialog
+	draw(board);
 }
 
 /* Add piece to board for freeplay
@@ -184,6 +171,33 @@ function addPiece(isWhite, pieceName, rank, file) {
 	listitemID++;
 }
 
+/* begin a match against AI on "Start" button click
+ *
+*/
+function startMatchListener() {
+	// var enteredPly = $('#uiPly').val();
+	// treeDepth = (enteredPly > 4 || enteredPly < 2) ? 4 : enteredPly;
+	// $('#uiPly').attr('disabled', true);
+	
+	// //enable AI
+	startAI();
+	
+	if (isGameRunning) {
+		// board.clear(0,0,8,8); //clean up the board
+		// placePiecesForMatch(true);
+		// $('#uiFreeplay').attr('disabled', true);
+		// alert("The match has started!");
+	}
+	
+	//place pieces on board
+	board.initialize(true);
+	draw(board);
+	
+	//DEBUG
+	// minimax(board);
+	max(board);
+}
+
 /* Remove piece from board and from backing data structure
  *
 */
@@ -246,5 +260,12 @@ function freeplayListener() {
 	board.clear(0, 0, 8, 8);
 }
 
-
+function resetListener() {
+	if (savedBoard !== undefined) {
+		board.clear();
+		board = savedBoard;
+		
+	}
+	$('#fpReset').attr('disabled', true);
+}
 

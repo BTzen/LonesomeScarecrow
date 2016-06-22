@@ -5,10 +5,10 @@
 */
 
 //object constructor
-var Piece = function(type, isWhite, unicode) {
+function Piece(type, isWhite, unicode) {
 	//warns the user if a Piece object is instantiated
 	if (this.__proto__ === Piece.prototype) {
-		alert("Piece is intended as an abstract class and should not be instantiated.");
+		alert("Piece is an abstract class and should not be instantiated directly.");
 	}
 	// ************************************************************************ 
 	// PUBLIC PROPERTIES -- ANYONE MAY READ/WRITE 
@@ -16,12 +16,15 @@ var Piece = function(type, isWhite, unicode) {
 	this.type = type;
 	this.isWhite = isWhite;
 	this.unicode = unicode;
+	// this.legalMoves;			// ds
 };
 
 Piece.prototype.toString = function() {
 	return ((this.isWhite) ? "White " : "Black ") + this.type;
 }
-
+/* Create a Pawn.prototype object that inherits from Piece.prototype.  
+ * Note: A common error here is to use "new Piece()" to create Pawn.prototype.
+ */
 function Pawn(isWhite) {
 	//call superclass constructor.  Note that the constructor must pass the child object's context (ie. this)
 	Piece.call(this, "Pawn", isWhite, (isWhite) ? "9817" : "9823");
