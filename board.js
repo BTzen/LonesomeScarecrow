@@ -1,12 +1,14 @@
 /* Note: Board class does not contain the functionality to draw the pieces. That is handled by chessboardScript.js
 */
-function Board(opts) {
-	// if (opts !== undefined)
-		// this.occupiedTiles = [];
-	// else if (opts === "clone") {
-		// this.occupiedTiles = jQuery.extend(true, {}, occupiedTilesToClone);
-	// }
+function Board(boardToClone) {
 	this.occupiedTiles = [];
+	if (arguments.length === 1) {
+		if (boardToClone.hasOwnProperty("occupiedTiles") && boardToClone.occupiedTiles !== null && boardToClone.occupiedTiles !== undefined) {
+			for (var i = 0; i < boardToClone.occupiedTiles.length; i++) {
+				this.occupiedTiles.push($.extend(true, {}, boardToClone.occupiedTiles[i]));
+			}
+		}
+	}
 }
 
 Board.prototype.clear = function() {
@@ -14,7 +16,9 @@ Board.prototype.clear = function() {
 }
 
 // Board.prototype.clone = function(boardToClone) {
-	
+	// for (var i = 0; i < boardToClone.occupiedTiles.length; i++) {
+		// this.occupiedTiles.push($.extend(true, {}, boardToClone.occupiedTiles[i]));
+	// }
 // }
 
 Board.prototype.draw = function() {

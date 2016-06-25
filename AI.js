@@ -1,6 +1,8 @@
 var player_max = BLACK;		// moves first
 var player_min = WHITE;
-var ply = 1;		// the desired search depth
+var currentPly = 0;
+var desiredPly = 1;		// the desired search depth
+var currentChildStates = [];
 // var root = new Node(null, board);
 
 function Node(parent, board) {
@@ -74,16 +76,18 @@ function highlightLogic(displayHighlight, tile) {
 function utility(s) {
 	let sum = 0;
 	
-	console.log(s.occupiedTiles.length);
+	// console.log("Current number of tiles on given board: " + s.occupiedTiles.length);
 	for (let tile of s.occupiedTiles) {
-		console.log("Piece: " + tile.piece);
+		// console.log("Piece: " + tile.piece);
 		let val = tile.piece.value;
 		if (!tile.piece.isWhite)
 			val *= -1;
-		console.log("Value: " + val);
+		// console.log("Value: " + val);
 		sum += val;
 		console.log("current sum: " + sum);
 	}
+	
+	return sum;
 }
 
 /*
@@ -99,44 +103,83 @@ function max(state) {
 	// for each a in ACTIONS(state)
 	// v = MAX(v, MIN_VALUE(result(s, a)))
 	// return v
-	
-	if (false)	// isTerminalState(state)
+	console.log('max');
+	if (false || currentPly == desiredPly)	// isTerminalState(state)
 		return utility(state);
 	
-	isCheckingBoard = true;
+	isCheckingBoard = true;		// prevent tiles in UI from being visibly highlighted
 	var v = Number.MIN_VALUE;
 	// loop through all the occupied tiles and find all the possible moves for the relevant team.
 	// try each of those moves and see which one offers the best result
-	let currentChildStates = [];
+	
 	board.occupiedTiles.forEach(function(tile) {
 		if (player_max == tile.piece.isWhite) {		// only check pieces of the appropriate colour
 			highlightLogic(true, tile);			// find which actions this specific piece can take
 			
 			// create a new board state for each of the possible actions
 			allHighlightedTiles.forEach(function(action, index) {
-				let newBoardState = jQuery.extend(true, {}, board.occupiedTiles);
-				let child = new Board(newBoardState);
+				// let child = new Board();
+				// child.clone(board);
+				let child = new Board(board);
+				
 				// let isSame = (child === board);
 				// let t2 = (child == board);
 				// let t3 = Object.is(child, board);
 				// let t4 = Object.is(board, board);
 				child.movePiece(tile.row, tile.column, allHighlightedTiles[index].row, allHighlightedTiles[index].column);
+				currentChildStates.push(child);
 			});
-			
-			//child.movePiece(tile.row, tile.col,
 		}
+		currentPly++;
 		
-		// child.move(tile.)
-		// child
-		
+		for (var i = 0; i < currentChildStates.length; i++) {
+			v = Math.max(v, min(currentChildStates[i]));
+		}
+		// currentChildStates.forEach(function(state, index) {
+			// v = Math.max(v, min(state));
+		// });
 	});
-	console.log('max');
+	
 	// v = max(v, min(result(s,a))
 	
 	// returns a utility value
 	isCheckingBoard = false;
 }
 
+function min(state) {
+	// if TERMINAL-STATE(state) then return UTILITY(state)
+	// v = -infinity
+	// for each a in ACTIONS(state)
+	// v = MAX(v, MIN_VALUE(result(s, a)))
+	// return v
+	console.log('min');
+	
+	if (false || currentPly == desiredPly)	// isTerminalState(state)
+		return utility(state);
+	
+	isCheckingBoard = true;
+	var v = Number.MAX_VALUE;
+
+	board.occupiedTiles.forEach(function(tile) {
+		if (player_max == tile.piece.isWhite) {		// only check pieces of the appropriate colour
+			highlightLogic(true, tile);			// find which actions this specific piece can take
+			
+			// create a new board state for each of the possible actions
+			allHighlightedTiles.forEach(function(action, index) {
+				let child = new Board(board);
+				child.movePiece(tile.row, tile.column, allHighlightedTiles[index].row, allHighlightedTiles[index].column);
+				currentChildStates.push(child);
+			});
+		}
+		currentPly++;
+		
+		currentChildStates.forEach(function(state, index) {
+			v = Math.min(v, max(state));
+		});
+	});
+	// returns a utility value
+	isCheckingBoard = false;
+}
 /*
  * returns true if the game is over and false otherwise
  */
