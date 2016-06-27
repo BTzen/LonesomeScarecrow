@@ -194,8 +194,8 @@ function startMatchListener() {
 	draw(board);
 	
 	//DEBUG
-	// minimax(board);
-	max(board);
+	minimax(board);
+	//max(board);
 }
 
 /* Remove piece from board and from backing data structure

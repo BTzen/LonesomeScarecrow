@@ -1,13 +1,23 @@
-var player_max = BLACK;		// moves first
+var player_max = BLACK;		// played by the AI; the root of the search tree is a max node
 var player_min = WHITE;
 var currentPly = 0;
-var desiredPly = 1;		// the desired search depth
-var currentChildStates = [];
+var desiredPly = 2;		// the desired search depth
+var successors = [];
 // var root = new Node(null, board);
+// DEBUG
+var utilityResults = 0;
+var nodes = [];
+var tempUtility = -Math.MAX_VALUE;
 
-function Node(parent, board) {
-	this.parent = parent;
-	this.board = board
+/* encapsulates data needed to infer the best move from a given state
+ * state the state of the board
+ * action the action that led from the prior state to the current one
+ */
+function Node(state, utility, action, ply) {
+	this.state = state;
+	this.utility = utility;
+	this.action = action;
+	this.ply = ply;
 }
 
 /* 
@@ -34,7 +44,7 @@ function generateSuccessors(state, bColour) {
 	isCheckingBoard = false;
 }
 
-function highlightLogic(displayHighlight, tile) {
+function highlightLogic(displayHighlight, tile, board) {
 	// if (displayHighlight)
 		// isCheckingBoard = false;
 	// else
@@ -80,107 +90,138 @@ function utility(s) {
 	for (let tile of s.occupiedTiles) {
 		// console.log("Piece: " + tile.piece);
 		let val = tile.piece.value;
-		if (!tile.piece.isWhite)
+		if (tile.piece.isWhite)
 			val *= -1;
 		// console.log("Value: " + val);
 		sum += val;
-		console.log("current sum: " + sum);
+		
 	}
-	
+	console.log("total sum: " + sum);
 	return sum;
 }
 
 /*
- * returns an action
+ * returns an action with the best utility score
  */ 
 function minimax(state) {
-	return Math.max;
+	isCheckingBoard = true;		// prevent tiles in UI from being visibly highlighted
+	nodes.push(new Node(state, undefined, null, 0));			// push root node
+	var action;
+	var v = max(state);
+	isCheckingBoard = false;
+	// nodes = [];
+	console.log('minimax returned: ' + v);
+	
+	// return action;	// return the action in successors(state) with value v
+}
+
+// contains common logic for min and max methods
+function minimaxHelper(state, isRunningMaxCode) {
+	var u = (isRunningMaxCode) ? -Number.MAX_VALUE : Number.MAX_VALUE;
+	// if TERMINAL-STATE(state) then return UTILITY(state)
+	if (false || currentPly == desiredPly) {	// isTerminalState(state)
+		u = utility(state);
+		for (var i = 0; i < nodes.length; i++) {
+			if (Object.is(nodes[i].state, state)) {
+				nodes[i].utility = u;
+			}
+		}
+	}
+	else {
+		// loop through all the occupied tiles and find all the possible moves for the relevant team
+		// try each of those moves and see which one offers the best result
+		state.occupiedTiles.forEach(function(tile) {
+			if (player_max == tile.piece.isWhite) {		// only check pieces of the appropriate colour
+				highlightLogic(true, tile, state);				// find which actions this specific piece can take
+				
+				// create a new board state for each of the possible actions
+				allHighlightedTiles.forEach(function(action, index) {
+					// let child = new Board();
+					// child.clone(board);
+					let child = new Board(board);
+					
+					// let isSame = (child === board);
+					// let t2 = (child == board);
+					// let t3 = Object.is(child, board);
+					// let t4 = Object.is(board, board);
+					child.movePiece(tile.row, tile.column, allHighlightedTiles[index].row, allHighlightedTiles[index].column);
+					successors.push(child);
+					
+					//DEBUG
+					let node = new Node(child, undefined, allHighlightedTiles[index], currentPly + 1);
+					nodes.push(node);
+				});
+			}
+		});
+		currentPly++;
+		allHighlightedTiles = []
+		// for each a in ACTIONS(state)
+		// v = MAX(v, MIN_VALUE(result(s, a)))
+		for (var i = 0; i < successors.length; i++) {
+			u = (isRunningMaxCode) ? Math.max(u, min(successors[i])) : Math.min(u, max(successors[i]));
+			// nodes[i + 1].utility = u;					// first node is the root so I need to start at the element at index i+1
+		}
+	}
+	
+	return u;
 }
 
 function max(state) {
+	return minimaxHelper(state, true);
+	// var u = -Number.MAX_VALUE;
 	// if TERMINAL-STATE(state) then return UTILITY(state)
-	// v = -infinity
-	// for each a in ACTIONS(state)
-	// v = MAX(v, MIN_VALUE(result(s, a)))
-	// return v
-	console.log('max');
-	if (false || currentPly == desiredPly)	// isTerminalState(state)
-		return utility(state);
-	
-	isCheckingBoard = true;		// prevent tiles in UI from being visibly highlighted
-	var v = Number.MIN_VALUE;
-	// loop through all the occupied tiles and find all the possible moves for the relevant team.
-	// try each of those moves and see which one offers the best result
-	
-	board.occupiedTiles.forEach(function(tile) {
-		if (player_max == tile.piece.isWhite) {		// only check pieces of the appropriate colour
-			highlightLogic(true, tile);			// find which actions this specific piece can take
-			
-			// create a new board state for each of the possible actions
-			allHighlightedTiles.forEach(function(action, index) {
-				// let child = new Board();
-				// child.clone(board);
-				let child = new Board(board);
+	// if (false || currentPly == desiredPly) {	// isTerminalState(state)
+		// u = utility(state);
+		// for (var i = 0; i < nodes.length; i++) {
+			// if (Object.is(nodes[i].state, state)) {
+				// nodes[i].utility = u;
+			// }
+		// }
+	// }
+	// else {
+		// // loop through all the occupied tiles and find all the possible moves for the relevant team
+		// // try each of those moves and see which one offers the best result
+		// board.occupiedTiles.forEach(function(tile) {
+			// if (player_max == tile.piece.isWhite) {		// only check pieces of the appropriate colour
+				// highlightLogic(true, tile);				// find which actions this specific piece can take
 				
-				// let isSame = (child === board);
-				// let t2 = (child == board);
-				// let t3 = Object.is(child, board);
-				// let t4 = Object.is(board, board);
-				child.movePiece(tile.row, tile.column, allHighlightedTiles[index].row, allHighlightedTiles[index].column);
-				currentChildStates.push(child);
-			});
-		}
-		currentPly++;
-		
-		for (var i = 0; i < currentChildStates.length; i++) {
-			v = Math.max(v, min(currentChildStates[i]));
-		}
-		// currentChildStates.forEach(function(state, index) {
-			// v = Math.max(v, min(state));
+				// // create a new board state for each of the possible actions
+				// allHighlightedTiles.forEach(function(action, index) {
+					// // let child = new Board();
+					// // child.clone(board);
+					// let child = new Board(board);
+					
+					// // let isSame = (child === board);
+					// // let t2 = (child == board);
+					// // let t3 = Object.is(child, board);
+					// // let t4 = Object.is(board, board);
+					// child.movePiece(tile.row, tile.column, allHighlightedTiles[index].row, allHighlightedTiles[index].column);
+					// successors.push(child);
+					
+					// //DEBUG
+					// let node = new Node(child, undefined, allHighlightedTiles[index], currentPly + 1);
+					// nodes.push(node);
+				// });
+			// }
 		// });
-	});
+		// currentPly++;
+		// allHighlightedTiles = []
+		// // for each a in ACTIONS(state)
+		// // v = MAX(v, MIN_VALUE(result(s, a)))
+		// for (var i = 0; i < successors.length; i++) {
+			// u = Math.max(u, min(successors[i]));
+			// // nodes[i + 1].utility = u;					// first node is the root so I need to start at the element at index i+1
+		// }
+	// }
 	
-	// v = max(v, min(result(s,a))
-	
-	// returns a utility value
-	isCheckingBoard = false;
+	// return u;
 }
 
 function min(state) {
-	// if TERMINAL-STATE(state) then return UTILITY(state)
-	// v = -infinity
-	// for each a in ACTIONS(state)
-	// v = MAX(v, MIN_VALUE(result(s, a)))
-	// return v
-	console.log('min');
-	
-	if (false || currentPly == desiredPly)	// isTerminalState(state)
-		return utility(state);
-	
-	isCheckingBoard = true;
-	var v = Number.MAX_VALUE;
-
-	board.occupiedTiles.forEach(function(tile) {
-		if (player_max == tile.piece.isWhite) {		// only check pieces of the appropriate colour
-			highlightLogic(true, tile);			// find which actions this specific piece can take
-			
-			// create a new board state for each of the possible actions
-			allHighlightedTiles.forEach(function(action, index) {
-				let child = new Board(board);
-				child.movePiece(tile.row, tile.column, allHighlightedTiles[index].row, allHighlightedTiles[index].column);
-				currentChildStates.push(child);
-			});
-		}
-		currentPly++;
-		
-		currentChildStates.forEach(function(state, index) {
-			v = Math.min(v, max(state));
-		});
-	});
-	// returns a utility value
-	isCheckingBoard = false;
+	return minimaxHelper(state, false);
 }
-/*
+
+/* TODO doesn't check for stalemate or surrender
  * returns true if the game is over and false otherwise
  */
 function isTerminalState(state) {
