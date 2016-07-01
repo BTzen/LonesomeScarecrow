@@ -12,12 +12,16 @@ var tempUtility = -Math.MAX_VALUE;
 /* encapsulates data needed to infer the best move from a given state
  * state the state of the board
  * action the action that led from the prior state to the current one
+ *
+ *
  */
-function Node(state, utility, action, ply) {
+function Node(state, utility, action, ply, children, parent) {
 	this.state = state;
 	this.utility = utility;
 	this.action = action;
 	this.ply = ply;
+	this.parent = parent;
+	this.children = children;
 }
 
 /* 
@@ -105,7 +109,7 @@ function utility(s) {
  */ 
 function minimax(state) {
 	isCheckingBoard = true;		// prevent tiles in UI from being visibly highlighted
-	nodes.push(new Node(state, undefined, null, 0));			// push root node
+	nodes.push(new Node(state, undefined, null, 0, undefined, null));			// push root node
 	var action;
 	var v = max(state);
 	isCheckingBoard = false;
@@ -116,7 +120,7 @@ function minimax(state) {
 }
 
 // contains common logic for min and max methods
-function minimaxHelper(state, isRunningMaxCode) {
+function minimaxHelper(state, isRunningMaxCode, parent) {
 	var u = (isRunningMaxCode) ? -Number.MAX_VALUE : Number.MAX_VALUE;
 	// if TERMINAL-STATE(state) then return UTILITY(state)
 	if (false || currentPly == desiredPly) {	// isTerminalState(state)
@@ -124,6 +128,7 @@ function minimaxHelper(state, isRunningMaxCode) {
 		for (var i = 0; i < nodes.length; i++) {
 			if (Object.is(nodes[i].state, state)) {
 				nodes[i].utility = u;
+				break;
 			}
 		}
 	}
@@ -131,7 +136,9 @@ function minimaxHelper(state, isRunningMaxCode) {
 		// loop through all the occupied tiles and find all the possible moves for the relevant team
 		// try each of those moves and see which one offers the best result
 		state.occupiedTiles.forEach(function(tile) {
-			if (player_max == tile.piece.isWhite) {		// only check pieces of the appropriate colour
+			var pieceColorToCheck = (isRunningMaxCode) ? BLACK : WHITE;
+			
+			if (pieceColorToCheck == tile.piece.isWhite) {		// only check pieces of the appropriate colour
 				highlightLogic(true, tile, state);				// find which actions this specific piece can take
 				
 				// create a new board state for each of the possible actions
@@ -148,13 +155,15 @@ function minimaxHelper(state, isRunningMaxCode) {
 					successors.push(child);
 					
 					//DEBUG
-					let node = new Node(child, undefined, allHighlightedTiles[index], currentPly + 1);
+					let node = new Node(child, undefined, allHighlightedTiles[index], currentPly + 1, undefined, state);
 					nodes.push(node);
 				});
+				
 			}
 		});
 		currentPly++;
-		allHighlightedTiles = []
+		allHighlightedTiles = [];
+		successors = [];
 		// for each a in ACTIONS(state)
 		// v = MAX(v, MIN_VALUE(result(s, a)))
 		for (var i = 0; i < successors.length; i++) {

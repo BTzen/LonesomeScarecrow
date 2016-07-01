@@ -42,12 +42,14 @@ Board.prototype.getTile = function(row, col) {
 	if (row < 0 || row > 7 || col < 0 || col > 7) {
 		return undefined;
 	} 
-	
-	var currentTile = null;
-	for (var i = 0; i < this.occupiedTiles.length; i++) {
-		currentTile = this.occupiedTiles[i];
-		if (row === currentTile.row && col === currentTile.column)
-			break;
+	else {
+		var currentTile = null;
+		for (var i = 0; i < this.occupiedTiles.length; i++) {
+			if (row === this.occupiedTiles[i].row && col === this.occupiedTiles[i].column) {
+				currentTile = this.occupiedTiles[i];
+				break;
+			}
+		}
 	}
 	
 	return currentTile;
@@ -66,16 +68,14 @@ Board.prototype.initialize = function(playerIsWhite) {
 			// this.addPiece(new Rook(black), 0, 0);
 			
 			// place white pieces
-			this.addPiece(new Pawn(white), 6, 3);
+			this.addPiece(new Pawn(white), 3, 3);
 			// this.addPiece(new Knight(white), 5, 4);
 			// this.addPiece(new Rook(white), 7, 0); 		// check if you can castle with left rook
 			// this.addPiece(new Bishop(white), 7, 2);
 			// this.addPiece(new Queen(white), 7, 3);
 			// this.addPiece(new King(white), 7, 4);
 			// this.addPiece(new Rook(white), 7, 7);
-			
-			this.addPiece(new Pawn(white), 3, 3);
-			this.addPiece(new Rook(white), 7, 3); 
+			this.addPiece(new Knight(white), 4, 1);
 		}
 		// for (var i = 0; i)
 	} else {
@@ -89,9 +89,8 @@ Board.prototype.initialize = function(playerIsWhite) {
 /* Move an existing piece from one location on the board to another.  This only modifies the backing data structure for the board so changes to the visual representation must be made elsewhere
 */
 Board.prototype.movePiece = function(fromRow, fromCol, toRow, toCol) {
-	let movingPiece = this.getTile(fromRow, fromCol).piece;
+	let movingPiece = null;
 	// let finalLocation = this.getTile(toRow, toCol);
-	ERRORS ERRORS ERRORS! THIS IS WHERE I LEFT OFF LAST NIGHT
 	
 	let hasMovedPiece = false;
 	let hasClearedTile = false;
@@ -100,18 +99,19 @@ Board.prototype.movePiece = function(fromRow, fromCol, toRow, toCol) {
 	// update piece position in DS
 	for (var i = 0; i < this.occupiedTiles.length; i++) {
 		if (this.occupiedTiles[i].row == fromRow && this.occupiedTiles[i].column == fromCol) {
-			this.occupiedTiles[i].row = toRow;
-			this.occupiedTiles[i].column = toCol;
+			movingPiece = this.occupiedTiles[i]
+			movingPiece.row = toRow;
+			movingPiece.column = toCol;
 			hasMovedPiece = true;
-			if (this.occupiedTiles[i].type === "Pawn" || this.occupiedTiles[i].type === "King" this.occupiedTiles[i].type === "Rook") {
-				this.occupiedTiles[i].hasMoved = true;
+			if (movingPiece.piece.hasOwnProperty('hasMoved')) {
+				movingPiece.piece.hasMoved = true;
 			}
 			continue;								//prevents removal of element that was just moved from occupiedTiles
 		}
 		
 		// remove the piece previously existing on that tile if one exists
 		if (this.occupiedTiles[i].row == toRow && this.occupiedTiles[i].column == toCol) {
-			indexOfTileToRemove = i
+			indexOfTileToRemove = i;
 			hasClearedTile = true;
 		}
 		

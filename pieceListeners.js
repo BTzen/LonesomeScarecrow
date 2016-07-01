@@ -37,7 +37,7 @@ function pawnListener(ctxHighlight, board, row, column, forwardMoves, bColour) {
 			attackFlag2 = true;
 		}
 
-		// check if pawn can be moved ot the desired location
+		// check if pawn can be moved to the desired location
 		if (board.getPiece(row+(i*sign),column) === null) {
 			fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row + (i*sign), column));
 		} else {

@@ -2,6 +2,7 @@
 $(document).ready(function() {
 	var canvasHighlight = document.getElementById('highlight');
 	var ctxHighlight = canvasHighlight.getContext('2d');
+	
 });
 
 var canvas;
