@@ -105,7 +105,7 @@ function utility(s) {
 }
 
 /*
- * returns an action with the best utility score
+ * returns an action with the best utility score THIS IS FILLER SO I CAN MAKE A COMMIT WITH A MESSAGE
  */ 
 function minimax(state) {
 	isCheckingBoard = true;		// prevent tiles in UI from being visibly highlighted
