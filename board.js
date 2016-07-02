@@ -4,8 +4,18 @@ function Board(boardToClone) {
 	this.occupiedTiles = [];
 	if (arguments.length === 1) {
 		if (boardToClone.hasOwnProperty("occupiedTiles") && boardToClone.occupiedTiles !== null && boardToClone.occupiedTiles !== undefined) {
+			// deep copy
 			for (var i = 0; i < boardToClone.occupiedTiles.length; i++) {
-				this.occupiedTiles.push($.extend(true, {}, boardToClone.occupiedTiles[i]));
+				// this.occupiedTiles.push($.extend(true, {}, boardToClone.occupiedTiles[i]));
+				let tileToClone = boardToClone.occupiedTiles[i];
+				
+				var clonePiece = new Piece();
+				for (var prop in tileToClone.piece) {
+					clonePiece[prop] = tileToClone.piece[prop];
+				}
+				
+				let cloneTile = new Tile(clonePiece, tileToClone.row, tileToClone.column);
+				this.occupiedTiles.push(cloneTile);
 			}
 		}
 	}
@@ -86,6 +96,22 @@ Board.prototype.initialize = function(playerIsWhite) {
 	//utility(this);
 }
 
+/* check for opponent and board boundaries
+ * rowToAttack the row of the piece the possibility of attack is being checked against
+ * columnToAttack
+ * attackingPiece
+*/
+Board.prototype.isValidAttack = function(rowToAttack, columnToAttack, attackingPiece) {
+	//check that the desired selection is within legal board dimensions
+	if  (rowToAttack > 7 || rowToAttack < 0 || columnToAttack > 7 || columnToAttack < 0) {
+		return false;
+	}
+	
+	var potentialTarget = this.getPiece(rowToAttack, columnToAttack);
+	if (potentialTarget !== null) {
+		return !(potentialTarget.isWhite === attackingPiece.isWhite);
+	}		
+}
 /* Move an existing piece from one location on the board to another.  This only modifies the backing data structure for the board so changes to the visual representation must be made elsewhere
 */
 Board.prototype.movePiece = function(fromRow, fromCol, toRow, toCol) {

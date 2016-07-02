@@ -7,16 +7,12 @@
 //object constructor
 function Piece(type, isWhite, unicode) {
 	//warns the user if a Piece object is instantiated
-	if (this.__proto__ === Piece.prototype) {
-		alert("Piece is an abstract class and should not be instantiated directly.");
-	}
-	// ************************************************************************ 
-	// PUBLIC PROPERTIES -- ANYONE MAY READ/WRITE 
-	// ************************************************************************
+	// if (this.__proto__ === Piece.prototype) {
+		// console.log("Piece is an abstract class and should not be instantiated directly.");
+	// }
 	this.type = type;
 	this.isWhite = isWhite;
 	this.unicode = unicode;
-	// this.legalMoves;			// ds
 };
 
 Piece.prototype.toString = function() {

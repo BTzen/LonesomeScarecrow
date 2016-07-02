@@ -1,6 +1,7 @@
+// DEBUG hasMoved is being set to true when it shouldn't be
+// DEBUG miniMax not returning best move
 var player_max = BLACK;		// played by the AI; the root of the search tree is a max node
 var player_min = WHITE;
-var currentPly = 0;
 var desiredPly = 2;		// the desired search depth
 var successors = [];
 // var root = new Node(null, board);
@@ -111,72 +112,84 @@ function minimax(state) {
 	isCheckingBoard = true;		// prevent tiles in UI from being visibly highlighted
 	nodes.push(new Node(state, undefined, null, 0, undefined, null));			// push root node
 	var action;
-	var v = max(state);
+	var v = max(nodes[0]);
 	isCheckingBoard = false;
 	// nodes = [];
 	console.log('minimax returned: ' + v);
-	
+	let nextMoveNode = null;
+	for (var i = 0; i < nodes[0].children.length; i++) {
+		if (nodes[0].children[i].utility === v) {
+			nextMoveNode = nodes[0].children[i];
+		}
+	}
 	// return action;	// return the action in successors(state) with value v
 }
 
 // contains common logic for min and max methods
-function minimaxHelper(state, isRunningMaxCode, parent) {
+function minimaxHelper(node, isRunningMaxCode, parent) {
+	// var bestNode;		// node with the highest minimax value in the search tree
 	var u = (isRunningMaxCode) ? -Number.MAX_VALUE : Number.MAX_VALUE;
 	// if TERMINAL-STATE(state) then return UTILITY(state)
-	if (false || currentPly == desiredPly) {	// isTerminalState(state)
-		u = utility(state);
-		for (var i = 0; i < nodes.length; i++) {
-			if (Object.is(nodes[i].state, state)) {
-				nodes[i].utility = u;
-				break;
-			}
-		}
+	if (false || node.ply == desiredPly) {	// isTerminalState(state)
+		u = utility(node.state);
+		// assign the utility value to the state once discovered
+		node.utility = u;
+		// for (var i = 0; i < nodes.length; i++) {
+			// if (Object.is(nodes[i].state, node.state)) {
+				// nodes[i].utility = u;
+				// break;
+			// }
+		// }
 	}
 	else {
+		let child = null;
 		// loop through all the occupied tiles and find all the possible moves for the relevant team
 		// try each of those moves and see which one offers the best result
-		state.occupiedTiles.forEach(function(tile) {
-			var pieceColorToCheck = (isRunningMaxCode) ? BLACK : WHITE;
+		node.state.occupiedTiles.forEach(function(tile) {
+			let pieceColorToCheck = (isRunningMaxCode) ? BLACK : WHITE;
 			
 			if (pieceColorToCheck == tile.piece.isWhite) {		// only check pieces of the appropriate colour
-				highlightLogic(true, tile, state);				// find which actions this specific piece can take
+				highlightLogic(true, tile, node.state);				// find which actions this specific piece can take
 				
 				// create a new board state for each of the possible actions
 				allHighlightedTiles.forEach(function(action, index) {
 					// let child = new Board();
 					// child.clone(board);
-					let child = new Board(board);
+					child = new Board(node.state);
 					
 					// let isSame = (child === board);
 					// let t2 = (child == board);
 					// let t3 = Object.is(child, board);
 					// let t4 = Object.is(board, board);
 					child.movePiece(tile.row, tile.column, allHighlightedTiles[index].row, allHighlightedTiles[index].column);
-					successors.push(child);
 					
 					//DEBUG
-					let node = new Node(child, undefined, allHighlightedTiles[index], currentPly + 1, undefined, state);
-					nodes.push(node);
+					let newNode = new Node(child, undefined, allHighlightedTiles[index], node.ply + 1, null, node);
+					nodes.push(newNode);
+					successors.push(newNode);
 				});
-				
+				allHighlightedTiles = [];
 			}
 		});
-		currentPly++;
-		allHighlightedTiles = [];
+		// currentPly++;
+		node.children = successors;
 		successors = [];
 		// for each a in ACTIONS(state)
 		// v = MAX(v, MIN_VALUE(result(s, a)))
-		for (var i = 0; i < successors.length; i++) {
-			u = (isRunningMaxCode) ? Math.max(u, min(successors[i])) : Math.min(u, max(successors[i]));
+		if (node.children !== null) {
+			for (var i = 0; i < node.children.length; i++) {
+			// examine all children of current node
+			u = (isRunningMaxCode) ? Math.max(u, min(node.children[i])) : Math.min(u, max(node.children[i]));
 			// nodes[i + 1].utility = u;					// first node is the root so I need to start at the element at index i+1
+			}
 		}
 	}
 	
 	return u;
 }
 
-function max(state) {
-	return minimaxHelper(state, true);
+function max(node) {
+	return minimaxHelper(node, true);
 	// var u = -Number.MAX_VALUE;
 	// if TERMINAL-STATE(state) then return UTILITY(state)
 	// if (false || currentPly == desiredPly) {	// isTerminalState(state)
@@ -226,8 +239,8 @@ function max(state) {
 	// return u;
 }
 
-function min(state) {
-	return minimaxHelper(state, false);
+function min(node) {
+	return minimaxHelper(node, false);
 }
 
 /* TODO doesn't check for stalemate or surrender

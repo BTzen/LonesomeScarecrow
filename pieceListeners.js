@@ -24,13 +24,13 @@ function pawnListener(ctxHighlight, board, row, column, forwardMoves, bColour) {
 		 * 1st if for attacking right, 2nd for left
 		 * condition following OR is for en passant
 		 */
-		if ((board.getPiece(row + (1 * sign), column + 1) !== null && isValidAttack(row + (1 * sign), column + 1, callingPiece) && !attackFlag1) || 
+		if ((board.getPiece(row + (1 * sign), column + 1) !== null && board.isValidAttack(row + (1 * sign), column + 1, callingPiece) && !attackFlag1) || 
 		(board.getPiece(row, column + 1) !== null && pawnTwoSquaresRowCol !== null && pawnTwoSquaresRowCol[0] === row && pawnTwoSquaresRowCol[1] === column + 1))
 		{
 			fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row + (1 * sign), column + 1));
 			attackFlag1 = true;
 		}
-		if ((board.getPiece(row + (1 * sign), column-1) !== null && isValidAttack(row + (1 * sign), column - 1, callingPiece) && !attackFlag2) || 
+		if ((board.getPiece(row + (1 * sign), column-1) !== null && board.isValidAttack(row + (1 * sign), column - 1, callingPiece) && !attackFlag2) || 
 		(board.getPiece(row, column - 1) !== null && pawnTwoSquaresRowCol !== null && pawnTwoSquaresRowCol[0] === row && pawnTwoSquaresRowCol[1] === column - 1))
 		{
 			fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row + (1*sign), column - 1));
@@ -59,7 +59,7 @@ function rookListener(ctxHighlight, board, row, column) {
             fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row + i, column));
         } else if (!blockedBelow) {
             //ATTACK HIGHLIGHT, this will need to check isWhite
-            if (isValidAttack(row+i,column, callingPiece)) {
+            if (board.isValidAttack(row+i,column, callingPiece)) {
                 fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row + i, column));
             }
             blockedBelow = true;
@@ -68,7 +68,7 @@ function rookListener(ctxHighlight, board, row, column) {
         if (board.getPiece(row, column+i) === null && !blockedOnRight) {
             fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row, column + i));
         } else if (!blockedOnRight) {
-            if (isValidAttack(row, column+i, callingPiece)) {
+            if (board.isValidAttack(row, column+i, callingPiece)) {
                 fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row, column + i));
             }
             blockedOnRight = true;
@@ -78,7 +78,7 @@ function rookListener(ctxHighlight, board, row, column) {
             fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row - i, column));
         } 
 		else if (!blockedAbove) {		// there is a piece on the path
-            if (isValidAttack(row-i, column, callingPiece)) {	// check to see if the piece is an enemy
+            if (board.isValidAttack(row-i, column, callingPiece)) {	// check to see if the piece is an enemy
                 fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row - i, column));
             }
             blockedAbove = true;
@@ -87,7 +87,7 @@ function rookListener(ctxHighlight, board, row, column) {
         if (board.getPiece(row, column-i) === null && !blockedOnLeft) { // && !leftFlag
             fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row, column - i));
         } else if (!blockedOnLeft) {
-            if (isValidAttack(row, column-i, callingPiece)) {
+            if (board.isValidAttack(row, column-i, callingPiece)) {
                 fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row, column - i));
             }
             blockedOnLeft = true;
@@ -105,7 +105,7 @@ function knightListener(ctxHighlight, board, row, column) {
     //DOWNRIGHT
     if (board.getPiece(row+2,column+1) === null) {
         fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row + 2, column + 1));
-    } else if (isValidAttack(row + 2, column+1, callingPiece)) {
+    } else if (board.isValidAttack(row + 2, column+1, callingPiece)) {
         // MEMO somewhere here we should check the team, maybe by passing in the isWhite boolean, 
         //then check if the highlighted piece is the opposite.
         fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row + 2, column + 1));
@@ -113,44 +113,44 @@ function knightListener(ctxHighlight, board, row, column) {
     //DOWNLEFT
     if (board.getPiece(row+2,column-1) === null) {
         fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row + 2, column - 1));
-    } else if (isValidAttack(row+2, column-1, callingPiece)) {
+    } else if (board.isValidAttack(row+2, column-1, callingPiece)) {
         fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row + 2, column - 1));
-    }
-    //RIGHTDOWN
-    if (board.getPiece(row+1,column+2) === null) {
-        fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row + 1, column + 2));
-    } else if (isValidAttack(row + 1, column + 2, callingPiece)) {
-        fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row + 1, column + 2));
     }
     //LEFTDOWN
     if (board.getPiece(row+1,column-2) === null) {
         fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row + 1, column - 2));
-    } else if (isValidAttack(row + 1, column - 2, callingPiece)) {
+    } else if (board.isValidAttack(row + 1, column - 2, callingPiece)) {
         fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row + 1, column - 2));
     }
-    //UPRIGHT
-    if (board.getPiece(row-2,column+1) === null) {
-        fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row - 2, column + 1));
-    } else if (isValidAttack(row-2, column + 1, callingPiece)) {
-        fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row - 2, column + 1));
+	//LEFTUP
+    if (board.getPiece(row-1,column-2) === null) {
+        fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row - 1, column - 2));
+    } else if (board.isValidAttack(row - 1, column-2, callingPiece)) {
+        fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row - 1, column - 2));
     }
     //UPLEFT
     if (board.getPiece(row-2,column-1) === null) {
         fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row - 2, column - 1));
-    } else if (isValidAttack(row - 2, column-1, callingPiece)) {
+    } else if (board.isValidAttack(row - 2, column-1, callingPiece)) {
         fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row - 2, column - 1));
+    }
+	//UPRIGHT
+    if (board.getPiece(row-2,column+1) === null) {
+        fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row - 2, column + 1));
+    } else if (board.isValidAttack(row-2, column + 1, callingPiece)) {
+        fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row - 2, column + 1));
     }
     //RIGHTUP
     if (board.getPiece(row-1,column+2) === null) {
         fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row - 1, column + 2));
-    } else if (isValidAttack(row - 1, column + 2, callingPiece)) {
+    } else if (board.isValidAttack(row - 1, column + 2, callingPiece)) {
         fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row - 1, column + 2));
     }
-    //LEFTUP
-    if (board.getPiece(row-1,column-2) === null) {
-        fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row - 1, column - 2));
-    } else if (isValidAttack(row - 1, column-2, callingPiece)) {
-        fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row - 1, column - 2));
+	//RIGHTDOWN
+    if (board.getPiece(row+1,column+2) === null) {
+        fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row + 1, column + 2));
+    } else if (board.isValidAttack(row + 1, column + 2, callingPiece)) {
+        fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row + 1, column + 2));
     }
 }
 
@@ -163,7 +163,7 @@ function bishopListener(ctxHighlight, board, row, column) {
             fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row + i, column + i));
         } else if (!blockedSoutheast) {
             //ATTACK HIGHLIGHT, this will need to check isWhite
-            if (isValidAttack(row + i, column + i, callingPiece)) {
+            if (board.isValidAttack(row + i, column + i, callingPiece)) {
                 fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row + i, column + i));
             }
             blockedSoutheast = true;
@@ -171,7 +171,7 @@ function bishopListener(ctxHighlight, board, row, column) {
         if (board.getPiece(row+i,column-i) === null && !blockedSouthwest) {
             fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row + i, column - i));
         } else if (!blockedSouthwest) {
-            if (isValidAttack(row+i, column-i, callingPiece)) {
+            if (board.isValidAttack(row+i, column-i, callingPiece)) {
                 fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row + i, column - i));
             }
             blockedSouthwest = true;
@@ -179,7 +179,7 @@ function bishopListener(ctxHighlight, board, row, column) {
         if (board.getPiece(row-i,column-i) === null && !blockedNorthwest) {
             fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row - i, column - i));
         } else if (!blockedNorthwest) {
-            if (isValidAttack(row - i, column - i, callingPiece)) {
+            if (board.isValidAttack(row - i, column - i, callingPiece)) {
                 fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row - i, column - i));
             }
             blockedNorthwest = true;
@@ -187,7 +187,7 @@ function bishopListener(ctxHighlight, board, row, column) {
         if (board.getPiece(row-i,column+i) === null && !blockedNortheast) {
             fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row - i, column + i));
         } else if (!blockedNortheast) {
-            if (isValidAttack(row-i,column+i, callingPiece)) {
+            if (board.isValidAttack(row-i,column+i, callingPiece)) {
                 fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row - i, column + i));
             }
             blockedNortheast = true;
@@ -227,7 +227,7 @@ function kingListener(ctxHighlight, board, row, column) {
 		fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row, column + 1));
 	} else {
 		//ATTACK HIGHLIGHT, this will need to check isWhite
-		if (isValidAttack(row,column + 1, callingPiece)) {
+		if (board.isValidAttack(row,column + 1, callingPiece)) {
 			fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row, column + 1));
 		}
 		// blockedOnRight = true;
@@ -236,7 +236,7 @@ function kingListener(ctxHighlight, board, row, column) {
 	if (board.getPiece(row + 1,column) === null) {
 		fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row + 1, column));
 	} else {
-		if (isValidAttack(row + 1,column, callingPiece)) {
+		if (board.isValidAttack(row + 1,column, callingPiece)) {
 			fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row + 1, column));
 		}
 	}
@@ -249,7 +249,7 @@ function kingListener(ctxHighlight, board, row, column) {
 	if (board.getPiece(row, column - 1) === null) {
 		fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row, column - 1));
 	} else {
-		if (isValidAttack(row,column - 1, callingPiece)) {
+		if (board.isValidAttack(row,column - 1, callingPiece)) {
 			fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row, column - 1));
 		}
 	}
@@ -257,7 +257,7 @@ function kingListener(ctxHighlight, board, row, column) {
 	if (board.getPiece(row - 1,column) === null) {
 		fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row - 1, column));
 	} else {
-		if (isValidAttack(row - 1,column, callingPiece)) {
+		if (board.isValidAttack(row - 1,column, callingPiece)) {
 			fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row - 1, column));
 		}
 	}
@@ -267,7 +267,7 @@ function kingListener(ctxHighlight, board, row, column) {
 		fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row + 1, column + 1));
 	} else {
 		//ATTACK HIGHLIGHT, this will need to check isWhite
-		if (isValidAttack(row + 1, column + 1, callingPiece)) {
+		if (board.isValidAttack(row + 1, column + 1, callingPiece)) {
 			fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row + 1, column + 1));
 		}
 	}
@@ -275,7 +275,7 @@ function kingListener(ctxHighlight, board, row, column) {
 	if (board.getPiece(row+1,column-1) === null) {
 		fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row + 1, column - 1));
 	} else {
-		if (isValidAttack(row+1, column-1, callingPiece)) {
+		if (board.isValidAttack(row+1, column-1, callingPiece)) {
 			fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row + 1, column - 1));
 		}
 	}
@@ -283,7 +283,7 @@ function kingListener(ctxHighlight, board, row, column) {
 	if (board.getPiece(row-1,column-1) === null) {
 		fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row - 1, column - 1));
 	} else {
-		if (isValidAttack(row - 1, column - 1, callingPiece)) {
+		if (board.isValidAttack(row - 1, column - 1, callingPiece)) {
 			fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row - 1, column - 1));
 		}
 	}
@@ -291,7 +291,7 @@ function kingListener(ctxHighlight, board, row, column) {
 	if (board.getPiece(row-1,column+1) === null) {
 		fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row - 1, column + 1));
 	} else {
-		if (isValidAttack(row-1,column+1, callingPiece)) {
+		if (board.isValidAttack(row-1,column+1, callingPiece)) {
 			fill(ctxHighlight, LIGHT_RED, new Action(callingPiece, ActionType.ATTACK, row - 1, column + 1));
 		}
 	}
