@@ -12,25 +12,25 @@ var ctx;
 var ctxPiece;
 // var ctxHighlight;
 	
-var board = new Board();		// primary board used to play the game
+var board = new Board();			// primary board used to play the game
 var isWhiteTurn = true;
 var isGameRunning = false;
 var isCastlingLeft = false;
 var isCastlingRight = false;
-var isFreeplayTest = false;  	//allows user to move both white and black pieces in freeplay with highlighting for both pieces
-var isCheckingBoard = false;	// used to prevent highlighting of tiles when piece actions are being determined;
-var isKingInCheck = false; 		//this will get changed to true hopefully once, and after alerting the user, should switch back to false (if they can get out of check)
+var isFreeplayTest = false;  		// allows user to move both white and black pieces in freeplay with highlighting for both pieces
+var isCheckingBoard = false;		// used to prevent highlighting of tiles when piece actions are being determined;
+var isKingInCheck = false; 			// this will get changed to true hopefully once, and after alerting the user, should switch back to false (if they can get out of check)
 var highlightedTiles = [];
-var allHighlightedTiles = []; //for looking ahead at all possible moves in a ply.
-var lastSelectedTile; // for moving pieces
+var allHighlightedTiles = []; 		// for looking ahead at all possible moves in a ply.
+var lastSelectedTile; 				// for moving pieces
 var lastRow, lastColumn; //
 var initialBoardState = [];
-var ctxPieces;// = document.getElementById('chesspieceCanvas').getContext('2d');	//the context that the pieces are drawn on - used EVERYWHERE
+var ctxPieces;						// the context that the pieces are drawn on - used EVERYWHERE
 var pawnTwoSquaresRowCol = null;	//array to hold pos of last pawn that moved 2 squares after moving
 var savedBoard = null;
 
 //from html
-var listitemID = 1;	//index used to allow remove button to reference the list element it's attached to for deletion
+var listitemID = 1;					//index used to allow remove button to reference the list element it's attached to for deletion
 var occupiedTiles = [];
 var isWhiteKingPlaced = false;
 var isBlackKingPlaced = false;

@@ -8,8 +8,29 @@ function Board(boardToClone) {
 			for (var i = 0; i < boardToClone.occupiedTiles.length; i++) {
 				// this.occupiedTiles.push($.extend(true, {}, boardToClone.occupiedTiles[i]));
 				let tileToClone = boardToClone.occupiedTiles[i];
+				let pieceToClone = tileToClone.piece;
 				
-				var clonePiece = new Piece();
+				var clonePiece;
+				// allows for quick identification of piece type while debugging
+				if (pieceToClone instanceof Pawn) {
+					clonePiece = new Pawn();
+				}
+				else if (pieceToClone instanceof Rook) {
+					clonePiece = new Rook();
+				}
+				else if (pieceToClone instanceof Knight) {
+					clonePiece = new Knight();
+				}
+				else if (pieceToClone instanceof Bishop) {
+					clonePiece = new Bishop();
+				}
+				else if (pieceToClone instanceof King) {
+					clonePiece = new King();
+				}
+				else if (pieceToClone instanceof Queen) {
+					clonePiece = new Queen();
+				}
+				
 				for (var prop in tileToClone.piece) {
 					clonePiece[prop] = tileToClone.piece[prop];
 				}
