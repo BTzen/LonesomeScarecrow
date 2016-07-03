@@ -72,6 +72,7 @@ function acceptPromotionListener() {
 			break;
 		case "Rook":
 			newPiece = new Rook(isWhite);
+			newPiece.hasMoved = true;
 			break;
 		case "Bishop":
 			newPiece = new Bishop(isWhite);

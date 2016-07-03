@@ -120,6 +120,10 @@ fieldset legend {	/* override styles for children*/
 	margin-top: 0;
 	text-align: center;
 }
+/* prevent the dialog box from showing the close button */
+.no-close .ui-dialog-titlebar-close {
+  display: none;
+}
 
 .fill {
 	display: table-cell;

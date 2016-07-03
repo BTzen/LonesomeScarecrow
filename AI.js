@@ -171,6 +171,7 @@ function isTerminalState(state) {
 	let blackPieces = 0;
 	let whitePieces = 0;
 	
+	// checks for presence of Kings
 	state.occupiedTiles.forEach(function(tile) {
 		// if (tile.piece.type == "King")
 			// if (tile.piece.isWhite)
@@ -185,11 +186,13 @@ function isTerminalState(state) {
 	
 	if (blackPieces == 0 || whitePieces == 0)
 		isTerminal = true;
+	if (blackPieces == 1 && whitePieces == 1 && blackKingLives && whiteKingLives)
+		isTerminal = true;
 	// if (!whiteKingLives || !blackKingLives) {
 		// return true
 	// }
 	
-	// a stalemate occurs when the only 2 pieces on the board are Kings, regardless of their position, or if the remaining pieces on the board make checkmate impossible (e.g. can't checkmate an appointing with only a king and a bishop)
+	// a stalemate occurs when the only 2 pieces on the board are Kings, regardless of their position, or if the remaining pieces on the board make checkmate impossible (e.g. can't checkmate an opponent with only a king and a bishop)
 	return isTerminal;
 }
 

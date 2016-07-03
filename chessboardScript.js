@@ -221,7 +221,7 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 			}
 			
 			// Castling check
-			if (lastSelectedTile.piece.type === "King") {
+			if (lastSelectedTile.piece.type === 'King') {
 				if (isCastlingLeft) {
 					//castle only if the castling square was selected ie. king was moved 2 spaces towards rook
 					if (column === 2) {
@@ -241,31 +241,28 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 				}
 			}
 			
-			// required for en passant and castling; works for rooks at least
-			// ERRATA: pawn hasmoved handled in own section as well
-			if (lastSelectedTile.piece.type === "Rook" || lastSelectedTile.piece.type === "King") {
+			// required for en passant and castling
+			if (lastSelectedTile.piece.hasOwnProperty('hasMoved')) {
 				lastSelectedTile.piece.hasMoved = true;
 			}
-			
+		
 			//update tracking variables
 			isHighlighted = null;
-			// ERRATA: may not need
-			if (lastSelectedTile.piece.type === "Pawn") {
-				lastSelectedTile.piece.hasMoved = true;
-				
-				//check if it's in a promotion tile ONLY WORKS FOR WHITE
-				if (lastSelectedTile.piece.isWhite) {
-					if (row == 0) {
+			
+			//check if it's in a promotion tile ONLY WORKS FOR WHITE
+			if (lastSelectedTile.piece.isWhite && lastSelectedTile.piece.type === 'Pawn') {
+				if (row == 0) {
 					//call promotion fn
-						$('#promotion')
-							.data( {isWhite: true, row: row, column: column} )	//2nd 'row' is the variable
-							.dialog({
+					$('#promotion')
+						.data( {isWhite: true, row: row, column: column} )	// 2nd 'row' is the variable
+						.dialog({
+							dialogClass: "no-close",						// remove close button
 							modal: true,
 							title: "Promote piece"
 						});
-					}
 				}
 			}
+			// }
 			highlightedTiles = []; //reset which tiles are hightlighted each time this runs
 			// check whether piece is in check
 			inCheck(lastSelectedTile.piece.isWhite);
