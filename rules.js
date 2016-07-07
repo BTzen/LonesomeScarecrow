@@ -1,5 +1,7 @@
 // contains methods that provide a mechanism to enforce the rules of chess and provide information on board and game state
 
+// DEBUG: MAY NEED TO CHANGE ALL OF THESE to Board.prototype functions
+
 /* Checks if castling is possible with rook at given position
  * technically a king move
  */
@@ -83,19 +85,19 @@ function castlingCheck(rookRow, rookCol) {
  * row the row of the pawn that moves 2 spaces forward, post move(and the one that is potentially vulnerable to en passant)
  * col the column of said pawn
  */
-function enPassantCheck(row, column) {
-	//capturing pawn must be on its 5th rank before executing the maneuver
-	//check for pawns immediate to the right and left of the pawn that moved
-	var rightAdjacentPiece = board.getPiece(row, col + 1);
-	var leftAdjacentPiece = board.getPiece(row, col + 1);
+// function enPassantCheck(row, column) {
+	// //capturing pawn must be on its 5th rank before executing the maneuver
+	// //check for pawns immediate to the right and left of the pawn that moved
+	// var rightAdjacentPiece = board.getPiece(row, col + 1);
+	// var leftAdjacentPiece = board.getPiece(row, col + 1);
 	
-	if (leftAdjacentPiece !== null && leftAdjacentPiece.type === "Pawn") {
+	// if (leftAdjacentPiece !== null && leftAdjacentPiece.type === "Pawn") {
 		
-	}
-	//must be done on turn immediately after captured pawn moves 2 spaces forward
+	// }
+	// //must be done on turn immediately after captured pawn moves 2 spaces forward
 	
-	//move capturing pawn to same position it would be in if the captured pawn only moved one square forward
-}
+	// //move capturing pawn to same position it would be in if the captured pawn only moved one square forward
+// }
 
 /* determine if given king is in check DEBUG doesn't work
  * I think this will have to be called inside each listener.
@@ -132,25 +134,25 @@ function inCheck(row, column, bColour) {
 /* checks if king is in check
  *
  */
-function isAttackingKing (row, column, attackingPiece) {
-	if (isValidAttack(row, column, attackingPiece) && board.getPiece(row,column).type === "King") {
-		return true;
-	}
-}
+// function isAttackingKing (row, column, attackingPiece) {
+	// if (isValidAttack(row, column, attackingPiece) && board.getPiece(row,column).type === "King") {
+		// return true;
+	// }
+// }
 
-/* check for opponent and board boundaries
- * rowToAttack the row of the piece the possibility of attack is being checked against
- * columnToAttack
- * attackingPiece
-*/
-function isValidAttack(rowToAttack, columnToAttack, attackingPiece) {
-	//check that the desired selection is within legal board dimensions
-	if  (rowToAttack > 7 || rowToAttack < 0 || columnToAttack > 7 || columnToAttack < 0) {
-		return false;
-	}
+// /* check for opponent and board boundaries
+ // * rowToAttack the row of the piece the possibility of attack is being checked against
+ // * columnToAttack
+ // * attackingPiece
+// */
+// function isValidAttack(board, rowToAttack, columnToAttack, attackingPiece) {
+	// check that the desired selection is within legal board dimensions
+	// if  (rowToAttack > 7 || rowToAttack < 0 || columnToAttack > 7 || columnToAttack < 0) {
+		// return false;
+	// }
 	
-	var potentialTarget = board.getPiece(rowToAttack, columnToAttack);
-	if (potentialTarget !== null) {
-		return !(potentialTarget.isWhite === attackingPiece.isWhite);
-	}		
-}
+	// var potentialTarget = board.getPiece(rowToAttack, columnToAttack);
+	// if (potentialTarget !== null) {
+		// return !(potentialTarget.isWhite === attackingPiece.isWhite);
+	// }		
+// }

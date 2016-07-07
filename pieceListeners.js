@@ -11,8 +11,9 @@ function pawnListener(ctxHighlight, board, row, column, forwardMoves, bColour) {
     var attackFlag2 = false;
 	let callingPiece = board.getPiece(row, column);
     //check direction of pawn travels, same principle can be applied to see what can attack what
-    var sign = 1;	// allows reuse of code for different colours. -ve sign for white and +ve for black
-
+    
+	var sign = 1;	// allows reuse of code for different colours. -ve sign for white and +ve for black
+	// causes white pawns moved towards the top of the board and black pawns to move towards the bottom
 	if (callingPiece !== null) {
 		if (callingPiece.isWhite) { sign *= -1; }
 	}
@@ -204,7 +205,6 @@ function queenListener(ctxHighlight, board, row, column) {
     rookListener(ctxHighlight, board, row, column);
 }
 
-//Note: I left all the methods in the king because he will have to have a lot more conditions added in the futre
 function kingListener(ctxHighlight, board, row, column) {
     let callingPiece = board.getPiece(row,column);
     // var blockedNortheast = false;
@@ -218,7 +218,7 @@ function kingListener(ctxHighlight, board, row, column) {
     //for (var i = 1; i <= 1; i++) { //could hard code it, change all i's to 1's
 
 	//RIGHT
-	//check if king can castle to the left - breaks if no rook, moves rook instead
+	//check if king can castle to the right - breaks if no rook, moves rook instead
 	if (castlingCheck(7,7)) {
 		fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row, column + 2));
 		isCastlingRight = true;	//used in listener to move rook

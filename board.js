@@ -46,12 +46,6 @@ Board.prototype.clear = function() {
 	this.occupiedTiles = [];
 }
 
-// Board.prototype.clone = function(boardToClone) {
-	// for (var i = 0; i < boardToClone.occupiedTiles.length; i++) {
-		// this.occupiedTiles.push($.extend(true, {}, boardToClone.occupiedTiles[i]));
-	// }
-// }
-
 Board.prototype.draw = function() {
 	
 }
@@ -68,6 +62,19 @@ Board.prototype.getPiece = function(row, col) {
 	}
 }
 
+/* Return the tile of the argument piece.  Used to find a piece's position on the board.
+ * piece the piece you want to know the position of
+ */
+Board.prototype.getPositionOfPiece = function(piece) {
+	var currentTile = null;
+	for (let i = 0; i < this.occupiedTiles.length; i++) {
+		if (this.occupiedTiles[i].piece == piece) {
+			currentTile = this.occupiedTiles[i];
+		}
+	}
+	return currentTile;
+}
+
 Board.prototype.getTile = function(row, col) {
 	// bounds check
 	if (row < 0 || row > 7 || col < 0 || col > 7) {
@@ -75,7 +82,7 @@ Board.prototype.getTile = function(row, col) {
 	} 
 	else {
 		var currentTile = null;
-		for (var i = 0; i < this.occupiedTiles.length; i++) {
+		for (let i = 0; i < this.occupiedTiles.length; i++) {
 			if (row === this.occupiedTiles[i].row && col === this.occupiedTiles[i].column) {
 				currentTile = this.occupiedTiles[i];
 				break;
@@ -85,28 +92,61 @@ Board.prototype.getTile = function(row, col) {
 	
 	return currentTile;
 }
+
 /* Initialize board for a chess match
 */
 Board.prototype.initialize = function(playerIsWhite) {
-	let white = true, black = false;
 	if (this instanceof Board) {
 		if (playerIsWhite) {
 			// place black pieces
-			// this.addPiece(new Rook(false), 0, 0);
-			// this.addPiece(new Bishop(false), 0, 1);
-			this.addPiece(new Pawn(black), 2, 2);
-			// this.addPiece(new Knight(false), 3, 4);
-			// this.addPiece(new Rook(black), 0, 0);
+			// this.addPiece(new Rook(BLACK), 0, 0);
+			// this.addPiece(new Knight(BLACK), 0, 1);
+			// this.addPiece(new Bishop(BLACK), 0, 2);
+			// this.addPiece(new Queen(BLACK), 0, 3);
+			// this.addPiece(new King(BLACK), 0, 4);
+			// this.addPiece(new Bishop(BLACK), 0, 5);
+			// this.addPiece(new Knight(BLACK), 0, 6);
+			// this.addPiece(new Rook(BLACK), 0, 7);
 			
+			// for (let i = 0; i < 8; i++) {
+				// if (i == 7)
+					// this.addPiece(new Pawn(BLACK), 3, i);
+				// else
+					// this.addPiece(new Pawn(BLACK), 1, i);
+			// }
+			
+			// var bPawn = new Pawn(BLACK);
+			// bPawn.hasMoved = true;
+			// this.addPiece(bPawn, 3, 3);
 			// place white pieces
-			this.addPiece(new Pawn(white), 3, 3);
-			// this.addPiece(new Knight(white), 5, 4);
-			// this.addPiece(new Rook(white), 7, 0); 		// check if you can castle with left rook
-			// this.addPiece(new Bishop(white), 7, 2);
-			// this.addPiece(new Queen(white), 7, 3);
-			// this.addPiece(new King(white), 7, 4);
-			// this.addPiece(new Rook(white), 7, 7);
-			this.addPiece(new Knight(white), 4, 1);
+			
+			// var wPawn = new Pawn(WHITE);
+			// wPawn.hasMoved = true;
+			// this.addPiece(wPawn, 3, 4);
+			
+			// ACTUAL BOARD LAYOUT
+			// this.addPiece(new Rook(WHITE), 7, 0);
+			// this.addPiece(new Knight(WHITE), 7, 1);
+			// this.addPiece(new Bishop(WHITE), 7, 2);
+			// this.addPiece(new Queen(WHITE), 7, 3);
+			// this.addPiece(new King(WHITE), 7, 4);
+			// this.addPiece(new Bishop(WHITE), 7, 5);
+			// this.addPiece(new Knight(WHITE), 7, 6);
+			// this.addPiece(new Rook(WHITE), 7, 7);
+			
+			// for (let i = 0; i < 8; i++) {
+				// if (i == 4)
+					// this.addPiece(new Pawn(WHITE), 4, i);
+				// else
+					// this.addPiece(new Pawn(WHITE), 6, i);
+			// }
+			
+			//set 1 
+			// this.addPiece(new Pawn(BLACK), 2, 2);
+			// this.addPiece(new Rook(BLACK), 0, 5);
+			// this.addPiece(new Knight(WHITE), 3, 3);
+			// this.addPiece(new Pawn(WHITE), 4, 1);
+			this.addPiece(new Rook(WHITE), 4, 4);
 		}
 		// for (var i = 0; i)
 	} else {
@@ -120,7 +160,7 @@ Board.prototype.initialize = function(playerIsWhite) {
 /* check for opponent and board boundaries
  * rowToAttack the row of the piece the possibility of attack is being checked against
  * columnToAttack
- * attackingPiece
+ * attackingPiece the piece that will claim the piece located at [rowToAttack, columnToAttack]
 */
 Board.prototype.isValidAttack = function(rowToAttack, columnToAttack, attackingPiece) {
 	//check that the desired selection is within legal board dimensions

@@ -162,7 +162,6 @@ function addPiece(isWhite, pieceName, rank, file) {
 		}
 	}
 	occupiedTiles.push([listitemID, file + rank, pieceName]);		//add the element to the occupiedTiles list
-	//console.log(listitemID + ', ' + (file + rank) + ', ' + pieceName); //debug
 	board.placePiece(piece, row, col);	//overwrite the old piece if the user attempts to place another piece on an already occupied tile
 	
 	//append new entry to list
@@ -195,8 +194,10 @@ function startMatchListener() {
 	draw(board);
 	
 	//DEBUG
-	minimax(board);
-	//max(board);
+	// var nextAIAction = minimax(board, BLACK);
+	// var agentTile = board.getPositionOfPiece(nextAIAction.agent);
+	// console.log('next move will move ' + nextAIAction.agent + ' from [' + agentTile.row + ', ' + agentTile.column + '] to ['
+		// + nextAIAction.row + ', ' + nextAIAction.column + ']')
 }
 
 /* Remove piece from board and from backing data structure

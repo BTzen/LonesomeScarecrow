@@ -13,8 +13,8 @@ var ctxPiece;
 // var ctxHighlight;
 	
 var board = new Board();			// primary board used to play the game
-var isWhiteTurn = true;
-var isGameRunning = false;
+var isWhiteTurn = false;			// change back to TRUE; changed to FALSE for debugging minimax
+var isGameRunning = false;			// true when the player is playing a game
 var isCastlingLeft = false;
 var isCastlingRight = false;
 var isFreeplayTest = false;  		// allows user to move both white and black pieces in freeplay with highlighting for both pieces
@@ -36,6 +36,8 @@ var isWhiteKingPlaced = false;
 var isBlackKingPlaced = false;
 var whiteKingData = [];
 var blackKingData = [];
+
+//DEBUG
 
 /* Find a piece on the board using pixel coordinates on the canvas
  * x the horizontal component of the 2d coordinate 
@@ -166,7 +168,7 @@ function reinit(playerIsWhite) {
 	document.$('turn').innerHTML = "Turn: White";
 }
 
-/* for every piece in the array I check if it has been clicked and do the corresponding highlighting
+/* Responsible for creating 'highlighted tiles' which contain all legal moves for a given piece. Logic for displaying this information to the user is handled separately from this method.
  * ctxHighlight
  * ctxPiece
  * board
@@ -174,7 +176,7 @@ function reinit(playerIsWhite) {
  * y the vertical pixel ....
  */
 function highlightListener(ctxHighlight, ctxPiece, board, x, y) {
-	highlightedTiles = [];				// contains the list of tiles that the piece at [x,y] can end up on through movement or attack
+	highlightedTiles = [];				// will contain the list of tiles that the piece found using coordinates (x,y) can end up on through movement or attack
 	lastSelectedTile = null;
 	chessPieceListener(ctxHighlight, ctxPiece, board, x, y);
 }
@@ -187,23 +189,23 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 		//lastSelectedTile = getBoardPieceWithCoords(board, x, y);
 		var column = Math.floor(x / LENGTH);
 		var row = Math.floor(y / LENGTH);
-		var isHighlighted = null; // not null if tile selected is highlighted in someway, ie. can the piece be moved there
+		var highlightedPiece = null; // not null if tile selected is highlighted in someway, ie. can the piece be moved there
 
 		//check if selected tile is highlighted
 		highlightedTiles.forEach(function(currentElement) {
 			if (currentElement.row == row && currentElement.column == column)
-				isHighlighted = currentElement;
+				highlightedPiece = currentElement;
 		});
 		//console.log('prev. coords ' + lastRow + ' ' + lastColumn);
 
 		//deal with piece movement (including attacking) - piece selected last turn; time to move!
-		if (isHighlighted) {		
-			if (isHighlighted.actionType === ActionType.ATTACK) { //DEBUG highlighted
+		if (highlightedPiece) {		
+			if (highlightedPiece.actionType === ActionType.ATTACK) { //DEBUG highlighted
 				// if the attack square is empty then en passant must have just occured
-				if (board.getPiece(isHighlighted.row, isHighlighted.column) === null)
+				if (board.getPiece(highlightedPiece.row, highlightedPiece.column) === null)
 					board.removePiece(row-1, column);
 				else
-					ctxPiece.clearRect(isHighlighted.column * LENGTH, isHighlighted.row * LENGTH, LENGTH, LENGTH); //remove old piece image
+					ctxPiece.clearRect(highlightedPiece.column * LENGTH, highlightedPiece.row * LENGTH, LENGTH, LENGTH); //remove old piece image
 			}
 			//move the piece corresponding to that highlighted pattern to the selected location 
 			board.movePiece(lastSelectedTile.row, lastSelectedTile.column, row, column);
@@ -247,9 +249,9 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 			}
 		
 			//update tracking variables
-			isHighlighted = null;
+			highlightedPiece = null;
 			
-			//check if it's in a promotion tile ONLY WORKS FOR WHITE
+			//check if it's in a promotion tile; only works for white pieces
 			if (lastSelectedTile.piece.isWhite && lastSelectedTile.piece.type === 'Pawn') {
 				if (row == 0) {
 					//call promotion fn
@@ -263,20 +265,22 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 				}
 			}
 			// }
-			highlightedTiles = []; //reset which tiles are hightlighted each time this runs
+			highlightedTiles = []; 						//reset which tiles are hightlighted each time this runs
 			// check whether piece is in check
 			inCheck(lastSelectedTile.piece.isWhite);
 			
 			//AI CALL HERE
 			// isWhiteTurn = !isWhiteTurn;
 			
-			 // if (!isWhiteTurn) { //prevent the AI from thinking it's its turn everytime. isAI will need to come in
-				// //This is where you call the AI, after you make your move!
-				// console.log("break one");
-				// var oldBoard = jQuery.extend(true, {}, board);
-				// moveAIPiece(ctxHighlight, ctxPiece, oldBoard);
+			// let nextAIAction = minimax(board, BLACK);//(isWhiteTurn) ? WHITE : BLACK);
+			// let agentTile = board.getPositionOfPiece(nextAIAction.agent);
+			// console.log('next move will move ' + nextAIAction.agent + ' from [' + agentTile.row + ', ' + agentTile.column + '] to ['
+				// + nextAIAction.row + ', ' + nextAIAction.column + ']');
+			// if (!isWhiteTurn) { //prevent the AI from thinking it's its turn everytime. isAI will need to come in
+				
 				// console.log("break");
-			 // }
+			// }
+			 
 		}
 		/* logic used when a piece is first selected - before anything is highlighted for the player
 		 * check if player clicked on their own piece and highlight the appropriate tiles in response
@@ -289,37 +293,32 @@ function chessPieceListener(ctxHighlight, ctxPiece, board, x, y) {
 			// only allow interaction with pieces of the correct colour
 			if (lastSelectedTile !== undefined)
 				var turnCheck = lastSelectedTile.piece.isWhite === lastSelectedTile.piece.isWhite; // DEBUG: currently lets you select any piece; isWhiteTurn
-			//check what kind of highlighting should take place based on the piece type
+			
+			// highlight the appropriate tiles
+			lastSelectedTile.piece.getStandardMoves(board, true, lastSelectedTile.row, lastSelectedTile.column) 
+			
 			if (lastSelectedTile.piece.type === "Pawn" && turnCheck) {
 				//if pawn hasn't moved, highlight up to 2 spaces forward
 				let forwardMoves = (lastSelectedTile.piece.hasMoved) ? 1 : 2; //how many space the piece can potentially move forward
 				pawnListener(ctxHighlight, board, row, column, forwardMoves, lastSelectedTile.piece.isWhite);
 			} 
-			else if (lastSelectedTile.piece.type === "Rook" && turnCheck) {
-				rookListener(ctxHighlight, board, row, column);
-			} 
-			else if (lastSelectedTile.piece.type === "Knight" && turnCheck) {
-				knightListener(ctxHighlight, board, row, column);
-			} 
-			else if (lastSelectedTile.piece.type === "Bishop" && turnCheck) {
-				bishopListener(ctxHighlight, board, row, column);
-			}
-			else if (lastSelectedTile.piece.type === "Queen" && turnCheck) {
-				queenListener(ctxHighlight, board, row, column);
-			}
-			else if (lastSelectedTile.piece.type === "King" && turnCheck) {
-				kingListener(ctxHighlight, board, row, column);
-			}
+
+				
+			
 		} 
 		else {	// player clicked off the piece
 			highlightedTiles = [];
-			isHighlighted = false;
+			highlightedPiece = false;
 		}
-	} else {
+	} 
+	else {
 		//alert("Press the 'Start' button to begin your chess adventure!");
 	}
 }
 
+function getAllPossibleMoves() {
+	// for (var row = 0; row < 8;)
+}
 // function DEBUG_HIGHLIGHT() {
 	// for (var row=0; row<8; row++) {
 		// for (var col=0; col<8; col++) {
