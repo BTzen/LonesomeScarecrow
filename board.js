@@ -58,7 +58,7 @@ Board.prototype.getPiece = function(row, col) {
 	if (currentTile !== null && currentTile !== undefined)
 		return currentTile.piece;
 	else {
-		return currentTile;
+		return null;
 	}
 }
 
@@ -146,9 +146,10 @@ Board.prototype.initialize = function(playerIsWhite) {
 			// this.addPiece(new Rook(BLACK), 0, 5);
 			// this.addPiece(new Knight(WHITE), 3, 3);
 			// this.addPiece(new Pawn(WHITE), 4, 1);
-			this.addPiece(new Rook(WHITE), 4, 4);
+			this.addPiece(new Pawn(BLACK), 3, 5);
+			this.addPiece(new Pawn(BLACK), 2, 3);
+			this.addPiece(new Pawn(WHITE), 4, 4);
 		}
-		// for (var i = 0; i)
 	} else {
 		console.log("context of 'this' may be unintended:" + this);
 	}
@@ -210,35 +211,6 @@ Board.prototype.movePiece = function(fromRow, fromCol, toRow, toCol) {
 	if (indexOfTileToRemove !== undefined)
 		this.occupiedTiles.splice(indexOfTileToRemove, 1);		
 }
-// // Move an existing piece from one location on the board to another 
-    // movePiece: function(piece, row, column) {
-        // //iterate through board to find which piece we're moving
-        // var temp;
-        // var i = 0;
-        // for (; i < 64; i++) {
-            // if (piece == this.__position__[i]) {
-                // temp = this.__position__[i];
-                // this.__position__[i] = null; //remove that piece from its old index
-				// break;
-            // }
-        // }
-        // this.__position__[column + row * 8] = piece; //update ds that backs the piece canvas
-		
-		// var canvasPieces = document.getElementById('chesspieceCanvas');
-		// var ctxPiece = canvasPieces.getContext('2d');
-		// ctxPiece.clearRect(lastColumn * LENGTH, lastRow * LENGTH, LENGTH, LENGTH); //erase old piece
-		// ctxPiece.fillText(String.fromCharCode(piece.unicode), column * LENGTH, (row + 1) * LENGTH - OFFSET); //draw piece at required spot
-
-		// if (!isFreeplayTest)
-			// isWhiteTurn = !isWhiteTurn;
-	
-		// //update turn info on HTML page
-		// if (isWhiteTurn) { 
-			// document.getElementById('turn').innerHTML = "Turn: White";}
-		// else {
-			// document.getElementById('turn').innerHTML = "Turn: Black";
-		// }
-    // },
 
 /* Adds a piece to the backing data structure and draws it to the canvas.  If a piece already exists at the given cell it will be replaced with the argument piece in order to maintain a legal board state.  
  * piece the piece to be added

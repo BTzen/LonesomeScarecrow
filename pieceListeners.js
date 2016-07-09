@@ -1,6 +1,8 @@
 //Billings, Kurylovich
 //Contains logic for piece behaviour, including movement and attack capabilities
 
+//DEBUG delete these once you've made sure they're not placed anywhere else
+
 /*
  * row row of the object that the listener is being called on; the agent
  * col column of the object that the listener is being called on

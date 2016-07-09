@@ -22,27 +22,36 @@ function castlingCheck(rookRow, rookCol) {
 				endCol = 4;		//exclusive
 			}
 			else {
-				startCol = 5;
-				endCol = 7;
+				startCol = 5;	//inclusive
+				endCol = 7;		//exclusive
 			}
-
-			for (var i = startCol; i < endCol; i++) {
-				//no pieces between rook and king
-				if (board.getPiece(kingsRow, i) !== null) { 
+			
+			// check that there are no pieces between the king and the castling rook
+			
+			if (rookCol == 0) {
+				if (board.getPiece(kingsRow, 1) !== null || board.getPiece(kingsRow, 2) !== null || board.getPiece(kingsRow, 3) !== null)
 					return false;
-				}
+				
+			}
+			else {
+				if (board.getPiece(kingsRow, 5) !== null || board.getPiece(kingsRow, 6) !== null)
+					return false;
+			}
+			for (var i = startCol; i < endCol; i++) {
 				//king doesn't cross over, or end on a square in which it would be in check
-				//check if a piece can attack any square between the kings initial and destination square
-				if (i > 1 && i < 7) {	//if castling with the rook in file A we don't need to check column adjacent to it as the king doesn't pass over that one)
-					isCheckingBoard = true;
+				//check if any pieces could potentially attack any square between the kings initial and destination square
+				if (i > 1 && i < 7) {	//if castling with the rook in file A I don't need to check column adjacent to said rook, as king doesn't pass over that one)
+					// isCheckingBoard = true;
 				
 					// find the actions every enemy piece on the board can take from their current positions to determine if castling is possible
 					for (var row = 0; row < 8; row++) {
 						for (var col = 0; col < 8; col++) {
+							
 							if (board.getPiece(row, col) !== null && board.getPiece(row, col).isWhite !== king.isWhite) {
-								isWhiteTurn = !isWhiteTurn;			//looks like this has something to do with highlighting the proper tiles
-								highlightListener(ctxHighlight, ctxPiece, board, col*LENGTH, row*LENGTH);
-								isWhiteTurn = !isWhiteTurn;
+								// isWhiteTurn = !isWhiteTurn;			//looks like this has something to do with highlighting the proper tiles
+								// highlightListener(ctxHighlight, ctxPiece, board, col*LENGTH, row*LENGTH);
+								// isWhiteTurn = !isWhiteTurn;
+								
 							}
 						}
 					}
@@ -71,13 +80,7 @@ function castlingCheck(rookRow, rookCol) {
 	 * 
 	*/
 	lastSelectedTile = new Tile(king, kingsRow, 4);	
-	// if (canCastle) {
-		// lastRow = kingsRow;
-		// lastColumn = 4;
-	// }
-	
-	
-	isCheckingBoard = false;
+	isCheckingBoard = false;	// DEBUG remove all instances of this var when possible
 	return canCastle;
 }
 
@@ -91,12 +94,39 @@ function castlingCheck(rookRow, rookCol) {
 	// var rightAdjacentPiece = board.getPiece(row, col + 1);
 	// var leftAdjacentPiece = board.getPiece(row, col + 1);
 	
-	// if (leftAdjacentPiece !== null && leftAdjacentPiece.type === "Pawn") {
+	// var legalMoves = [];
+	// // var attackFlag1 = false;
+    // // var attackFlag2 = false;
+	// var sign = (this.isWhite) ? -1 : 1;			// causes white pawns moved towards the top of the board and black pawns to move towards the bottom
 		
+	// // attack east
+	// if (board.getPiece(row + (1 * sign), column + 1) !== null && board.isValidAttack(row + (1 * sign), column + 1, this))
+	// {
+		// if (bHighlight)
+			// fill(ctxHighlight, LIGHT_RED, new Action(this, ActionType.ATTACK, row + (1 * sign), column + 1));
+		// legalMoves.push(new Action(this, ActionType.ATTACK, row + (1 * sign), column + 1));
 	// }
-	// //must be done on turn immediately after captured pawn moves 2 spaces forward
+	// // attack west
+	// if ((board.getPiece(row + (1 * sign), column-1) !== null && board.isValidAttack(row + (1 * sign), column - 1, this)))
+	// {
+		// if (bHighlight)
+			// fill(ctxHighlight, LIGHT_RED, new Action(this, ActionType.ATTACK, row + (1*sign), column - 1));
+		// legalMoves.push(new Action(this, ActionType.ATTACK, row + (1*sign), column - 1));
+	// }
+	// // movement
+	// if (board.getPiece(row + (1 * sign),column) === null) {
+		// if (bHighlight)
+			// fill(ctxHighlight, MELLOW_YELLOW, new Action(this, ActionType.MOVE, row + (1*sign), column));
+		// legalMoves.push(new Action(this, ActionType.MOVE, row + (1*sign), column));
+	// } 
+	// if (!this.hasMoved)
+	// if (board.getPiece(row + (2 * sign), column) === null) {
+		// if (bHighlight)
+			// fill(ctxHighlight, MELLOW_YELLOW, new Action(this, ActionType.MOVE, row + (2*sign), column));
+		// legalMoves.push(new Action(this, ActionType.MOVE, row + (2*sign), column));
+	// } 
 	
-	// //move capturing pawn to same position it would be in if the captured pawn only moved one square forward
+	// return legalMoves;
 // }
 
 /* determine if given king is in check DEBUG doesn't work
