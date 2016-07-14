@@ -24,6 +24,7 @@ function Action(agent, actionType, row, column) {
 const ActionType = {
 	MOVE : Symbol("MOVE"),
 	ATTACK : Symbol("ATTACK")
+	// CASTLE : Symbol("CASTLE")
 };
 
 /* Test if the argument type is valid property of ActionType

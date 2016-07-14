@@ -31,9 +31,10 @@ function Pawn(isWhite) {
 Pawn.prototype = Object.create(Piece.prototype);	//creates empty object with given prototype
 Pawn.prototype.value = 1;	//make all chess pieces share same value (ie. what the piece is worth)
 
+// NOTE not used as of yet
 Pawn.prototype.getAllMoves = function(board, bHighlight, row, column) {
 	var legalMoves = this.getStandardMoves(this, board, bHighlight, row, column);
-	legalMoves = legalMoves.concat(this.getEnPassantMoves(this, board, bHighlight, row, column));
+	legalMoves = legalMoves.concat(this.getSpecialMoves(this, board, bHighlight, row, column));
 	return legalMoves;
 }
 
@@ -64,36 +65,57 @@ Pawn.prototype.getStandardMoves = function(board, bHighlight, row, column) {
 		legalMoves.push(new Action(this, ActionType.MOVE, row + (1*sign), column));
 	} 
 	if (!this.hasMoved)
-	if (board.getPiece(row + (2 * sign), column) === null) {
-		if (bHighlight)
-			fill(ctxHighlight, MELLOW_YELLOW, new Action(this, ActionType.MOVE, row + (2*sign), column));
-		legalMoves.push(new Action(this, ActionType.MOVE, row + (2*sign), column));
-	} 
+		if (board.getPiece(row + (2 * sign), column) === null) {
+			if (bHighlight)
+				fill(ctxHighlight, MELLOW_YELLOW, new Action(this, ActionType.MOVE, row + (2*sign), column));
+			legalMoves.push(new Action(this, ActionType.MOVE, row + (2*sign), column));
+		} 
 	
 	return legalMoves;
 }
 
-Pawn.prototype.getEnPassantMoves = function(board, bHighlight, row, column) {
+/* 
+ * only works for white
+ */
+Pawn.prototype.getSpecialMoves = function(board, bHighlight, row, column) {
 	var legalMoves = [];
-
+	
 	// check right
 	var adjacentPiece = board.getPiece(row, column + 1);
-	if (adjacentPiece !== null && lastSelectedTile.piece.type == 'Pawn' 
-		&& pawnThatMovedTwoLastTurn == adjacentPiece
-		&& pawnThatMovedTwoLastTurn.isWhite !== this.isWhite) {
-		if (bHighlight)
-			fill(ctxHighlight, LIGHT_RED, new Action(this, ActionType.ATTACK, row - 1, column + 1));
-		legalMoves.push(new Action(this, ActionType.ATTACK, row - 1, column + 1));
+	var rowSign = (this.isWhite) ? 1 : -1;
+	// check left then right
+	for (let i = 1; i >= -1; i = i - 2) {
+		if (pawnThatMovedTwoLastTurn !== null) {
+			if (adjacentPiece !== null && lastSelectedTile.piece.type == 'Pawn' 
+			&& pawnThatMovedTwoLastTurn == adjacentPiece
+			&& pawnThatMovedTwoLastTurn.isWhite !== this.isWhite) {
+				let action = new Action(this, ActionType.ATTACK, row - (1 * rowSign), column + i);
+				if (bHighlight)
+					fill(ctxHighlight, LIGHT_RED, action);
+				legalMoves.push(action);
+			}
+		}
 	}
-	// check left
-	adjacentPiece = board.getPiece(row, column - 1);
-	if (adjacentPiece !== null && lastSelectedTile.piece.type == 'Pawn' 
-		&& pawnThatMovedTwoLastTurn == adjacentPiece
-		&& pawnThatMovedTwoLastTurn.isWhite !== this.isWhite) {
-		if (bHighlight)
-			fill(ctxHighlight, LIGHT_RED, new Action(this, ActionType.ATTACK, row - 1, column - 1));
-		legalMoves.push(new Action(this, ActionType.ATTACK, row - 1, column - 1));
-	}
+	// }
+	// if (pawnThatMovedTwoLastTurn !== null) {
+		// if (adjacentPiece !== null && lastSelectedTile.piece.type == 'Pawn' 
+			// && pawnThatMovedTwoLastTurn == adjacentPiece
+			// && pawnThatMovedTwoLastTurn.isWhite !== this.isWhite) {
+			// if (bHighlight)
+				// fill(ctxHighlight, LIGHT_RED, new Action(this, ActionType.ATTACK, row - 1, column + 1));
+			// legalMoves.push(new Action(this, ActionType.ATTACK, row - 1, column + 1));
+		// }
+	// // check left
+		// adjacentPiece = board.getPiece(row, column - 1);
+		// if (adjacentPiece !== null && lastSelectedTile.piece.type == 'Pawn' 
+			// && pawnThatMovedTwoLastTurn == adjacentPiece
+			// && pawnThatMovedTwoLastTurn.isWhite !== this.isWhite) {
+			// if (bHighlight)
+				// fill(ctxHighlight, LIGHT_RED, new Action(this, ActionType.ATTACK, row - 1, column - 1));
+			// legalMoves.push(new Action(this, ActionType.ATTACK, row - 1, column - 1));
+		// }
+	// }
+	return legalMoves;
 }
 
 function Knight(isWhite) {
@@ -218,6 +240,7 @@ Bishop.prototype.getStandardMoves = function(board, bHighlight, row, column) {
 			legalMoves.push(new Action(this, ActionType.ATTACK, row - i, column + i));
             blockedNortheast = true;
         }
+		else blockedNortheast = true;
 		// southeast
 		if (board.getPiece(row + i, column + i) === null && !blockedSoutheast) {
 			if (bHighlight)
@@ -230,6 +253,7 @@ Bishop.prototype.getStandardMoves = function(board, bHighlight, row, column) {
 			legalMoves.push(new Action(this, ActionType.ATTACK, row + i, column + i));
             blockedSoutheast = true;
         }
+		else blockedSoutheast = true;
 		// southwest
         if (board.getPiece(row + i, column - i) === null && !blockedSouthwest) {
 			if (bHighlight)
@@ -242,6 +266,7 @@ Bishop.prototype.getStandardMoves = function(board, bHighlight, row, column) {
 			legalMoves.push(new Action(this, ActionType.ATTACK, row + i, column - i));
             blockedSouthwest = true;
         }
+		else blockedSouthwest = true;
 		// northwest
         if (board.getPiece(row-i,column-i) === null && !blockedNorthwest) {
 			if (bHighlight)
@@ -254,7 +279,8 @@ Bishop.prototype.getStandardMoves = function(board, bHighlight, row, column) {
 			legalMoves.push(new Action(this, ActionType.ATTACK, row - i, column - i));
             blockedNorthwest = true;
         }
-
+		else blockedNorthwest = true;
+		
         if (blockedNortheast && blockedSoutheast && blockedNorthwest && blockedSouthwest) 
             break;
     }
@@ -287,6 +313,7 @@ Rook.prototype.getStandardMoves = function(board, bHighlight, row, column) {
 			legalMoves.push(new Action(this, ActionType.ATTACK, row - i, column));
             blockedAbove = true;
         }
+		else blockedAbove = true;
 		// east
         if (board.getPiece(row, column+i) === null && !blockedEast) {
 			if (bHighlight)
@@ -299,6 +326,7 @@ Rook.prototype.getStandardMoves = function(board, bHighlight, row, column) {
             legalMoves.push(new Action(this, ActionType.ATTACK, row, column + i));
             blockedEast = true;
         }
+		else blockedEast = true;
         // south
         if (board.getPiece(row+i, column) === null && !blockedBelow) { //and down flag
 			if (bHighlight)
@@ -311,6 +339,7 @@ Rook.prototype.getStandardMoves = function(board, bHighlight, row, column) {
             legalMoves.push(new Action(this, ActionType.ATTACK, row + i, column));
             blockedBelow = true;
         }
+		else blockedBelow = true;
         // west
         if (board.getPiece(row, column-i) === null && !blockedWest) {
             if (bHighlight)
@@ -322,6 +351,7 @@ Rook.prototype.getStandardMoves = function(board, bHighlight, row, column) {
             legalMoves.push(new Action(this, ActionType.ATTACK, row, column - i));
             blockedWest = true;
         }
+		else blockedWest = true;
 		// current piece is surrounded on all sides by pieces so stop the loop
         if (blockedAbove && blockedBelow && blockedWest && blockedEast) 
             break;
@@ -466,87 +496,15 @@ King.prototype.getStandardMoves = function(board, bHighlight, row, column) {
 	return legalMoves;
 }
 
-King.prototype.canCastle = function(board, bHighlight, row, column, bCastleWithLeftRook) {
-	var canCastle = true;
-	// castling with left rook
-	// castling with right rook
+King.prototype.getSpecialMoves = function(board, bHighlight, row, column) {
+	var legalMoves = [];
+	var kingTile = new Tile(this, row, column);
+	// castle right
+	if (canCastle(kingTile, board.getPiece(row, 7)))
+		legalMoves.push(new Action(this, ActionType.MOVE, row, column + 2));
+	// castle left
+	if (canCastle(kingTile, board.getPiece(row, 0)))
+		legalMoves.push(new Action(this, ActionType.MOVE, row, column - 2));
 	
-	var pieceToCheck = (board, bHighlight, row, column, bCastleWithLeftRook) ? board.getPiece(row, 0) : board.getPiece(row, 7);
-	
-	if (pieceToCheck !== null && pieceToCheck.type == 'Rook' && !pieceToCheck.hasMoved) {
-		// var kingsRow = row;	//store the row the king and rooks start in
-		// var king = null;
-		// if (board.getPiece(row, column) !== null && board.getPiece(kingsRow, 4).type === "King") 
-			// king = board.getPiece(kingsRow, 4);
-		
-		if (!this.hasMoved) {
-			var startCol, endCol;
-			
-			if (bCastleWithLeftRook) {
-				startCol = 1;		//inclusive
-				endCol = 4;			//exclusive
-			}
-			else {
-				startCol = 5;	//inclusive
-				endCol = 7;		//exclusive
-			}
-			
-			// check that there are no pieces between the king and the rook
-			for (let i = startCol; i < endCol; i++) {
-				if (board.getPiece(row, i) !== null) 
-					return false;
-			}
-			
-			// for (let i = startCol; i < endCol; i++) {
-				//king doesn't cross over, or end on a square in which it would be in check
-				//check if any pieces could potentially attack any square between the kings initial and destination square
-				// if (i > 1 && i < 7) {	//if castling with the rook in file A I don't need to check column adjacent to said rook, as king doesn't pass over that one)
-					// isCheckingBoard = true;
-					var possibleEnemyMoves = [];
-					// find the actions every enemy piece on the board can take from their current positions to determine if castling is possible
-					for (var row = 0; row < 8; row++) {
-						for (var col = 0; col < 8; col++) {
-							let currentTile = board.getTile(row, col);
-							if (currentTile !== null && currentTile.piece.isWhite !== this.isWhite) {
-								// isWhiteTurn = !isWhiteTurn;			//looks like this has something to do with highlighting the proper tiles
-								// highlightListener(ctxHighlight, ctxPiece, board, col*LENGTH, row*LENGTH);
-								// isWhiteTurn = !isWhiteTurn;
-								if (currentTile.piece == 'Pawn') {		//only piece whose attack options are different from their movement options
-									// TODO need to handle pawns separately
-								}
-								else {
-									possibleEnemyMoves = possibleEnemyMoves.concat(currentTile.piece.getStandardMoves(board, false, currentTile.row, currentTile.column));
-								}
-							}
-						}
-					}
-					for (let i = 0; i < possibleEnemyMoves.length; i++) {
-						var currentMove = possibleEnemyMoves[i];
-						//if (enemyPiece[1] === kingsRow && enemyPiece[2] === i) { //the piece can attack the king somewhere along his castling path DEBUG only need to check ActionType.ATTACK
-						if (currentMove.row === row && currentMove.column >= startCol && currentMove.column < endCol) {
-							console.log("in castle check");
-							//board.getPiece(item[1],item[2]).isInCheck = true; //may not even use this
-							// allHighlightedTiles = [];
-							// isCheckingBoard = false;
-							canCastle = false;
-							break;
-						}
-					}
-				// }
-			// }
-			
-			//king can't be in check
-			if (inCheck(king.isWhite)) { return false; }
-		}
-		else 
-			canCastle = false;
-	}
-	else 
-		canCastle = false;
-	/* Need to update the data of last tile as the current way of checking pieces changes the lastSelectedPiece and associated data
-	 * 
-	*/
-	// lastSelectedTile = new Tile(king, kingsRow, 4);	
-	// isCheckingBoard = false;	// DEBUG remove all instances of this var when possible
-	return canCastle;
+	return legalMoves;
 }

@@ -221,7 +221,7 @@ function kingListener(ctxHighlight, board, row, column) {
 
 	//RIGHT
 	//check if king can castle to the right - breaks if no rook, moves rook instead
-	if (castlingCheck(7,7)) {
+	if (canCastle(7,7)) {
 		fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row, column + 2));
 		isCastlingRight = true;	//used in listener to move rook
 	}
@@ -244,7 +244,7 @@ function kingListener(ctxHighlight, board, row, column) {
 	}
 	//LEFT
 	//check if king can castle to the left - breaks if no rook, moves rook instead
-	if (castlingCheck(7,0)) {
+	if (canCastle(7,0)) {
 		fill(ctxHighlight, MELLOW_YELLOW, new Action(callingPiece, ActionType.MOVE, row, column - 2));
 		isCastlingLeft = true;	//used in listener to move rook
 	}

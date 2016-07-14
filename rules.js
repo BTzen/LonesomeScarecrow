@@ -3,84 +3,84 @@
 // DEBUG: MAY NEED TO CHANGE ALL OF THESE to Board.prototype functions
 
 /* Checks if castling is possible with rook at given position
- * technically a king move
+ * TODO needs to check if King is currently in check
  */
-function castlingCheck(rookRow, rookCol) {
+function canCastle(castlingKingTile, castlingRookTile) {
 	var canCastle = true;
-	var rookToCheck = board.getPiece(rookRow, rookCol);
 	
-	if (rookToCheck !== null && !rookToCheck.hasMoved) {
-		var kingsRow = (rookToCheck.isWhite) ? 7 : 0;	//store the row the king and rooks start in
-		var king = null;
-		if (board.getPiece(kingsRow, 4) !== null && board.getPiece(kingsRow, 4).type === "King") 
-			king = board.getPiece(kingsRow, 4);
+	if (castlingRookTile !== null && castlingRookTile.piece.type == 'Rook' && !castlingRookTile.piece.hasMoved && !castlingKingTile.piece.hasMoved) {
+		var possibleEnemyActions = [];
+		if (inCheck(castlingKingTile, possibleEnemyActions)) {
+			return false;
+		}
+		var startCol, endCol;
 		
-		if (king !== null && !king.hasMoved) {
-			var startCol, endCol;
-			if (rookCol < 4) {	//determine which rook was passed for the check
-				startCol = 1;	//inclusive
-				endCol = 4;		//exclusive
-			}
-			else {
-				startCol = 5;	//inclusive
-				endCol = 7;		//exclusive
-			}
-			
-			// check that there are no pieces between the king and the castling rook
-			
-			if (rookCol == 0) {
-				if (board.getPiece(kingsRow, 1) !== null || board.getPiece(kingsRow, 2) !== null || board.getPiece(kingsRow, 3) !== null)
-					return false;
-				
-			}
-			else {
-				if (board.getPiece(kingsRow, 5) !== null || board.getPiece(kingsRow, 6) !== null)
-					return false;
-			}
-			for (var i = startCol; i < endCol; i++) {
-				//king doesn't cross over, or end on a square in which it would be in check
-				//check if any pieces could potentially attack any square between the kings initial and destination square
-				if (i > 1 && i < 7) {	//if castling with the rook in file A I don't need to check column adjacent to said rook, as king doesn't pass over that one)
-					// isCheckingBoard = true;
-				
-					// find the actions every enemy piece on the board can take from their current positions to determine if castling is possible
-					for (var row = 0; row < 8; row++) {
-						for (var col = 0; col < 8; col++) {
-							
-							if (board.getPiece(row, col) !== null && board.getPiece(row, col).isWhite !== king.isWhite) {
-								// isWhiteTurn = !isWhiteTurn;			//looks like this has something to do with highlighting the proper tiles
-								// highlightListener(ctxHighlight, ctxPiece, board, col*LENGTH, row*LENGTH);
-								// isWhiteTurn = !isWhiteTurn;
-								
-							}
-						}
+		if (castlingRookTile.column == 0) {
+			startCol = 1;		//inclusive
+			endCol = 4;			//exclusive
+		}
+		else {
+			startCol = 5;	//inclusive
+			endCol = 7;		//exclusive
+		}
+		
+		// check that there are no pieces between the king and the rook
+		for (let i = startCol; i < endCol; i++) {
+			if (board.getPiece(castlingKingTile.row, i) !== null) 
+				return false;
+		}
+
+		// find the actions every enemy piece on the board can take from their current positions to determine if castling is possible
+		for (let currentRow = 0; currentRow < 8; currentRow++) {
+			for (let currentColumn = 0; currentColumn < 8; currentColumn++) {
+				let currentTile = board.getTile(currentRow, currentColumn);
+				if (currentTile !== null && currentTile.piece.isWhite !== castlingKingTile.piece.isWhite) {
+					if (currentTile.piece.type !== 'Pawn') {
+						possibleEnemyActions = possibleEnemyActions.concat(currentTile.piece.getStandardMoves(board, false, currentTile.row, currentTile.column));
 					}
-					for (var index = 0; index < allHighlightedTiles.length; index++) {
-						var enemyPiece = allHighlightedTiles[index];
-						//if (enemyPiece[1] === kingsRow && enemyPiece[2] === i) { //the piece can attack the king somewhere along his castling path DEBUG only need to check ActionType.ATTACK
-						if (enemyPiece.row === kingsRow && enemyPiece.column === i) { //the piece can attack the king somewhere along his castling path DEBUG only need to check ActionType.ATTACK
-							console.log("in castle check");
-							//board.getPiece(item[1],item[2]).isInCheck = true; //may not even use this
-							allHighlightedTiles = [];
-							isCheckingBoard = false;
-							canCastle = false;
-							break;
+					else {
+						if (Math.abs(currentTile.row - castlingKingTile.row) == 1) {	// piece needs to be 1 row away from the king
+							let columnDifference = currentTile.column - castlingKingTile.column;
+							// left-hand or right-hand rook
+							if (startCol == 1) {		// lefthand
+								if (columnDifference > -4 && columnDifference <= 1) {
+									// console.log("can't castle left");
+									canCastle = false;
+									break;
+								}
+							}
+							else {
+								if (columnDifference >= -1) {
+									// console.log("can't castle right");
+									canCastle = false;
+									break;
+								}
+							}
 						}
 					}
 				}
 			}
-			
-			//king can't be in check
-			if (inCheck(king.isWhite)) { return false; }
 		}
-		else { return false; }
+		if (canCastle) {
+			for (let i = 0; i < possibleEnemyActions.length; i++) {
+				var currentMove = possibleEnemyActions[i];
+				if (currentMove.row === castlingKingTile.row && currentMove.column >= startCol && currentMove.column < endCol) {
+					console.log("in castle check");
+					canCastle = false;
+					break;
+				}
+			}
+		}
 	}
-	else { return false; }
+	else 
+		canCastle = false;
 	/* Need to update the data of last tile as the current way of checking pieces changes the lastSelectedPiece and associated data
 	 * 
 	*/
-	lastSelectedTile = new Tile(king, kingsRow, 4);	
-	isCheckingBoard = false;	// DEBUG remove all instances of this var when possible
+	// lastSelectedTile = new Tile(king, kingsRow, 4);	
+	// isCheckingBoard = false;	// DEBUG remove all instances of this var when possible
+	var sRookToCastleWith = (castlingRookTile.column == 0) ? 'left rook' : 'right rook';
+	console.log('canCastle with ' + sRookToCastleWith + ': ' + canCastle);
 	return canCastle;
 }
 
@@ -135,54 +135,37 @@ function castlingCheck(rookRow, rookCol) {
  * Once the turn is over it should output some sort of message.
  * Should require a global variable
  */
-function inCheck(row, column, bColour) {
-	
-	//REDO THIS METHOD
-	/* 
-	Go through each piece.
-	Check the highlighted tiles.
-	see if it is attacking the king.
-	if the king is being under attack then he is in check.
-	-----------------------------------------------------
-	Now we want to check where the king can move.
-	We also need to see if by moving one of our pieces will save the king.
-	If neither of these types of moves are possible then we are in checkmate.
-	*/
-	
-	// check if every piece is attacking or not? might not use this logic.
-	// may delgate this to isValidAttack
-/*	for (var checkRow = 0; checkRow < 64; checkRow++) {
-		for (var checkCol = 0; checkCol < 64; checkCol++) {
-			if (isAttackingKing (row, column, colourBool)) {
-				return true;
+function inCheck(kingsTile) {
+	var inCheck = false;
+	// if I need to get all the possibly enemy moves
+	if (arguments.length == 1) {
+		var possibleEnemyActions = [];
+		for (let currentRow = 0; currentRow < 8; currentRow++) {
+			for (let currentColumn = 0; currentColumn < 8; currentColumn++) {
+				let currentTile = board.getTile(currentRow, currentColumn);
+				// DEBUG
+				// if (currentTile !== null && kingsTile.piece == undefined) {
+					// console.log();
+				// }
+				if (currentTile !== null && currentTile.piece.isWhite !== kingsTile.piece.isWhite) {
+					possibleEnemyActions = possibleEnemyActions.concat(currentTile.piece.getStandardMoves(board, false, currentTile.row, currentTile.column));
+				}
 			}
-		}		
+		}
+		
+		for (let i = 0; i < possibleEnemyActions.length; i++) {
+			if (possibleEnemyActions[i].actionType === ActionType.ATTACK && possibleEnemyActions[i].row === kingsTile.row && possibleEnemyActions[i].column === kingsTile.column) {
+				inCheck = true;
+				break;
+			}
+		}
 	}
-	*/
+	// received array intended to store all possible actions for pieces of the opposing colour
+	// NOTE only bother with this if it causes a noticeable improvement in AI performance
+	else if (arguments.length == 2) {
+		console.log();
+	}
+	// if (inCheck) 
+		// console.log( ((kingsTile.piece.isWhite) ? "White " : "Black ") + "king is in check");
+	return inCheck;
 }
-
-/* checks if king is in check
- *
- */
-// function isAttackingKing (row, column, attackingPiece) {
-	// if (isValidAttack(row, column, attackingPiece) && board.getPiece(row,column).type === "King") {
-		// return true;
-	// }
-// }
-
-// /* check for opponent and board boundaries
- // * rowToAttack the row of the piece the possibility of attack is being checked against
- // * columnToAttack
- // * attackingPiece
-// */
-// function isValidAttack(board, rowToAttack, columnToAttack, attackingPiece) {
-	// check that the desired selection is within legal board dimensions
-	// if  (rowToAttack > 7 || rowToAttack < 0 || columnToAttack > 7 || columnToAttack < 0) {
-		// return false;
-	// }
-	
-	// var potentialTarget = board.getPiece(rowToAttack, columnToAttack);
-	// if (potentialTarget !== null) {
-		// return !(potentialTarget.isWhite === attackingPiece.isWhite);
-	// }		
-// }

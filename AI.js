@@ -23,38 +23,26 @@ function Node(state, utility, action, ply, children, parent) {
 }
 
 function highlightLogic(displayHighlight, tile, board) {
-	// if (displayHighlight)
-		// isCheckingBoard = false;
-	// else
-		// isCheckingBoard = true;
+	var possibleActions = [];
 	
-	// tile = getBoardTileWithCoords(board, x, y);
-	highlightedTiles = [];
-	
-	// only allow interaction with pieces of the correct colour
-	if (tile !== undefined)
-		var turnCheck = tile.piece.isWhite === tile.piece.isWhite; // ERRATA: currently lets you select any piece; isWhiteTurn
 	//check what kind of highlighting should take place based on the piece type
-	if (tile.piece.type === "Pawn" && turnCheck) {
-		//if pawn hasn't moved, highlight up to 2 spaces forward
-		let forwardMoves = (!tile.piece.hasMoved) ? 2 : 1; //how many space the piece can potentially move forward
-		pawnListener(ctxHighlight, board, tile.row, tile.column, forwardMoves, tile.piece.isWhite);
-	} 
-	else if (tile.piece.type === "Rook" && turnCheck) {
-		rookListener(ctxHighlight, board, tile.row, tile.column);
-	} 
-	else if (tile.piece.type === "Knight" && turnCheck) {
-		knightListener(ctxHighlight, board, tile.row, tile.column);
-	} 
-	else if (tile.piece.type === "Bishop" && turnCheck) {
-		bishopListener(ctxHighlight, board, tile.row, tile.column);
-	}
-	else if (tile.piece.type === "Queen" && turnCheck) {
-		queenListener(ctxHighlight, board, tile.row, tile.column);
-	}
-	else if (tile.piece.type === "King" && turnCheck) {
-		kingListener(ctxHighlight, board, tile.row, tile.column);
-	}
+	possibleActions = possibleActions.concat(tile.piece.getStandardMoves(board, false, tile.row, tile.column));
+	
+	// else if (tile.piece.type === "Rook" && turnCheck) {
+		// rookListener(ctxHighlight, board, tile.row, tile.column);
+	// } 
+	// else if (tile.piece.type === "Knight" && turnCheck) {
+		// knightListener(ctxHighlight, board, tile.row, tile.column);
+	// } 
+	// else if (tile.piece.type === "Bishop" && turnCheck) {
+		// bishopListener(ctxHighlight, board, tile.row, tile.column);
+	// }
+	// else if (tile.piece.type === "Queen" && turnCheck) {
+		// queenListener(ctxHighlight, board, tile.row, tile.column);
+	// }
+	// else if (tile.piece.type === "King" && turnCheck) {
+		// kingListener(ctxHighlight, board, tile.row, tile.column);
+	// }
 }
 
 /* used to assign a value to the board state for the given colour.  The larger the value the better the board state for the given side.
@@ -96,6 +84,7 @@ function utility(s, maxIsWhite) {
 function minimax(state, maxIsWhite) {
 	isCheckingBoard = true;		// prevent tiles in UI from being visibly highlighted
 	var nodes = [];				// store all possible moves from current state
+	var possibleActions = [];	// stores all possible actions possible for a given state
 	nodes.push(new Node(state, undefined, null, 0, undefined, null));			// push root node
 	var action = null;					//the (or one of the) optimal actions to take
 	var bestUtility = max(nodes[0], maxIsWhite, nodes);
@@ -121,10 +110,8 @@ function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {
 		// if (node.action.agent == 'Pawn' &&node.action.row == 4 && node.action.column == 3)
 			// console.log();
 	// }
-	
-	
 	var u = (isRunningMaxCode) ? -Number.MAX_VALUE : Number.MAX_VALUE;
-	// if TERMINAL-STATE(state) then return UTILITY(state)
+
 	if (isTerminalState(node.state) || node.ply == desiredPly) {	
 		u = utility(node.state, maxIsWhite);
 	}
@@ -134,31 +121,55 @@ function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {
 		if (!isRunningMaxCode)
 			pieceColorToCheck = !pieceColorToCheck;
 			
-			
 		// loop through all the occupied tiles and find all the possible moves for the relevant team
 		// try each of those moves and see which one offers the best result
 		node.state.occupiedTiles.forEach(function(tile) {
 			if (pieceColorToCheck == tile.piece.isWhite) {			// only check pieces of the appropriate colour
-				highlightLogic(true, tile, node.state);				// find which actions the piece in question can take
+				let possibleActions = [];
 				
-				/* create a new board state for each of the possible actions
-				 * note: allHighlightedTiles = [] if there are no possible moves which may cause problems for utility calculations done within this function
-				 */
-				allHighlightedTiles.forEach(function(action, index) {
-					child = new Board(node.state);
-					child.movePiece(tile.row, tile.column, allHighlightedTiles[index].row, allHighlightedTiles[index].column);
-					
-					//DEBUG
-					let newNode = new Node(child, undefined, allHighlightedTiles[index], node.ply + 1, null, node);
-					// if (nodes === undefined)
-						// console.log();
-					// if (nodes.length == 17) 
-						// var ab = 0;
-					
-					nodes.push(newNode);
-					successors.push(newNode);
-				});
-				allHighlightedTiles = [];
+				// NOTE only works for black (obviously)
+				if (inCheck(blackKingTile)) {
+					if (tile.piece.type == 'King')
+						possibleActions = tile.piece.getStandardMoves(node.state, false, tile.row, tile.column);
+				}
+				else {
+					if (tile.row == 1 && tile.column == 0) 
+						console.log();
+					possibleActions = tile.piece.getStandardMoves(node.state, false, tile.row, tile.column);
+	
+					if (tile.piece.type == 'Pawn')
+						possibleActions = possibleActions.concat(tile.piece.getSpecialMoves(node.state, false, tile.row, tile.column));
+					else if (tile.piece.type == 'King') {
+						// check right
+						let castlingRookTile = board.getTile(tile.row, 7);
+						if (castlingRookTile !== null && canCastle(tile, castlingRookTile))		
+							possibleActions.push(new Action(this, ActionType.MOVE, tile.row, tile.column + 2));	
+						// check left
+						castlingRookTile = board.getTile(tile.row, 0);
+						if (castlingRookTile !== null && canCastle(tile, castlingRookTile))		
+							possibleActions.push(new Action(this, ActionType.MOVE, tile.row, tile.column - 2));	
+					}
+					/* create a new board state for each of the possible actions
+					 * note: possibleActions = [] if there are no possible moves which may cause problems for utility calculations done within this function
+					 */
+					 
+					possibleActions.forEach(function(action, index) {
+						child = new Board(node.state);
+						
+						child.movePiece(tile.row, tile.column, possibleActions[index].row, possibleActions[index].column);
+						
+						//DEBUG
+						let newNode = new Node(child, undefined, possibleActions[index], node.ply + 1, null, node);
+						// if (nodes === undefined)
+							// console.log();
+						// if (nodes.length == 17) 
+							// var ab = 0;
+						
+						nodes.push(newNode);
+						successors.push(newNode);
+					});
+					possibleActions = [];
+				}
 			}
 		});
 		node.children = successors;
