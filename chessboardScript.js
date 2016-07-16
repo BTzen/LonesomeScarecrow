@@ -18,7 +18,6 @@ var isWhiteTurn = true;			// change back to TRUE; changed to FALSE for debugging
 var isGameRunning = false;			// true when the player is playing a game
 var isCastlingLeft = false;
 var isCastlingRight = false;
-var isFreeplayTest = false;  		// allows user to move both white and black pieces in freeplay with highlighting for both pieces
 var isCheckingBoard = false;		// used to prevent highlighting of tiles when piece actions are being determined;
 var isKingInCheck = false; 			// this will get changed to true hopefully once, and after alerting the user, should switch back to false (if they can get out of check)
 var highlightedTiles = [];
@@ -29,14 +28,6 @@ var initialBoardState = [];
 var ctxPieces;						// the context that the pieces are drawn on - used EVERYWHERE
 var pawnThatMovedTwoLastTurn = null;	// pawn that moved two tiles on the last turn
 var savedBoard = null;				
-
-//from html
-var listitemID = 1;					//index used to allow remove button to reference the list element it's attached to for deletion
-var occupiedTiles = [];
-var isWhiteKingPlaced = false;
-var isBlackKingPlaced = false;
-var whiteKingData = [];
-var blackKingData = [];
 
 //DEBUG
 
@@ -96,16 +87,6 @@ function draw(board) {
 	}
 }
 
-/* changes UI and gameRunning bool
- * 
-*/
-function startAI() {
-	isGameRunning = true;
-	$('#turn').css('visibility', 'visible');		//display which colour's turn it is to user
-	$('.uiSurrender').attr('disabled', false);
-	$('.uiStart').attr('disabled', true);
-}
-
 /* This method initializes on load and creates an onclick event.
 */
 function init() {
@@ -131,7 +112,7 @@ function init() {
 
         var x = event.pageX - canvasLeft,
             y = event.pageY - canvasTop; //alert('event.pageX - canvasLeft = ' + event.pageX + '-' + canvasLeft);
-        gameLoop(ctxHighlight, ctxPiece, board, x, y);
+        gameLoop(x, y);
     });
 }
 
@@ -179,24 +160,32 @@ function reinit(playerIsWhite) {
 function highlightListener(ctxHighlight, ctxPiece, board, x, y) {
 	highlightedTiles = [];				// will contain the list of tiles that the piece found using coordinates (x,y) can end up on through movement or attack
 	lastSelectedTile = null;
-	gameLoop(board, x, y);
+	gameLoop(x, y);
 }
 
 /* 
- * majority of game logic occurs here
+ * x the x coordinate of the user's click
+ * y the y coordinate of the user's click
 */
-function gameLoop(ctxHighlight, ctxPiece, board, x, y) { 
+function gameLoop(x, y) { 
 	if (isGameRunning) {
 		playerTurn(x, y);
 		
-		setTimeout(function() {		//necessary to draw the player move before drawing the CPUs move
+		setTimeout(function() {		//setTimeout is necessary to draw the player move before drawing the CPUs move
 			if (!isWhiteTurn) {
 				CPUTurn(x, y);
 			}
 		}, 20);
 	}
+	// game is over
+	else {
+		board.initialize(WHITE);
+	}
 }
 
+/* code supporting the player's interaction with the game
+ *
+ */
 function playerTurn(x, y) {
 	var column = Math.floor(x / LENGTH);		// find out the intersection of the row and column using the coordinates of where the player clicked
 	var row = Math.floor(y / LENGTH);
@@ -211,7 +200,7 @@ function playerTurn(x, y) {
 
 	//deal with piece movement (including attacking) - piece selected last turn; time to move!
 	if (highlightedTile) {		
-		if (highlightedTile.actionType === ActionType.ATTACK) { //DEBUG highlighted
+		if (highlightedTile.actionType === ActionType.ATTACK) { 
 			// if the attack square is empty then en passant must have just occured
 			// NOTE only works for white
 			if (board.getPiece(highlightedTile.row, highlightedTile.column) === null)
@@ -279,7 +268,7 @@ function playerTurn(x, y) {
 	/* logic used when a piece is first selected - before anything is highlighted for the player
 	 * check if player clicked on their own piece and highlight the appropriate tiles in response
 	 */
-	else if (lastSelectedTile = getBoardTileWithCoords(board, x, y)) {
+	if (lastSelectedTile = getBoardTileWithCoords(board, x, y)) {
 		var lastSelectedPiece = lastSelectedTile.piece;
 		// lastRowSelected = row;
 		// lastColumnSelected = column;
@@ -320,13 +309,24 @@ function playerTurn(x, y) {
 	}
 }
 
+/* code controlling AI action
+ * TODO support 
+ */
 function CPUTurn(x, y) {
-	//AI CALL HERE
-	var nextAIAction = minimax(board, BLACK);//(isWhiteTurn) ? WHITE : BLACK);
-	var agentTile = board.getPositionOfPiece(nextAIAction.agent);
-	board.movePiece(agentTile.row, agentTile.column, nextAIAction.row, nextAIAction.column);
-	draw(board);
-	isWhiteTurn = true;
+	var nextAIAction = minimax(board, BLACK);
+	if (nextAIAction !== null) {
+		var agentTile = board.getPositionOfPiece(nextAIAction.agent);
+		board.movePiece(agentTile.row, agentTile.column, nextAIAction.row, nextAIAction.column);
+		draw(board);
+		isWhiteTurn = true;
+	}
+	// AI caught in checkmate
+	else {
+		alert("Success! You won!");
+		isGameRunning = false;
+		
+	}
+	// DEBUG
 	// console.log('next move will move ' + nextAIAction.agent + ' from [' + agentTile.row + ', ' + agentTile.column + '] to ['
 		// + nextAIAction.row + ', ' + nextAIAction.column + ']'); 
 }

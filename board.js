@@ -89,9 +89,12 @@ Board.prototype.getTile = function(row, col) {
 	return currentTile;
 }
 
-/* Initialize board for a chess match
+/* Initialize board for a chess match. Overwrites the backing DS with the required setup for a standard chess game.
+ * TODO support playing as Black as well
 */
 Board.prototype.initialize = function(playerIsWhite) {
+	this.occupiedTiles = [];
+	
 	if (this instanceof Board) {
 		if (playerIsWhite) {
 			// place black pieces
@@ -106,9 +109,9 @@ Board.prototype.initialize = function(playerIsWhite) {
 			this.addPiece(new Rook(BLACK), 0, 7);
 			
 			for (let i = 0; i < 8; i++) {
-				// if (i == 7)
-					// this.addPiece(new Pawn(BLACK), 3, i);
-				// else
+				if (i == 3)
+					console.log();
+				else
 					this.addPiece(new Pawn(BLACK), 1, i);
 			}
 			
@@ -122,6 +125,14 @@ Board.prototype.initialize = function(playerIsWhite) {
 			// this.addPiece(wPawn, 3, 4);
 			
 			// ACTUAL BOARD LAYOUT
+			for (let i = 0; i < 8; i++) {
+				if (i == 4)
+					// this.addPiece(new Pawn(WHITE), 4, i);
+					console.log();
+				else
+					this.addPiece(new Pawn(WHITE), 6, i);
+			}
+			
 			this.addPiece(new Rook(WHITE), 7, 0);
 			this.addPiece(new Knight(WHITE), 7, 1);
 			this.addPiece(new Bishop(WHITE), 7, 2);
@@ -131,13 +142,6 @@ Board.prototype.initialize = function(playerIsWhite) {
 			this.addPiece(new Bishop(WHITE), 7, 5);
 			this.addPiece(new Knight(WHITE), 7, 6);
 			this.addPiece(new Rook(WHITE), 7, 7);
-			
-			for (let i = 0; i < 8; i++) {
-				// if (i == 4)
-					// this.addPiece(new Pawn(WHITE), 4, i);
-				// else
-					this.addPiece(new Pawn(WHITE), 6, i);
-			}
 			
 			//set 1 
 			// this.addPiece(new Pawn(BLACK), 2, 2);
@@ -152,12 +156,9 @@ Board.prototype.initialize = function(playerIsWhite) {
 	} else {
 		console.log("context of 'this' may be unintended:" + this);
 	}
-	
-	//#TESTING
-	//utility(this);
 }
 
-/* check for opponent and board boundaries
+/* check for opponent and board boundaries.  Does not check if the piece in question is blocked or not.
  * rowToAttack the row of the piece the possibility of attack is being checked against
  * columnToAttack
  * attackingPiece the piece that will claim the piece located at [rowToAttack, columnToAttack]

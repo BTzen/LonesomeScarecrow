@@ -134,20 +134,18 @@ function canCastle(castlingKingTile, castlingRookTile) {
  * Meaning after a piece is moved it will automatically check the condition
  * Once the turn is over it should output some sort of message.
  * Should require a global variable
+ * bColour boolean indicating which colour (white or black) should be tested
  */
-function inCheck(kingsTile) {
+function inCheck(bColour) {
 	var inCheck = false;
+	var kingsTile = (bColour === WHITE) ? whiteKingTile : blackKingTile;
 	// if I need to get all the possibly enemy moves
 	if (arguments.length == 1) {
 		var possibleEnemyActions = [];
 		for (let currentRow = 0; currentRow < 8; currentRow++) {
 			for (let currentColumn = 0; currentColumn < 8; currentColumn++) {
 				let currentTile = board.getTile(currentRow, currentColumn);
-				// DEBUG
-				// if (currentTile !== null && kingsTile.piece == undefined) {
-					// console.log();
-				// }
-				if (currentTile !== null && currentTile.piece.isWhite !== kingsTile.piece.isWhite) {
+				if (currentTile !== null && currentTile.piece.isWhite !== bColour) {
 					possibleEnemyActions = possibleEnemyActions.concat(currentTile.piece.getStandardMoves(board, false, currentTile.row, currentTile.column));
 				}
 			}
@@ -165,7 +163,5 @@ function inCheck(kingsTile) {
 	else if (arguments.length == 2) {
 		console.log();
 	}
-	// if (inCheck) 
-		// console.log( ((kingsTile.piece.isWhite) ? "White " : "Black ") + "king is in check");
 	return inCheck;
 }

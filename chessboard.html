@@ -10,13 +10,12 @@
 	 <script type="text/javascript" src="global.js"></script>
 	 <script src="jquery-ui/jquery-ui.js"></script>
 	 <script type="text/javascript" src="AI.js"></script>
-	 <script type="text/javascript" src="Board.js"></script>
-	 <script type="text/javascript" src="Canvas.js"></script>
-	 <script type="text/javascript" src="Listeners.js"></script>
-	 <script type="text/javascript" src="Piece.js"></script>
-	 <script type="text/javascript" src="Action.js"></script>
-   <script type="text/javascript" src="PieceListeners.js"></script>
-	 <script type="text/javascript" src="Rules.js"></script>
+	 <script type="text/javascript" src="board.js"></script>
+	 <script type="text/javascript" src="canvas.js"></script>
+	 <script type="text/javascript" src="listeners.js"></script>
+	 <script type="text/javascript" src="piece.js"></script>
+	 <script type="text/javascript" src="action.js"></script>
+	 <script type="text/javascript" src="rules.js"></script>
    <!-- <script type="text/javascript" src="minimax.js"></script> -->
    <!-- <script type="text/javascript" src="ai.js"></script> -->
    <script type="text/javascript" src="ChessboardScript.js" ></script>
@@ -38,61 +37,8 @@
 			<fieldset id="gameInfo">
 				<legend>Options</legend>
 				<label>Select ply: </label><input type="number" id="uiPly" min="2" max="4" value="3">
-				<input type="button" id="uiSurrender" class="uiSurrender fill" value="Surrender" disabled>
+				<input type="button" id="uiSurrender" class="uiSurrender fill" value="Resign" disabled>
 				<input type="button" id="uiStart" class="uiStart" value="Start">
-				<input type="button" id="uiFreeplay" value="Freeplay" onclick="freeplayListener()">
-			</fieldset>
-			<fieldset id="freeplayInfo">
-				<legend>Freeplay</legend>
-				<input id="fpAddPiece" type="button" value="Add" 
-					onclick="addPiece($('select[name=fpIsWhite]').val(), $('select[name=fpPiece]').val(), $('select[name=fpRank]').val(), $('select[name=fpFile]').val())">
-				<select id="fpIsWhite" name="fpIsWhite">
-					<option value="true">White</option>
-					<option value="false">Black</option>
-				</select>
-				<select id="fpPiece" name="fpPiece">
-					<option value="Pawn">Pawn</option>
-					<option value="Rook">Rook</option>
-					<option value="Knight">Knight</option>
-					<option value="Bishop">Bishop</option>
-					<option value="Queen">Queen</option>
-					<option value="King">King</option>
-				</select>
-				at
-				<select name="fpFile">	
-					<option value="0">a</option>
-					<option value="1">b</option>
-					<option value="2">c</option>
-					<option value="3">d</option>
-					<option value="4">e</option>
-					<option value="5">f</option>
-					<option value="6">g</option>
-					<option value="7">h</option>
-				</select>
-				<select name="fpRank">
-					<option value="7">1</option>
-					<option value="6">2</option>
-					<option value="5">3</option>
-					<option value="4">4</option>
-					<option value="3">5</option>
-					<option value="2">6</option>
-					<option value="1">7</option>
-					<option value="0">8</option>
-				</select>
-				
-				<div id="freeplayPieces">						<!--contains list of pieces added to the board in freeplay mode-->
-					<ol>
-					</ol>
-				</div>
-
-				<!-- <input type="radio" name="fpPlayerMovesBlack" value="true" checked="checked">Player controls black
-				<input type="radio" name="fpPlayerMovesBlack" value="false">AI controls black -->
-				<input type="button" id="fpStart" class="uistart fill" value="Start" onclick="freeplayStartListener()">
-				<input type="button" id="fpSaveLayout" class="fill" value="Save Layout" onclick="saveLayoutListener()">
-				<input type="button" id="fpLoadLayout" class="fill" value="Load Layout" onclick="loadLayoutListener()">
-
-				<input type="button" id="fpReset" class="uiSurrender fill" value="Reset" onclick="resetListener()" disabled>
-				<input type="button" class="fill alignBottom" value="Exit Freeplay" onclick="exitFreeplayListener()">
 			</fieldset>
 			
 			<div id="board">
@@ -115,15 +61,5 @@
 		</div>
 		<input type="button" id="acceptPromotion" value="Accept" onclick="acceptPromotionListener()">
 	</div>
-	<script>
-		var listitemID = 1;	//so the remove button knows what list element to delete
-		var occupiedTiles = [];
-		var isWhiteKingPlaced = false;
-		var isBlackKingPlaced = false;
-		var whiteKingData = [];
-		var blackKingData = [];
-		
-		
-	</script>
 </body>
 </html>

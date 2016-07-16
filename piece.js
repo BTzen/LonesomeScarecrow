@@ -86,7 +86,7 @@ Pawn.prototype.getSpecialMoves = function(board, bHighlight, row, column) {
 	// check left then right
 	for (let i = 1; i >= -1; i = i - 2) {
 		if (pawnThatMovedTwoLastTurn !== null) {
-			if (adjacentPiece !== null && lastSelectedTile !== null && lastSelectedTile.piece.type == 'Pawn' 
+			if (adjacentPiece !== null && lastSelectedTile !== null && lastSelectedTile.piece.type == 'Pawn' 	// 'lastSelectedTile !== null' check done to prevent errors from user mouse clicks between moves
 			&& pawnThatMovedTwoLastTurn == adjacentPiece
 			&& pawnThatMovedTwoLastTurn.isWhite !== this.isWhite) {
 				let action = new Action(this, ActionType.ATTACK, row - (1 * rowSign), column + i);
@@ -96,25 +96,6 @@ Pawn.prototype.getSpecialMoves = function(board, bHighlight, row, column) {
 			}
 		}
 	}
-	// }
-	// if (pawnThatMovedTwoLastTurn !== null) {
-		// if (adjacentPiece !== null && lastSelectedTile.piece.type == 'Pawn' 
-			// && pawnThatMovedTwoLastTurn == adjacentPiece
-			// && pawnThatMovedTwoLastTurn.isWhite !== this.isWhite) {
-			// if (bHighlight)
-				// fill(ctxHighlight, LIGHT_RED, new Action(this, ActionType.ATTACK, row - 1, column + 1));
-			// legalMoves.push(new Action(this, ActionType.ATTACK, row - 1, column + 1));
-		// }
-	// // check left
-		// adjacentPiece = board.getPiece(row, column - 1);
-		// if (adjacentPiece !== null && lastSelectedTile.piece.type == 'Pawn' 
-			// && pawnThatMovedTwoLastTurn == adjacentPiece
-			// && pawnThatMovedTwoLastTurn.isWhite !== this.isWhite) {
-			// if (bHighlight)
-				// fill(ctxHighlight, LIGHT_RED, new Action(this, ActionType.ATTACK, row - 1, column - 1));
-			// legalMoves.push(new Action(this, ActionType.ATTACK, row - 1, column - 1));
-		// }
-	// }
 	return legalMoves;
 }
 
@@ -234,7 +215,7 @@ Bishop.prototype.getStandardMoves = function(board, bHighlight, row, column) {
 				fill(ctxHighlight, MELLOW_YELLOW, new Action(this, ActionType.MOVE, row - i, column + i));
 			legalMoves.push(new Action(this, ActionType.MOVE, row - i, column + i));
         } 
-		else if (board.isValidAttack(row - i, column + i, this && !blockedNortheast)) {
+		else if (board.isValidAttack(row - i, column + i, this) && !blockedNortheast) {
             if (bHighlight)
                 fill(ctxHighlight, LIGHT_RED, new Action(this, ActionType.ATTACK, row - i, column + i));
 			legalMoves.push(new Action(this, ActionType.ATTACK, row - i, column + i));

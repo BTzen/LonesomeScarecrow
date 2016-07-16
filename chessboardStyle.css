@@ -40,17 +40,16 @@ fieldset legend {	/* override styles for children*/
 	color: black;
 	margin: 0;
 }
-
+/* not in use */
 #freeplayInfo {
 	display: none;
-	/* margin-top: 600px; */
 	margin-left: 635px;
 	position: absolute;
 	height: 585px;
 	width: 300px;
 	
 }
-
+/* not in use */
 #freeplayPieces {
 	border: 2px solid gray;
 	font-size: 200%;
