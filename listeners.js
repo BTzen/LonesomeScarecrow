@@ -56,20 +56,8 @@ function surrenderListener() {
 		//reset board to initial state
 		isGameRunning = false;
 		$('#uiPly').attr('disabled', false);
-		$('#uiFreeplay').attr('disabled', false);
 		$('.uiSurrender').attr('disabled', true);
 		$('.uiStart').attr('disabled', false);
-		//alert($('#freeplayInfo').css('display'));
-		// board.clear(0, 0, 8, 8);
-		//freeplay options
-		if ($('#freeplayInfo').css('display') == "block") {
-			$('#fpAddPiece').attr('disabled', false);
-			isFreeplayTest = false;
-		}
-		else {
-			reinit(true);  // CALL ON START INSTEAD IN CASE AI SURRENDERS?!?!
-			alert("Your conditions of surrender have been accepted!");
-		}
 		
 		document.getElementById('highlight').getContext('2d').clearRect(0,0, LENGTH * 8, LENGTH * 8);
 	}
