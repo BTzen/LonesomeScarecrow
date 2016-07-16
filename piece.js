@@ -86,7 +86,7 @@ Pawn.prototype.getSpecialMoves = function(board, bHighlight, row, column) {
 	// check left then right
 	for (let i = 1; i >= -1; i = i - 2) {
 		if (pawnThatMovedTwoLastTurn !== null) {
-			if (adjacentPiece !== null && lastSelectedTile.piece.type == 'Pawn' 
+			if (adjacentPiece !== null && lastSelectedTile !== null && lastSelectedTile.piece.type == 'Pawn' 
 			&& pawnThatMovedTwoLastTurn == adjacentPiece
 			&& pawnThatMovedTwoLastTurn.isWhite !== this.isWhite) {
 				let action = new Action(this, ActionType.ATTACK, row - (1 * rowSign), column + i);
