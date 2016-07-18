@@ -16,15 +16,11 @@
 	 <script type="text/javascript" src="piece.js"></script>
 	 <script type="text/javascript" src="action.js"></script>
 	 <script type="text/javascript" src="rules.js"></script>
-   <!-- <script type="text/javascript" src="minimax.js"></script> -->
-   <!-- <script type="text/javascript" src="ai.js"></script> -->
    <script type="text/javascript" src="ChessboardScript.js" ></script>
 </head>
 
 <body>
 	<div id="gameArea">
-	
-		
 		<h3 id="turn">Turn: White</h3>
 		<div id="fileNotation">
 			01234567 <!-- ABCDEFGH -->
@@ -33,14 +29,6 @@
 			01234567 <!-- 87654321 -->
 		</div>
 		<div id="boardAndInfo">
-			
-			<fieldset id="gameInfo">
-				<legend>Options</legend>
-				<label>Select ply: </label><input type="number" id="uiPly" min="2" max="4" value="3">
-				<input type="button" id="uiSurrender" class="uiSurrender fill" value="Resign" disabled>
-				<input type="button" id="uiStart" class="uiStart" value="Start">
-			</fieldset>
-			
 			<div id="board">
 				<canvas id="chessboard" width="600" height="600"></canvas>
 				<canvas id="highlight" width="600" height="600"></canvas>
@@ -48,6 +36,12 @@
 					<p>Your browser doesn't support the HTML5 canvas. Please consider updating your browser or using one which supports canvas.</p>
 				</canvas>
 			</div>
+			<fieldset id="gameInfo">
+				<legend>Options</legend>
+				<label>Select ply: </label><input type="number" id="uiPly" min="2" max="4" value="3">
+				<input type="button" id="uiReset" class="uiReset fill" value="Reset board" disabled>
+				<input type="button" id="uiStart" class="uiStart" value="Start">
+			</fieldset>
 		</div>
 	</div>
 	
@@ -61,5 +55,9 @@
 		</div>
 		<input type="button" id="acceptPromotion" value="Accept" onclick="acceptPromotionListener()">
 	</div>
+<!-- 	<script>
+		var boardHeight = document.getElementById('chesspieceCanvas').style.height;
+		document.getElementById('gameInfo').style.height = boardHeight;
+	</script> -->
 </body>
 </html>

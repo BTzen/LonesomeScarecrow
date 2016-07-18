@@ -74,66 +74,15 @@ function canCastle(castlingKingTile, castlingRookTile) {
 	}
 	else 
 		canCastle = false;
-	/* Need to update the data of last tile as the current way of checking pieces changes the lastSelectedPiece and associated data
-	 * 
-	*/
-	// lastSelectedTile = new Tile(king, kingsRow, 4);	
-	// isCheckingBoard = false;	// DEBUG remove all instances of this var when possible
+	
+	// Need to update the data of last tile as the current way of checking pieces changes the lastSelectedPiece and associated data
+	// DEBUG
 	var sRookToCastleWith = (castlingRookTile.column == 0) ? 'left rook' : 'right rook';
 	console.log('canCastle with ' + sRookToCastleWith + ': ' + canCastle);
 	return canCastle;
 }
 
-/*
- * row the row of the pawn that moves 2 spaces forward, post move(and the one that is potentially vulnerable to en passant)
- * col the column of said pawn
- */
-// function enPassantCheck(row, column) {
-	// //capturing pawn must be on its 5th rank before executing the maneuver
-	// //check for pawns immediate to the right and left of the pawn that moved
-	// var rightAdjacentPiece = board.getPiece(row, col + 1);
-	// var leftAdjacentPiece = board.getPiece(row, col + 1);
-	
-	// var legalMoves = [];
-	// // var attackFlag1 = false;
-    // // var attackFlag2 = false;
-	// var sign = (this.isWhite) ? -1 : 1;			// causes white pawns moved towards the top of the board and black pawns to move towards the bottom
-		
-	// // attack east
-	// if (board.getPiece(row + (1 * sign), column + 1) !== null && board.isValidAttack(row + (1 * sign), column + 1, this))
-	// {
-		// if (bHighlight)
-			// fill(ctxHighlight, LIGHT_RED, new Action(this, ActionType.ATTACK, row + (1 * sign), column + 1));
-		// legalMoves.push(new Action(this, ActionType.ATTACK, row + (1 * sign), column + 1));
-	// }
-	// // attack west
-	// if ((board.getPiece(row + (1 * sign), column-1) !== null && board.isValidAttack(row + (1 * sign), column - 1, this)))
-	// {
-		// if (bHighlight)
-			// fill(ctxHighlight, LIGHT_RED, new Action(this, ActionType.ATTACK, row + (1*sign), column - 1));
-		// legalMoves.push(new Action(this, ActionType.ATTACK, row + (1*sign), column - 1));
-	// }
-	// // movement
-	// if (board.getPiece(row + (1 * sign),column) === null) {
-		// if (bHighlight)
-			// fill(ctxHighlight, MELLOW_YELLOW, new Action(this, ActionType.MOVE, row + (1*sign), column));
-		// legalMoves.push(new Action(this, ActionType.MOVE, row + (1*sign), column));
-	// } 
-	// if (!this.hasMoved)
-	// if (board.getPiece(row + (2 * sign), column) === null) {
-		// if (bHighlight)
-			// fill(ctxHighlight, MELLOW_YELLOW, new Action(this, ActionType.MOVE, row + (2*sign), column));
-		// legalMoves.push(new Action(this, ActionType.MOVE, row + (2*sign), column));
-	// } 
-	
-	// return legalMoves;
-// }
-
-/* determine if given king is in check DEBUG doesn't work
- * I think this will have to be called inside each listener.
- * Meaning after a piece is moved it will automatically check the condition
- * Once the turn is over it should output some sort of message.
- * Should require a global variable
+/* determine if given king is in check
  * bColour boolean indicating which colour (white or black) should be tested
  */
 function inCheck(bColour) {

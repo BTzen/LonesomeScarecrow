@@ -24,47 +24,4 @@ function Action(agent, actionType, row, column) {
 const ActionType = {
 	MOVE : Symbol("MOVE"),
 	ATTACK : Symbol("ATTACK")
-	// CASTLE : Symbol("CASTLE")
 };
-
-/* Test if the argument type is valid property of ActionType
- *
- */ 
-// function isActionType(arg) {
-	// // parse symbol format to extract symbol description
-	// var firstCharOfDesc = String(arg).indexOf('(') + 1;
-	// var firstCharAfterDesc = String(arg).indexOf(')');
-	
-	// return (ActionType.hasOwnProperty( String(arg).substring(firstCharOfDesc, firstCharAfterDesc)));
-// }
-
-//testing
-// var newMove = new Move(ActionType.MOVE, 4, 3);
-// for (var p in ActionType) {
-	// console.log(p);
-	// console.log(ActionType.MOVE === ActionType[p]);
-// }
-// console.log("newMove.actionType: " + String(newMove.actionType));
-// console.log(ActionType.hasOwnProperty("MOVE"));
-// console.log(ActionType.MOVE);
-// var t = String(ActionType.ATTACK).substring(String(ActionType.ATTACK).indexOf('(') + 1, String(ActionType.ATTACK).indexOf(')') );
-// console.log(t);
-// console.log(ActionType.hasOwnProperty(t));
-// console.log('isActionType: ActionType.ATTACK? ' + isActionType("MOVE"));
-
-/* Used to define the method through which a piece reaches a given position
- */
-// class Action {
-	// constructor(action) {
-		// this.action = action;
-	// }
-	// toString() {
-		// return `Action.${this.action}`;
-	// }
-// }
-
-// Action.MOVE = new Action('MOVE');
-// Action.ATTACK = new Action('ATTACK');
-
-// alert(Action.MOVE);
-// console.log(Action.MOVE instanceof Action);

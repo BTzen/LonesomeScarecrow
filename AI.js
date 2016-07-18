@@ -1,8 +1,8 @@
 // Billings, M.
 // ERROR some board states return Number.MAX_VALUE
 
-var desiredPly = 3;		// the desired search depth
-var successors = [];
+var desiredPly = 1;		// the desired search depth
+var successors = [];	// stores every board state that can be reached from moving a particular piece
 
 // DEBUG
 /* encapsulates data needed to infer the best move from a given state
@@ -57,13 +57,13 @@ function utility(s, maxIsWhite) {
  * 
  */ 
 function minimax(state, maxIsWhite) {
-	isCheckingBoard = true;		// prevent tiles in UI from being visibly highlighted
+	// isCheckingBoard = true;		// prevent tiles in UI from being visibly highlighted
 	var nodes = [];				// store all possible moves from current state
 	var possibleActions = [];	// stores all possible actions possible for a given state
 	nodes.push(new Node(state, undefined, null, 0, undefined, null));			// push root node
 	var action = null;					//the (or one of the) optimal actions to take
 	var bestUtility = max(nodes[0], maxIsWhite, nodes);
-	isCheckingBoard = false;
+	// isCheckingBoard = false;
 	// nodes = [];
 	console.log('minimax returned: ' + bestUtility);
 	let nextMoveNode = null;

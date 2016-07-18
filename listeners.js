@@ -2,7 +2,7 @@
 
 $(window).load(function() {
 	document.getElementById('uiStart').addEventListener('click', startMatchListener);
-	document.getElementById('uiSurrender').addEventListener('click', surrenderListener);
+	document.getElementById('uiReset').addEventListener('click', resetListener);
 	
 
 });
@@ -42,26 +42,33 @@ function acceptPromotionListener() {
 */
 function startMatchListener() {
 	// carry out necessary logic to begin playing
-	isGameRunning = true;
+	gameIsRunning = true;
 	$('#turn').css('visibility', 'visible');		//display which colour's turn it is to user
-	$('.uiSurrender').attr('disabled', false);		//
-	$('.uiStart').attr('disabled', true);			//
-	
+	$('.uiReset').attr('disabled', false);			
+	$('.uiStart').attr('disabled', true);			
+
 	board.initialize(WHITE);	// initalize backing data structure
 	draw(board);				// draw pieces on the canvas
 }
 
-function surrenderListener() {
-	if (isGameRunning) {
-		//reset board to initial state
-		isGameRunning = false;
-		$('#uiPly').attr('disabled', false);
-		$('.uiSurrender').attr('disabled', true);
-		$('.uiStart').attr('disabled', false);
+/* reset the board to its initial state
+ *
+ */
+function resetListener() {
+	if (gameIsRunning) {
+		gameIsRunning = false;
+		// $('#uiPly').attr('disabled', false);
+		// $('.uiReset').attr('disabled', true);
+		// $('.uiStart').attr('disabled', false);
 		
-		document.getElementById('highlight').getContext('2d').clearRect(0,0, LENGTH * 8, LENGTH * 8);
+		// document.getElementById('highlight').getContext('2d').clearRect(0,0, LENGTH * 8, LENGTH * 8);
 	}
 	else {
-		alert("You can't give up if you haven't even started yet!");
+		resetBoard(board);
 	}
+	gameIsRunning = false;
+	$('#uiPly').attr('disabled', false);
+	$('.uiReset').attr('disabled', true);
+	$('.uiStart').attr('disabled', false);
+	$('#turn').css({'visibility':'hidden'});
 }
