@@ -1,12 +1,15 @@
 /* Billings, Kurylovich */
+#actionList {
+	border: 1px solid black;
+}
 
 #chessboard {
 	position:absolute;
-	z-index:0;
+	z-index:0;				/* only works on positioned elements */
 }
 
 #chesspieceCanvas {
-	/* position:absolute; */
+	position: relative;
 	z-index:2;
 }
 
@@ -17,15 +20,14 @@
 
 #board {
 	/* display: inline; */
-	display: inline-block;
 	border: 2px solid black;
-	/* box-sizing: border-box; */
-	/* height: inherit; */
+	height: inherit;
 	margin-left: 25px;
 	overflow: auto;		/* prevent canvas from being pushed out of the border */
 	position: relative; 
 	width: 600px;
 	
+	display: inline-block;
 	line-height: 0;			/* remove whitespace gap on bottom */
 	overflow: hidden;		/* remove scrollbars */
 }
@@ -34,7 +36,8 @@
 	overflow: visible;
 	/* height: 600px; */	/* probably should be auto */
 	position: relative;
-	width: auto;
+	width: 1000px;			/* ideally have this stretch to fit contents. 840px temp*/
+	/* width: auto; */
 }
 
 fieldset > * {
@@ -127,6 +130,12 @@ fieldset legend {	/* override styles for children*/
 	margin-top: 0;
 	text-align: center;
 }
+
+.blackAction {
+	color: red;
+	float: right;
+}
+
 /* prevent the dialog box from showing the close button */
 .no-close .ui-dialog-titlebar-close {
   display: none;
@@ -140,6 +149,7 @@ fieldset legend {	/* override styles for children*/
 :focus {	/* prevent chrome from putting a misshapen highlight on the dialog box close button */
 	outline: none;
 }
+
 ol {	/* override defaults */
 	margin:0;
 	margin-left: .5em; /* prevent numbers from running out of their container */

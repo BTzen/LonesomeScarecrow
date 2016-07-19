@@ -1,10 +1,9 @@
 /* Billings, Kurylovich */
 
+// assign listeners
 $(window).load(function() {
 	document.getElementById('uiStart').addEventListener('click', startMatchListener);
 	document.getElementById('uiReset').addEventListener('click', resetListener);
-	
-
 });
 
 /* show promotion dialog when pawn reaches opposite side of board

@@ -63,8 +63,6 @@ function minimax(state, maxIsWhite) {
 	nodes.push(new Node(state, undefined, null, 0, undefined, null));			// push root node
 	var action = null;					//the (or one of the) optimal actions to take
 	var bestUtility = max(nodes[0], maxIsWhite, nodes);
-	// isCheckingBoard = false;
-	// nodes = [];
 	console.log('minimax returned: ' + bestUtility);
 	let nextMoveNode = null;
 	if (nodes[0].children !== undefined && nodes[0].children.length > 0) {

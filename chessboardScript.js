@@ -1,24 +1,12 @@
 /* Billings, Kurylovich */
+// BUG black doesn't promote
 $(document).ready(function() {
 	var canvasHighlight = document.getElementById('highlight');
 	var canvasPieces = document.getElementById('chesspieceCanvas');
 	var ctxHighlight = canvasHighlight.getContext('2d');
 	var ctxPiece = canvasPieces.getContext('2d');				// the context that the pieces are drawn on - used EVERYWHERE
-});
-
-var canvas;
-// var canvasPieces;
-var ctx;
-// var ctxPiece;
-	
-var board = new Board();			// primary board used to play the game
-var isWhiteTurn = true;			// change back to TRUE; changed to FALSE for debugging minimax
-var gameIsRunning = false;			// true when the player is playing a game
-var isCheckingBoard = false;		// used to prevent highlighting of tiles when piece actions are being determined;
-var highlightedTiles = [];
-var lastSelectedTile; 				// for moving pieces
-var lastRowSelected, lastColumnSelected; //
-var pawnThatMovedTwoLastTurn = null;	// pawn that moved two tiles on the last turn		
+	board = new Board();
+});	
 
 /* Find a piece on the board using pixel coordinates on the canvas
  * x the horizontal component of the 2d coordinate 
@@ -114,32 +102,6 @@ function promotePiece(piece) {
 	//replace existing piece with a piece of that type
 }
 
-//freeplay?
-// function reinit(playerIsWhite) {
-	// /* account for fact that board may not be positioned in the top left corner of the page
-	 // * border isn't counted with offset()
-	// */
-    // canvasLeft = $('#board').offset().left + parseInt($('#board').css('border-left-width')); 
-    // canvasTop = $('#board').offset().top;
-
-    // ctx = document.getElementById('chessboard').getContext('2d');
-    // ctxPiece = document.getElementById('chesspieceCanvas').getContext('2d');
-	// ctxPiece.font = PIECE_FONT;
-    // ctxHighlight = document.getElementById('highlight').getContext('2d');
-
-    // //board stuff
-	// for (var index = 16; index < 48; index++) {
-		   // board.__position__[index] = null;
-	// }
-	// ctxPiece.clearRect(0, 0, LENGTH * 8, LENGTH * 8);	// remove piece images from board
-    
-	// //play pieces
-	// // placePiecesForMatch(isWhite);
-	
-	// isWhiteTurn = true;	//white will always move first
-	// document.$('turn').innerHTML = "Turn: White";
-// }
-
 /* Responsible for creating 'highlighted tiles' which contain all legal moves for a given piece. Logic for displaying this information to the user is handled separately from this method.
  * ctxHighlight
  * ctxPiece
@@ -147,10 +109,36 @@ function promotePiece(piece) {
  * x the horizontal pixel of the selected piece?? NOTE need to check basic accuracy of this statement
  * y the vertical pixel ....
  */
-function highlightListener(ctxHighlight, ctxPiece, board, x, y) {
-	highlightedTiles = [];				// will contain the list of tiles that the piece found using coordinates (x,y) can end up on through movement or attack
-	lastSelectedTile = null;
-	gameLoop(x, y);
+// function highlightListener(ctxHighlight, ctxPiece, board, x, y) {
+	// highlightedTiles = [];				// will contain the list of tiles that the piece found using coordinates (x,y) can end up on through movement or attack
+	// lastSelectedTile = null;
+	// gameLoop(x, y);
+// }
+
+function logAction() {
+	console.log();
+	var actionLog = document.getElementById('actionList');
+	var actionCountNumber = document.createElement('span');
+	var actionText;
+	actionCountNumber.appendChild(document.createTextNode(actionCount++ + '.'));
+	
+	
+	if (isWhiteTurn) {
+		actionLog.appendChild(actionCountNumber);
+		actionText = document.createTextNode('white');
+	}
+	else {
+		var actionText = document.createElement('span');
+		actionText.className = 'blackAction';
+		actionText.innerHTML = '\u00A0black'; //<br />
+		actionLog.appendChild(actionText);
+	}
+	actionLog.appendChild(actionText);
+	
+	if (!isWhiteTurn) {
+		var br = document.createElement('br');
+		actionLog.appendChild(br);
+	}
 }
 
 /* 
@@ -160,8 +148,9 @@ function highlightListener(ctxHighlight, ctxPiece, board, x, y) {
 function gameLoop(x, y) { 
 	if (gameIsRunning) {
 		playerTurn(x, y);
-		
+		logAction();
 		if (!isWhiteTurn) {
+			
 			setTimeout(function() {		//setTimeout is necessary to draw the player move before drawing the CPUs move
 				//if (!isWhiteTurn) 
 				CPUTurn(x, y);
@@ -180,7 +169,7 @@ function gameLoop(x, y) {
 function playerTurn(x, y) {
 	var column = Math.floor(x / LENGTH);		// find out the intersection of the row and column using the coordinates of where the player clicked
 	var row = Math.floor(y / LENGTH);
-	var highlightedTile = null; // not null if tile selected is highlighted in someway, ie. can the piece be moved there
+	var highlightedTile = null; 				// not null if tile selected is highlighted in someway, ie. can the piece be moved there
 
 	//check if selected tile is highlighted
 	highlightedTiles.forEach(function(currentTile) {
@@ -191,6 +180,7 @@ function playerTurn(x, y) {
 
 	//deal with piece movement (including attacking) - piece selected last turn; time to move!
 	if (highlightedTile) {		
+		// en passant
 		if (highlightedTile.actionType === ActionType.ATTACK) { 
 			// if the attack square is empty then en passant must have just occured
 			// NOTE only works for white
@@ -200,10 +190,9 @@ function playerTurn(x, y) {
 				ctxPiece.clearRect(highlightedTile.column * LENGTH, highlightedTile.row * LENGTH, LENGTH, LENGTH); //remove old piece image
 		}
 		
-		
 		if (pawnThatMovedTwoLastTurn !== null) pawnThatMovedTwoLastTurn = null;
 		
-		// En passant check
+		// check if pawn moved 2 ranks
 		if (lastSelectedTile !== null && lastSelectedTile.piece.type == "Pawn") {
 			//check for 2 square move
 			if (Math.abs(lastSelectedTile.row - row) == 2) {
@@ -227,6 +216,8 @@ function playerTurn(x, y) {
 			}
 		}
 		
+		prevLocationOfMovedPiece.row = lastSelectedTile.row;
+		prevLocationOfMovedPiece.column = lastSelectedTile.column;
 		//move the piece corresponding to that highlighted pattern to the selected location 
 		board.movePiece(lastSelectedTile.row, lastSelectedTile.column, row, column);
 		draw(board);
@@ -266,7 +257,6 @@ function playerTurn(x, y) {
 		// only allow interaction with pieces of the correct colour
 		if (lastSelectedTile !== undefined)
 			var isPlayerTurn = lastSelectedTile.piece.isWhite === lastSelectedTile.piece.isWhite; // DEBUG: currently lets you select any piece
-		
 		
 		// only allow King to be selected if King is in check
 		if (lastSelectedPiece.isWhite == true && inCheck(whiteKingTile)) {	// TODO remove isWhite condition once testing is done
@@ -333,4 +323,13 @@ function toggleTurn() {
 	var turnText = (isWhiteTurn) ? 'Turn: White' : 'Turn: Black';
 	document.getElementById('turn').innerHTML = turnText;
 }
+
+// performs standard move and saves movement information for reporting
+// function movePiece() {
+	// prevLocationOfMovedPiece.row = lastSelectedTile.row;
+		// prevLocationOfMovedPiece.column = lastSelectedTile.column;
+		// //move the piece corresponding to that highlighted pattern to the selected location 
+		// board.movePiece(lastSelectedTile.row, lastSelectedTile.column, row, column);
+		// draw(board);
+// }
 window.onload = init;
