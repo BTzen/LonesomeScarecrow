@@ -1,6 +1,15 @@
 /* Billings, Kurylovich */
 #actionList {
 	border: 1px solid black;
+	display: block;
+	height: 480px;
+	width: 100%;
+	margin-top: 10px;
+	overflow-y: scroll;
+}
+
+#actionList td {
+	border: 1px solid red;
 }
 
 #chessboard {
@@ -40,12 +49,12 @@
 	/* width: auto; */
 }
 
-fieldset > * {
+/* fieldset > * {
 	margin-bottom: 2px;
 	margin-top: 2px;
-}
+} */
 
-fieldset legend {	/* override styles for children*/
+fieldset legend {	/* override styles for children*/ /* fieldset */
 	color: black;
 	margin: 0;
 }
@@ -71,19 +80,46 @@ fieldset legend {	/* override styles for children*/
 }
 
 #gameInfo [type=button] {
-	display: table-cell;
-	width: 100%;
+	/* display: table-cell; */
+	/* width: 100%; */
 }
 
 #gameInfo {
 	display: inline-block;
 	/* margin-left: 635px; */
-	padding-bottom: 0.75em;
+	/* padding-bottom: 0.75em; */
 	/* position: absolute; */
-	/* height: 900px; */
+	height: 585px;				/* align bottom with board */
 	width: 170px;
 	vertical-align: top;
+
+	position: relative;
+	/* -webkit-margin-start: 0; */
+    /* -webkit-margin-end: 0; */
+    /* -webkit-padding-before: 0.0; */
+    /* -webkit-padding-start: 0.0; */
+    /* -webkit-padding-end: 0.0; */
+    /* -webkit-padding-after: 0.0; */
 }
+
+#gameControlWidgets {
+	/* display: table; */
+	box-sizing: border-box;
+	padding: 0;
+	position: absolute;
+	bottom: 10px;
+	width: 93%;
+}
+
+#gameControlWidgets * {
+	display: block;
+	/* display: table; */
+	padding: 1px 0;
+	/* position: absolute; */
+	/* bottom: 10px; */
+	width: inherit;
+}
+
 
 #fileNotation {
 	color: gray;
@@ -141,11 +177,6 @@ fieldset legend {	/* override styles for children*/
   display: none;
 }
 
-.fill {
-	display: table-cell;
-	width: 100%; 
-}
-
 :focus {	/* prevent chrome from putting a misshapen highlight on the dialog box close button */
 	outline: none;
 }
@@ -154,3 +185,7 @@ ol {	/* override defaults */
 	margin:0;
 	margin-left: .5em; /* prevent numbers from running out of their container */
 }
+
+/* html, body {
+	height: 100%;
+} */

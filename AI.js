@@ -82,7 +82,10 @@ function minimax(state, maxIsWhite) {
 // contains common logic for min and max methods
 function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {		
 	var u = (isRunningMaxCode) ? -Number.MAX_VALUE : Number.MAX_VALUE;
-
+	// var CPUColour = (playerIsWhite) ? BLACK : WHITE;
+	
+	//blackKingTile !== undefined used to test en passant
+	
 	if (isTerminalState(node.state) || node.ply == desiredPly) {	
 		u = utility(node.state, maxIsWhite);
 	}
@@ -93,9 +96,7 @@ function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {
 			pieceColorToCheck = !pieceColorToCheck;
 		var possibleActions = [];
 		
-		// check if the king is caught in check
-		if (inCheck(blackKingTile)) {
-			blackKingTile.piece.isInCheck = true;
+		if (blackKingTile !== undefined && inCheck(board, BLACK)) {
 			possibleActions = blackKingTile.piece.getStandardMoves(node.state, false, blackKingTile.row, blackKingTile.column);
 		}
 		else {
@@ -109,8 +110,8 @@ function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {
 					possibleActions = possibleActions.concat(tile.piece.getStandardMoves(node.state, false, tile.row, tile.column));
 	
 					if (tile.piece.type == 'Pawn')
-						possibleActions = possibleActions.concat(tile.piece.getSpecialMoves(node.state, false, tile.row, tile.column));
-					else if (tile.piece.type == 'King') {
+						possibleActions = possibleActions.concat(getEnPassantMoves(node.state, false, tile.row, tile));
+					else if (blackKingTile !== undefined && tile.piece.type == 'King') {
 						// check right
 						let castlingRookTile = board.getTile(tile.row, 7);
 						if (castlingRookTile !== null && canCastle(tile, castlingRookTile))		
@@ -120,8 +121,6 @@ function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {
 						if (castlingRookTile !== null && canCastle(tile, castlingRookTile))		
 							possibleActions.push(new Action(this, ActionType.MOVE, tile.row, tile.column - 2));	
 					}
-					
-
 				}
 			});
 		}
@@ -132,18 +131,15 @@ function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {
 			child = new Board(node.state);
 			child.movePiece(action.agent.row, action.agent.column, possibleActions[index].row, possibleActions[index].column);
 			
-			if (!blackKingTile.piece.isInCheck && !inCheck(blackKingTile)) {
+			// return list of actions if the King isn't in checkmate
+			if (blackKingTile !== undefined && !(blackKingTile.piece.isInCheck && inCheck(BLACK))) {
 				let newNode = new Node(child, undefined, possibleActions[index], node.ply + 1, null, node);
 				nodes.push(newNode);
 				successors.push(newNode);
 			}
-			// else {
-				// let newNode = new Node(child, undefined, possibleActions[index], node.ply + 1, null, node);
-				// nodes.push(newNode);
-				// successors.push(newNode);
-				// enemyKingInCheck = false;
-			// }
-				
+			else if (blackKingTile !== undefined) {
+				blackIsInCheckmate = true;
+			}			
 		});
 		possibleActions = [];
 			
@@ -151,18 +147,21 @@ function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {
 		successors = [];
 		
 		if (node.children !== null) {
-			// examine all children of current node
-			for (let i = 0; i < node.children.length; i++) {
-				if (i == 8 && node.ply == 0) 
-					console.log();
-				u = (isRunningMaxCode) ? Math.max(u, min(node.children[i], maxIsWhite, nodes)) : Math.min(u, max(node.children[i], maxIsWhite, nodes));
+			// DEBUG
+			// one player can't make any moves eg. they only have one pawn and it's blocked by a piece belonging to the opposing player - CATCH case, shouldn't happen in a real game
+			if (node.children.length == 0) {
+				u = utility(node.state, maxIsWhite);
 			}
-		}
-		// DEBUG
-		// one player can't make any moves eg. they only have one pawn and it's blocked by a piece belonging to the opposing player - CATCH case, shouldn't happen in a real game
-		else if (node.children.length == 0) {
-			u = utility(node.state, maxIsWhite);
-		}
+			// examine all children of current node
+			else {
+				for (let i = 0; i < node.children.length; i++) {
+					// DEBUG
+					if (i == 8 && node.ply == 0) 
+						console.log();
+					u = (isRunningMaxCode) ? Math.max(u, min(node.children[i], maxIsWhite, nodes)) : Math.min(u, max(node.children[i], maxIsWhite, nodes));
+				}
+			}
+		}	
 	}
 	node.utility = u;
 	return u;
@@ -186,10 +185,11 @@ function isTerminalState(state) {
 	var isTerminalState = false;
 	var blackKing = blackKingTile.piece;
 	
-	if (inCheck(BLACK) || inCheck(WHITE)
-		|| board.occupiedTiles.length == 2) {	// only 2 kings on board
-			isTerminalState = true;
-	}
+	// TODO check if the function call is necessary here 
+	// if (inCheck(CPUColour) || inCheck(CPUColour)
+		// || board.occupiedTiles.length == 2) {	// only 2 kings on board
+			// isTerminalState = true;
+	// }
 	
 	
 	// a stalemate occurs when the only 2 pieces on the board are Kings, regardless of their position, or if the remaining pieces on the board make checkmate impossible (e.g. can't checkmate an opponent with only a king and a bishop)

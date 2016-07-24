@@ -1,5 +1,5 @@
-/* Billings, Kurylovich */
-// BUG black doesn't promote
+/* Billings, M., Kurylovich, A. */
+// TODO player can intentionally move king into checkmates
 $(document).ready(function() {
 	var canvasHighlight = document.getElementById('highlight');
 	var canvasPieces = document.getElementById('chesspieceCanvas');
@@ -115,46 +115,164 @@ function promotePiece(piece) {
 	// gameLoop(x, y);
 // }
 
-function logAction() {
+function logAction(pieceType, previousRow, previousColumn, action) {
 	console.log();
-	var actionLog = document.getElementById('actionList');
-	var actionCountNumber = document.createElement('span');
-	var actionText;
-	actionCountNumber.appendChild(document.createTextNode(actionCount++ + '.'));
-	
+	var actionList = document.getElementById('actionListBody');
 	
 	if (isWhiteTurn) {
-		actionLog.appendChild(actionCountNumber);
-		actionText = document.createTextNode('white');
+		actionList.innerHTML += "<tr><td>" + ++actionCount + "." + "</td>" +
+			"<td>" + createChessNotationData(board, objLogData) + "</td>"; //convert('King', prevTileOfMovedPiece.row, prevTileOfMovedPiece.column, ) + 
 	}
 	else {
-		var actionText = document.createElement('span');
-		actionText.className = 'blackAction';
-		actionText.innerHTML = '\u00A0black'; //<br />
-		actionLog.appendChild(actionText);
+		// $('#actionList tr').append("<td>black</td>");
+		var lastTd = $('#actionList tr').last().append("<td>&nbsp;" + createChessNotationData(board, objLogData) + "</td");
+		console.log();
 	}
-	actionLog.appendChild(actionText);
+	// move scrollbar to the bottom to display new entry
+	var table = document.getElementById('actionList');
+	table.scrollTop = table.scrollHeight - table.clientHeight;
+}
+// TODO add 2nd param to calls
+/* return a string representing the action performed.  This information is displayed to the user within #actionList.
+ *
+ */
+function createChessNotationData(board, logData) {
+	var string = '';
 	
-	if (!isWhiteTurn) {
-		var br = document.createElement('br');
-		actionLog.appendChild(br);
+	switch (logData.action.agent.type) {
+		case 'King':
+			string += 'K';
+			break;
+		case 'Queen':
+			string += 'Q';
+			break;
+		case 'Rook':
+			string += 'R';
+			break;
+		case 'Bishop':
+			string += 'B';
+		case 'Knight':
+			string += 'N';
+			break;
+		default:
+			break;
 	}
+	
+	switch (logData.previousColumn) {
+		case 0:
+			string += 'a';
+			break;
+		case 1:
+			string += 'b';
+			break;
+		case 2:
+			string += 'c';
+			break;
+		case 3:
+			string += 'd';
+			break;
+		case 4:
+			string += 'e';
+			break;
+		case 5:
+			string += 'f';
+			break;
+		case 6:
+			string += 'g';
+			break;
+		case 7:
+			string += 'h';
+			break;
+		default:
+			throw "invalid column provided to log";
+			break;
+	}
+	
+	string += logData.previousRow;
+	
+	if (logData.action.actionType == ActionType.MOVE) {
+		string += '-';
+	}
+	else {
+		string += 'x';
+	}
+	
+	// checkmate
+		
+	
+	if (board.blackKingTile.piece.isInCheck || board.whiteKingTile.isInCheck) {
+		string += '+';
+	}
+	
+	// location moved to
+	switch (logData.action.column) {
+		case 0:
+			string += 'a';
+			break;
+		case 1:
+			string += 'b';
+			break;
+		case 2:
+			string += 'c';
+			break;
+		case 3:
+			string += 'd';
+			break;
+		case 4:
+			string += 'e';
+			break;
+		case 5:
+			string += 'f';
+			break;
+		case 6:
+			string += 'g';
+			break;
+		case 7:
+			string += 'h';
+			break;
+		default:
+			throw "invalid column provided to log";
+			break;
+	}
+	
+	string += logData.action.row;
+	return string;
 }
 
-/* 
+/* Code to carry out player and AI gameplay.  Called through clicks on the board.
  * x the x coordinate of the user's click
  * y the y coordinate of the user's click
 */
 function gameLoop(x, y) { 
 	if (gameIsRunning) {
-		playerTurn(x, y);
-		logAction();
-		if (!isWhiteTurn) {
-			
-			setTimeout(function() {		//setTimeout is necessary to draw the player move before drawing the CPUs move
-				//if (!isWhiteTurn) 
-				CPUTurn(x, y);
-			}, 20);
+		if (isWhiteTurn) {
+			if (playerIsWhite) {
+				playerTurn(board, x, y);
+		
+				// player moved piece
+				if (lastSelectedTile == null) {
+					logAction();
+					toggleTurn();
+				}
+			}
+			// else CPU is white
+		}
+		else {
+			playerTurn(board, x, y);
+	
+			// player moved piece
+			if (lastSelectedTile == null) {
+				logAction();
+				toggleTurn();
+			}
+			// if (!isWhiteTurn) {
+				// // setTimeout(function() {		// setTimeout is necessary to draw the player move before drawing the CPUs move
+					// // //if (!isWhiteTurn) 
+					// // CPUTurn(x, y);
+				// // }, 20);
+				// logAction();
+				// toggleTurn();
+			// }
 		}
 	}
 	// game is over
@@ -162,73 +280,60 @@ function gameLoop(x, y) {
 		board.initialize(WHITE);
 	}
 }
-
+// TODO* add board param
 /* code supporting the player's interaction with the game
  *
  */
-function playerTurn(x, y) {
+function playerTurn(board, x, y) {
 	var column = Math.floor(x / LENGTH);		// find out the intersection of the row and column using the coordinates of where the player clicked
 	var row = Math.floor(y / LENGTH);
 	var highlightedTile = null; 				// not null if tile selected is highlighted in someway, ie. can the piece be moved there
 
 	//check if selected tile is highlighted
-	highlightedTiles.forEach(function(currentTile) {
-		if (currentTile.row == row && currentTile.column == column)
-			highlightedTile = currentTile;
+	highlightedTiles.forEach(function(action) {
+		if (action.row == row && action.column == column) {
+			highlightedTile = action;
+			objLogData.action = action;
+		}
 	});
 	//console.log('prev. coords ' + lastRowSelected + ' ' + lastColumnSelected);
 
 	//deal with piece movement (including attacking) - piece selected last turn; time to move!
 	if (highlightedTile) {		
-		// en passant
-		if (highlightedTile.actionType === ActionType.ATTACK) { 
-			// if the attack square is empty then en passant must have just occured
-			// NOTE only works for white
-			if (board.getPiece(highlightedTile.row, highlightedTile.column) === null)
-				board.removePiece(row + 1, column);
-			else
-				ctxPiece.clearRect(highlightedTile.column * LENGTH, highlightedTile.row * LENGTH, LENGTH, LENGTH); //remove old piece image
-		}
+		objLogData.previousRow = lastSelectedTile.row;
+		objLogData.previousColumn = lastSelectedTile.column;
 		
-		if (pawnThatMovedTwoLastTurn !== null) pawnThatMovedTwoLastTurn = null;
-		
+		enPassantHandler(highlightedTile);
+
+		if (pawnThatMovedTwoLastTurn !== null)
+			pawnThatMovedTwoLastTurn = null;
 		// check if pawn moved 2 ranks
 		if (lastSelectedTile !== null && lastSelectedTile.piece.type == "Pawn") {
-			//check for 2 square move
 			if (Math.abs(lastSelectedTile.row - row) == 2) {
 				pawnThatMovedTwoLastTurn = lastSelectedTile.piece;
 			}
 		}
 		
 		// castling logic
-		if (lastSelectedTile.piece.type == 'King') {
-			//move the rook to the appropriate position
-			if (Math.abs(lastSelectedTile.column - highlightedTile.column) == 2) {
-				let rookTile = null;
-				if (lastSelectedTile.column < highlightedTile.column) {		// castle right
-					rookTile = board.getPiece(lastSelectedTile.row, 7);
-					board.movePiece(lastSelectedTile.row, 7, lastSelectedTile.row, highlightedTile.column - 1);
-				}
-				else {
-					rookTile = board.getPiece(lastSelectedTile.row, 0);		// castle left
-					board.movePiece(lastSelectedTile.row, 0, lastSelectedTile.row, highlightedTile.column + 1);
-				}
-			}
-		}
+		// if (lastSelectedTile.piece.type == 'King') {
+			// //move the rook to the appropriate position
+			// if (Math.abs(lastSelectedTile.column - highlightedTile.column) == 2) {
+				// let rookTile = null;
+				// if (lastSelectedTile.column < highlightedTile.column) {		// castle right
+					// rookTile = board.getPiece(lastSelectedTile.row, 7);
+					// board.movePiece(lastSelectedTile.row, 7, lastSelectedTile.row, highlightedTile.column - 1);
+				// }
+				// else {
+					// rookTile = board.getPiece(lastSelectedTile.row, 0);		// castle left
+					// board.movePiece(lastSelectedTile.row, 0, lastSelectedTile.row, highlightedTile.column + 1);
+				// }
+			// }
+		// }
+		castlingHandler(lastSelectedTile, highlightedTile);
 		
-		prevLocationOfMovedPiece.row = lastSelectedTile.row;
-		prevLocationOfMovedPiece.column = lastSelectedTile.column;
 		//move the piece corresponding to that highlighted pattern to the selected location 
 		board.movePiece(lastSelectedTile.row, lastSelectedTile.column, row, column);
 		draw(board);
-		
-		// required for en passant and castling
-		if (lastSelectedTile.piece.hasOwnProperty('hasMoved') && lastSelectedTile.piece.hasMoved == false) {
-			lastSelectedTile.piece.hasMoved = true;
-		}
-	
-		//update tracking variables
-		highlightedTile = null;
 		
 		//check if it's in a promotion tile; only works for white pieces
 		if (lastSelectedTile.piece.isWhite && lastSelectedTile.piece.type === 'Pawn') {
@@ -243,34 +348,85 @@ function playerTurn(x, y) {
 					});
 			}
 		}
-		// }
-		highlightedTiles = []; 						//reset which tiles are hightlighted each time this runs
-		toggleTurn();
+		
+		//update tracking variables
+		highlightedTile = null;
+		highlightedTiles = []; 						// reset which tiles are hightlighted each time this runs
+		lastSelectedTile = null;					
 	}
 	/* logic used when a piece is first selected - before anything is highlighted for the player
 	 * check if player clicked on their own piece and highlight the appropriate tiles in response
 	 */
 	else if (lastSelectedTile = getBoardTileWithCoords(board, x, y)) {
 		var lastSelectedPiece = lastSelectedTile.piece;
+		var legalMoves = [];
+		var potentialMoves = [];
 		highlightedTiles = [];
 		
+		// DEBUG currently lets you select any piece
 		// only allow interaction with pieces of the correct colour
 		if (lastSelectedTile !== undefined)
-			var isPlayerTurn = lastSelectedTile.piece.isWhite === lastSelectedTile.piece.isWhite; // DEBUG: currently lets you select any piece
+			var isPlayerTurn = lastSelectedTile.piece.isWhite === lastSelectedTile.piece.isWhite; 
 		
 		// only allow King to be selected if King is in check
-		if (lastSelectedPiece.isWhite == true && inCheck(whiteKingTile)) {	// TODO remove isWhite condition once testing is done
+		// NOTE need to test with other enemy pieces of all types
+		let playersKing = (isWhiteTurn) ? board.whiteKingTile.piece : board.blackKingTile.piece;		//(playerIsWhite)
+		if (playersKing !== undefined && inCheck(board, playersKing.isWhite)) {
+			// if (lastSelectedPiece.isWhite == playerIsWhite) {	// TODO remove isWhite condition once testing is done
 			if (lastSelectedPiece.type == 'King') {
-				lastSelectedPiece.getStandardMoves(board, true, lastSelectedTile.row, lastSelectedTile.column);
+				potentialMoves = lastSelectedPiece.getStandardMoves(board, false, lastSelectedTile.row, lastSelectedTile.column);
+			
+				//only highlight moves that will get the King out of check.  Could alternatively avoid potential checks by ensuring the king in check doesn't move into any of the movement tiles listed in potential moves.  This would work for all pieces whose movement options are the same as their attack options.
+				potentialMoves.forEach(function(action) {
+					let futureBoardState = new Board(board);
+					futureBoardState.movePiece(lastSelectedTile.row, lastSelectedTile.column, action.row, action.column);
+					if (!inCheck(futureBoardState, playersKing.isWhite)) {
+						let actionColour;
+						if (action.actionType == ActionType.MOVE) {
+							actionColour = MELLOW_YELLOW;
+						}
+						else if (action.actionType == ActionType.ATTACK) {
+							actionColour = LIGHT_RED;
+						}
+						fill(ctxHighlight, actionColour, action);
+						legalMoves.push(action);
+					}
+				});
+			
+				// checkmate
+				if (legalMoves.length == 0) {
+					alert('code for checkmate goes here');
+				}
+			} 
+			// allow selection of pieces that can get the King out of check
+			else {
+				
 			}
-		} 
+		}
 		else {	// highlight the appropriate tiles
-			lastSelectedPiece.getStandardMoves(board, true, lastSelectedTile.row, lastSelectedTile.column); 
+			legalMoves = [];
+			let potentialMoves = lastSelectedPiece.getStandardMoves(board, false, lastSelectedTile.row, lastSelectedTile.column); 
 			
 			if (lastSelectedPiece.type == 'Pawn')
-				lastSelectedPiece.getSpecialMoves(board, true, lastSelectedTile.row, lastSelectedTile.column);
-			// check for castling options
+				getEnPassantMoves(board, true, lastSelectedTile);
 			else if (lastSelectedPiece.type == 'King') {
+				// only allow actions that won't place the King in check
+				potentialMoves.forEach(function(action) {
+					let futureBoardState = new Board(board);
+					futureBoardState.movePiece(lastSelectedTile.row, lastSelectedTile.column, action.row, action.column);
+					if (!inCheck(futureBoardState, lastSelectedPiece.isWhite)) {
+						let actionColour;
+						if (action.actionType == ActionType.MOVE) {
+							actionColour = MELLOW_YELLOW;
+						}
+						else if (action.actionType == ActionType.ATTACK) {
+							actionColour = LIGHT_RED;
+						}
+						fill(ctxHighlight, actionColour, action);
+						legalMoves.push(action);
+					}
+				});
+				// castling options
 				// check right
 				let castlingRookTile = board.getTile(lastSelectedTile.row, 7);
 				if (castlingRookTile !== null && canCastle(lastSelectedTile, castlingRookTile))		
@@ -280,6 +436,10 @@ function playerTurn(x, y) {
 				if (castlingRookTile !== null && canCastle(lastSelectedTile, castlingRookTile))		
 					fill(ctxHighlight, MELLOW_YELLOW, new Action(this, ActionType.MOVE, lastSelectedTile.row, lastSelectedTile.column - 2));	
 			}
+			// standard case: potential moves = legal moves
+			else {
+				lastSelectedPiece.getStandardMoves(board, true, lastSelectedTile.row, lastSelectedTile.column);
+			}
 		}
 	} 
 	else {	// player clicked off the piece
@@ -288,23 +448,83 @@ function playerTurn(x, y) {
 	}
 }
 
+/* Update data structure in case of en passant
+ *
+ */
+function enPassantHandler(action) {
+	if (action.actionType === ActionType.ENPASSANT) { 
+		if (action.agent.isWhite === playerIsWhite)
+			board.removePiece(action.row + 1, action.column);
+		else
+			board.removePiece(action.row - 1, action.column);
+	}
+}
+
+/* Update data structure in the case of castling.  Code is common to player and CPU.
+ *
+ */
+function castlingHandler(agentTile, actionTile) {
+	// castling logic
+	if (agentTile.piece.type == 'King') {
+		//move the rook to the appropriate position
+		if (Math.abs(agentTile.column - actionTile.column) == 2) {
+			let rookTile = null;
+			if (agentTile.column < actionTile.column) {				// castle right
+				rookTile = board.getPiece(agentTile.row, 7);
+				board.movePiece(agentTile.row, 7, agentTile.row, actionTile.column - 1);
+			}
+			else {
+				rookTile = board.getPiece(agentTile.row, 0);		// castle left
+				board.movePiece(agentTile.row, 0, agentTile.row, actionTile.column + 1);
+			}
+		}
+	}
+}
+
 /* code controlling AI action
  * TODO support 
  */
 function CPUTurn(x, y) {
-	var nextAIAction = minimax(board, BLACK);
+	// DEBUG
+	// var agentTile = board.getTile(4, 2);
+	// var highlightedTile = new Action(agentTile.piece, ActionType.ENPASSANT, 5, 3);
+	var nextAIAction = new Action(board.getPiece(6, 3), ActionType.MOVE, 7, 3);
+	
+	// var nextAIAction = minimax(board, BLACK);		// action object
+	var agentTile;									// the tile of the piece that will be acted upon
 	if (nextAIAction !== null) {
-		var agentTile = board.getPositionOfPiece(nextAIAction.agent);
+		agentTile = board.getPositionOfPiece(nextAIAction.agent);
+	
+		enPassantHandler(nextAIAction);
+		
+		if (pawnThatMovedTwoLastTurn !== null)
+			pawnThatMovedTwoLastTurn = null;
+		// check if pawn moved 2 ranks
+		if (agentTile.piece.type == "Pawn") {
+			if (Math.abs(nextAIAction.row - agentTile.row) == 2) {
+				pawnThatMovedTwoLastTurn = agentTile.piece;
+			}
+		}
+		
+		// promotion
+		if (agentTile.piece.type == "Pawn" && agentTile.row !== 7 && nextAIAction.row == 7) {
+			let CPUcolour = (playerIsWhite) ? BLACK : WHITE;
+			board.addPiece(new Queen(CPUcolour), agentTile.row, agentTile.column);
+			// agentTile = new Tile(new Queen(CPUcolour), agentTile.row, agentTile.column);
+		}
+		
+		castlingHandler(agentTile, nextAIAction);
 		board.movePiece(agentTile.row, agentTile.column, nextAIAction.row, nextAIAction.column);
+
 		draw(board);
 	}
-	// AI caught in checkmate
-	else {
-		alert("Success! You won!");
-		gameIsRunning = false;
+	// // AI caught in checkmate
+	// else {
+		// alert("Success! You won!");
+		// gameIsRunning = false;
 		
-	}
-	toggleTurn();
+	// }
+	
 	// DEBUG
 	// console.log('next move will move ' + nextAIAction.agent + ' from [' + agentTile.row + ', ' + agentTile.column + '] to ['
 		// + nextAIAction.row + ', ' + nextAIAction.column + ']'); 
@@ -324,12 +544,4 @@ function toggleTurn() {
 	document.getElementById('turn').innerHTML = turnText;
 }
 
-// performs standard move and saves movement information for reporting
-// function movePiece() {
-	// prevLocationOfMovedPiece.row = lastSelectedTile.row;
-		// prevLocationOfMovedPiece.column = lastSelectedTile.column;
-		// //move the piece corresponding to that highlighted pattern to the selected location 
-		// board.movePiece(lastSelectedTile.row, lastSelectedTile.column, row, column);
-		// draw(board);
-// }
 window.onload = init;

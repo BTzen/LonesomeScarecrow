@@ -1,4 +1,4 @@
-/* Billings, Kurylovich */
+/* Billings, M., Kurylovich, A. */
 
 // assign listeners
 $(window).load(function() {

@@ -1,5 +1,10 @@
-/* contains data necessary to determine legal actions for a given piece at a given point in time.  This includes what tiles the piece can reach from it's current tile and whether that state is reached through movement or attack
- * action  whether the action is purely movement or causes a piece to be removed from the board, ie. an attack
+/* Billings, M. */
+
+/* Contains data necessary to determine legal actions for a given piece at a given point in time.
+ * agent the piece the will perform the action
+ * actionType object used to convey the proper behaviour requried of the action
+ * row the row the agent will move to as a result of the action
+ * column (look above)
  */
 function Action(agent, actionType, row, column) {
 	var objIsActionType = false;
@@ -23,5 +28,6 @@ function Action(agent, actionType, row, column) {
  */
 const ActionType = {
 	MOVE : Symbol("MOVE"),
-	ATTACK : Symbol("ATTACK")
+	ATTACK : Symbol("ATTACK"),
+	ENPASSANT : Symbol("EN PASSANT")
 };

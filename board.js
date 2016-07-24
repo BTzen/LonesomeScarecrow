@@ -1,7 +1,15 @@
+// TODO have each board keep track of their kings
+// TODO calculate if King's move will result in it being in check
+// TODO get check tests working for PC and CPU
+
+// NOTE untested
 /* Note: Board class does not contain the functionality to draw the pieces. That is handled by chessboardScript.js
 */
 function Board(boardToClone) {
 	this.occupiedTiles = [];
+	this.whiteKingTile;
+	this.blackKingTile;
+	
 	if (arguments.length === 1) {
 		if (boardToClone.hasOwnProperty("occupiedTiles") && boardToClone.occupiedTiles !== null && boardToClone.occupiedTiles !== undefined) {
 			// deep copy
@@ -31,12 +39,19 @@ function Board(boardToClone) {
 					clonePiece = new Queen();
 				}
 				
-				for (var prop in tileToClone.piece) {
-					clonePiece[prop] = tileToClone.piece[prop];
+				for (var prop in pieceToClone) { //tileToClone.piece
+					clonePiece[prop] = pieceToClone[prop];
 				}
 				
-				let cloneTile = new Tile(clonePiece, tileToClone.row, tileToClone.column);
+				let cloneTile = new Tile(clonePiece, tileToClone.row, tileToClone.column);					
 				this.occupiedTiles.push(cloneTile);
+				
+				if (clonePiece.type == 'King') {
+					if (clonePiece.isWhite)
+						this.whiteKingTile = cloneTile;
+					else
+						this.blackKingTile = cloneTile;
+				}
 			}
 		}
 	}
@@ -45,6 +60,7 @@ function Board(boardToClone) {
 Board.prototype.clear = function() {
 	this.occupiedTiles = [];
 }
+
 
 /* Returns piece located at tile specified by the intersection of the row and column
  * returns tile or null, or undefined if the given index is out of bounds
@@ -97,50 +113,50 @@ Board.prototype.initialize = function() {
 	
 	if (this instanceof Board) {
 		// place black pieces
-		this.addPiece(new Rook(BLACK), 0, 0);
-		this.addPiece(new Knight(BLACK), 0, 1);
-		this.addPiece(new Bishop(BLACK), 0, 2);
-		this.addPiece(new Queen(BLACK), 0, 3);
-		blackKingTile = new Tile(new King(BLACK), 0, 4);
-		this.addPiece(blackKingTile.piece, 0, 4);
-		this.addPiece(new Bishop(BLACK), 0, 5);
-		this.addPiece(new Knight(BLACK), 0, 6);
-		this.addPiece(new Rook(BLACK), 0, 7);
+		// this.addPiece(new Rook(BLACK), 0, 0);
+		// this.addPiece(new Knight(BLACK), 0, 1);
+		// this.addPiece(new Bishop(BLACK), 0, 2);
+		// this.addPiece(new Queen(BLACK), 0, 3);
+		// this.blackKingTile = new Tile(new King(BLACK), 0, 4);
+		// this.addPiece(this.blackKingTile.piece, 0, 4);
+		// this.addPiece(new Bishop(BLACK), 0, 5);
+		// this.addPiece(new Knight(BLACK), 0, 6);
+		// this.addPiece(new Rook(BLACK), 0, 7);
 		
-		for (let i = 0; i < 8; i++) {
-			if (i == 3)
-				console.log();
-			else
-				this.addPiece(new Pawn(BLACK), 1, i);
-		}
+		// for (let i = 0; i < 8; i++)
+			// this.addPiece(new Pawn(BLACK), 1, i);
 		
-		// var bPawn = new Pawn(BLACK);
-		// bPawn.hasMoved = true;
-		// this.addPiece(bPawn, 3, 3);
-		// place white pieces
+		// // place white pieces
+		// for (let i = 0; i < 8; i++) 
+			// this.addPiece(new Pawn(WHITE), 6, i);
 		
-		// var wPawn = new Pawn(WHITE);
-		// wPawn.hasMoved = true;
-		// this.addPiece(wPawn, 3, 4);
+		// this.addPiece(new Rook(WHITE), 7, 0);
+		// this.addPiece(new Knight(WHITE), 7, 1);
+		// this.addPiece(new Bishop(WHITE), 7, 2);
+		// this.addPiece(new Queen(WHITE), 7, 3);
+		// this.whiteKingTile = new Tile(new King(WHITE), 7, 4);
+		// this.addPiece(this.whiteKingTile.piece, this.whiteKingTile.row, this.whiteKingTile.column);
+		// this.addPiece(new Bishop(WHITE), 7, 5);
+		// this.addPiece(new Knight(WHITE), 7, 6);
+		// this.addPiece(new Rook(WHITE), 7, 7);
 		
-		// ACTUAL BOARD LAYOUT
-		for (let i = 0; i < 8; i++) {
-			if (i == 4)
-				// this.addPiece(new Pawn(WHITE), 4, i);
-				console.log();
-			else
-				this.addPiece(new Pawn(WHITE), 6, i);
-		}
+		this.blackKingTile = new Tile(new King(BLACK), 3, 4);
+		this.occupiedTiles.push(this.blackKingTile);
+		// this.addPiece(this.blackKingTile.piece, this.blackKingTile.row, this.blackKingTile.column);
+		this.whiteKingTile = new Tile(new King(WHITE), 1, 4);
+		// this.addPiece(this.whiteKingTile.piece, this.whiteKingTile.row, this.whiteKingTile.column);
+		this.occupiedTiles.push(this.whiteKingTile);
+		this.addPiece(new Rook(WHITE), 2, 3);
+		this.addPiece(new Rook(BLACK), 2, 6);
 		
-		this.addPiece(new Rook(WHITE), 7, 0);
-		this.addPiece(new Knight(WHITE), 7, 1);
-		this.addPiece(new Bishop(WHITE), 7, 2);
-		this.addPiece(new Queen(WHITE), 7, 3);
-		whiteKingTile = new Tile(new King(WHITE), 7, 4);
-		this.addPiece(whiteKingTile.piece, whiteKingTile.row, whiteKingTile.column);
-		this.addPiece(new Bishop(WHITE), 7, 5);
-		this.addPiece(new Knight(WHITE), 7, 6);
-		this.addPiece(new Rook(WHITE), 7, 7);
+		// en passant with black test
+		// this.addPiece(new Pawn(WHITE), 6, 1);
+		// this.addPiece(new Pawn(BLACK), 4, 2);
+		// this.addPiece(new Pawn(WHITE), 6, 3);
+		// this.addPiece(new Pawn(BLACK), 4, 4);	
+		
+		// CPU and black castling test
+		
 	} else {
 		console.log("context of 'this' may be unintended:" + this);
 	}
@@ -162,25 +178,25 @@ Board.prototype.isValidAttack = function(rowToAttack, columnToAttack, attackingP
 		return !(potentialTarget.isWhite === attackingPiece.isWhite);
 	}		
 }
-/* Move an existing piece from one location on the board to another.  This only modifies the backing data structure for the board so changes to the visual representation must be made elsewhere
-*/
+
+/* Move an existing piece from one location on the board to another and updates the hasMoved property of this piece, if one exists.  This only modifies the backing data structure for the board so changes to the visual representation must be 	made elsewhere
+ */
 Board.prototype.movePiece = function(fromRow, fromCol, toRow, toCol) {
-	let movingPiece = null;
-	// let finalLocation = this.getTile(toRow, toCol);
-	
-	let hasMovedPiece = false;
-	let hasClearedTile = false;
-	let indexOfTileToRemove;
+	var movingPiece = null;	
+	var hasMovedPiece = false;
+	var hasClearedTile = false;
+	var indexOfTileToRemove;
 	
 	// update piece position in DS
 	for (var i = 0; i < this.occupiedTiles.length; i++) {
 		if (this.occupiedTiles[i].row == fromRow && this.occupiedTiles[i].column == fromCol) {
-			movingPiece = this.occupiedTiles[i]
-			movingPiece.row = toRow;
-			movingPiece.column = toCol;
+			movingPieceTile = this.occupiedTiles[i];
+			movingPieceTile.row = toRow;
+			movingPieceTile.column = toCol;
 			hasMovedPiece = true;
-			if (movingPiece.piece.hasOwnProperty('hasMoved')) {
-				movingPiece.piece.hasMoved = true;
+			
+			if (movingPieceTile.piece.hasOwnProperty('hasMoved')) {
+				movingPieceTile.piece.hasMoved = true;
 			}
 			continue;								//prevents removal of element that was just moved from occupiedTiles
 		}
@@ -200,14 +216,15 @@ Board.prototype.movePiece = function(fromRow, fromCol, toRow, toCol) {
 		this.occupiedTiles.splice(indexOfTileToRemove, 1);		
 }
 
-/* Adds a piece to the backing data structure and draws it to the canvas.  If a piece already exists at the given cell it will be replaced with the argument piece in order to maintain a legal board state.  
+/* Adds a piece to the backing data structure and draws it to the canvas.  If a piece already exists at the given cell it will be replaced with the argument piece in order to maintain a legal board state.  If no piece exists with the provided row and column a new tile will be created for it and added to the list of existing tiles.
  * piece the piece to be added
  * row expects row index (ie. 0-7)
  * column expects column index (ie. 0-7)
  */
 Board.prototype.addPiece = function(piece, row, col) {
-	// check data structure to see if it contains a piece located on the given tile
 	var bPieceReplacesExistingElement = false;
+	
+	// check data structure to see if it contains a piece located on the given tile
 	for (var i = 0; i < this.occupiedTiles.length; i++) {
 		if (this.occupiedTiles[i].row === row && this.occupiedTiles[i].column === col) {
 			this.occupiedTiles[i].piece = piece;
@@ -221,7 +238,7 @@ Board.prototype.addPiece = function(piece, row, col) {
 	}
 }
 
-/* Removes an existing piece at the specified tile
+/* Removes an existing piece at the specified tile from backing data structure
  * 
  */
 Board.prototype.removePiece = function(row, col) {

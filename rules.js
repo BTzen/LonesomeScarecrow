@@ -1,6 +1,35 @@
 // contains methods that provide a mechanism to enforce the rules of chess and provide information on board and game state
 
-// DEBUG: MAY NEED TO CHANGE ALL OF THESE to Board.prototype functions
+/* NOTE only works for player
+ * pawnTile the tile of the pawn that could perform en passant
+ * returns any instances of en passant that can be made
+ */
+function getEnPassantMoves(board, bHighlight, pawnTile) {
+	var legalMoves = [];
+	
+	// check right
+	var adjacentPiece = board.getPiece(pawnTile.row, pawnTile.column + 1);
+	var rowSign = (pawnTile.piece.isWhite == playerIsWhite) ? 1 : -1;		// player pieces always positioned in rank 7 and 8 ie. at the bottom of the displayed board
+	if (pawnThatMovedTwoLastTurn !== null) {
+		// check left then right
+		for (let i = 1; i >= -1; i = i - 2) {	// loop avoids code duplication
+			if (adjacentPiece !== null && lastSelectedTile !== null && lastSelectedTile.piece.type == 'Pawn' 	// 'lastSelectedTile !== null' check done to prevent errors from user mouse clicks between moves
+			&& pawnThatMovedTwoLastTurn == adjacentPiece
+			&& pawnThatMovedTwoLastTurn.isWhite !== pawnTile.piece.isWhite) {
+				let action = new Action(pawnTile.piece, ActionType.ENPASSANT, pawnTile.row - (1 * rowSign), pawnTile.column + i);
+				if (bHighlight) {
+					fill(ctxHighlight, MELLOW_YELLOW, action);		// highlight square the pawn will move to with the movement colour
+					ctxHighlight.fillStyle = LIGHT_RED;				
+					ctxHighlight.fillRect(action.column * LENGTH, pawnTile.row * LENGTH, LENGTH, LENGTH);	// highlight square pawn will attack
+				}
+				legalMoves.push(action);
+			}
+			adjacentPiece = board.getPiece(pawnTile.row, pawnTile.column - 1);
+		}
+	}
+	
+	return legalMoves;
+}
 
 /* Checks if castling is possible with rook at given position
  * TODO needs to check if King is currently in check
@@ -10,7 +39,7 @@ function canCastle(castlingKingTile, castlingRookTile) {
 	
 	if (castlingRookTile !== null && castlingRookTile.piece.type == 'Rook' && !castlingRookTile.piece.hasMoved && !castlingKingTile.piece.hasMoved) {
 		var possibleEnemyActions = [];
-		if (inCheck(castlingKingTile, possibleEnemyActions)) {
+		if (castlingKingTile.piece.isInCheck) {	//if (inCheck(castlingKingTile, possibleEnemyActions))
 			return false;
 		}
 		var startCol, endCol;
@@ -85,18 +114,16 @@ function canCastle(castlingKingTile, castlingRookTile) {
 /* determine if given king is in check
  * bColour boolean indicating which colour (white or black) should be tested
  */
-function inCheck(bColour) {
+function inCheck(board, bColour) {
 	var inCheck = false;
-	var kingsTile = (bColour === WHITE) ? whiteKingTile : blackKingTile;
+	var kingsTile = (bColour === WHITE) ? board.whiteKingTile : board.blackKingTile;
 	// if I need to get all the possibly enemy moves
-	if (arguments.length == 1) {
+	if (arguments.length == 2) {
 		var possibleEnemyActions = [];
-		for (let currentRow = 0; currentRow < 8; currentRow++) {
-			for (let currentColumn = 0; currentColumn < 8; currentColumn++) {
-				let currentTile = board.getTile(currentRow, currentColumn);
-				if (currentTile !== null && currentTile.piece.isWhite !== bColour) {
-					possibleEnemyActions = possibleEnemyActions.concat(currentTile.piece.getStandardMoves(board, false, currentTile.row, currentTile.column));
-				}
+		for (let i = 0; i < board.occupiedTiles.length; i++) {
+			let currentTile = board.occupiedTiles[i];
+			if (currentTile !== null && currentTile.piece.isWhite !== bColour) {
+				possibleEnemyActions = possibleEnemyActions.concat(currentTile.piece.getStandardMoves(board, false, currentTile.row, currentTile.column));
 			}
 		}
 		
@@ -109,8 +136,20 @@ function inCheck(bColour) {
 	}
 	// received array intended to store all possible actions for pieces of the opposing colour
 	// NOTE only bother with this if it causes a noticeable improvement in AI performance
-	else if (arguments.length == 2) {
+	else if (arguments.length == 3) {
 		console.log();
 	}
+	
+	// set inCheck property of appropriate piece
+	if (inCheck)
+		if (bColour == WHITE)
+			board.whiteKingTile.piece.isInCheck = true;
+		else
+			board.blackKingTile.piece.isInCheck = true;
+	else
+		if (bColour == WHITE)
+			board.whiteKingTile.piece.isInCheck = false;
+		else
+			board.blackKingTile.piece.isInCheck = false;
 	return inCheck;
 }
