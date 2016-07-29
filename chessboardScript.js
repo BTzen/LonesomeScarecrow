@@ -252,12 +252,27 @@ function gameLoop(x, y) {
 			// else CPU is white
 		}
 		else {
-			playerTurn(board, x, y);
-	
-			if (isWhiteTurn == true) {	// set in playerTurn after piece is moved
-				logAction();
-				toggleTurnDisplayText();
+			if (playerIsWhite) {
+				// CPU
+				playerTurn(board, x, y);
+				
+				if (terminalGameConditionTest(board)) { //terminalGameConditionTest()
+					console.log('terminalGameConditionTest true');
+				}
+				else {
+					toggleTurnDisplayText();
+				}
+				//playerTurn
+				
+		
+				if (isWhiteTurn == true) {	// set in playerTurn after piece is moved
+					logAction();
+					toggleTurnDisplayText();
+				}
 			}
+			 
+			
+			
 			// if (!isWhiteTurn) {
 				// // setTimeout(function() {		// setTimeout is necessary to draw the player move before drawing the CPUs move
 					// // //if (!isWhiteTurn) 
@@ -373,6 +388,7 @@ function playerTurn(board, x, y) {
 				});
 			} 
 			// allow selection of pieces that can get the King out of check
+			// TODO doesn't work if you block the checkingPiece's path to the kind
 			else {
 				let potentialMovesForPiece;
 				if (lastSelectedPiece.isWhite == selectedKingTile.piece.isWhite) {			
@@ -380,10 +396,15 @@ function playerTurn(board, x, y) {
 			
 					for (let i = 0; i < potentialMovesForPiece.length; i++) {
 						let action = potentialMovesForPiece[i];
+						// if the selected piece can attack the checking piece
 						if (action.actionType == ActionType.ATTACK && action.row == board.tileOfCheckingPiece.row && action.column == board.tileOfCheckingPiece.column) {
 							legalMoves.push(action);
 							fill(ctxHighlight, LIGHT_RED, action);
 							break;
+						}
+						// if the selected piece can block the checking piece and prevent it from capturing the King next move
+						else if (action.agent.type !== 'Knight') {
+							
 						}
 					}
 				}
