@@ -192,7 +192,7 @@ function isTerminalState(state) {
 	// }
 	
 	
-	// a stalemate occurs when the only 2 pieces on the board are Kings, regardless of their position, or if the remaining pieces on the board make checkmate impossible (e.g. can't checkmate an opponent with only a king and a bishop)
+	// a stalemate occurs when the only 2 pieces on the board are Kings, regardless of their position, if the remaining pieces on the board make checkmate impossible (e.g. can't checkmate an opponent with only a king and a bishop), if the King is not in check but has no legal moves
 	return isTerminalState;
 }
 

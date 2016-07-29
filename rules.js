@@ -1,5 +1,7 @@
-// contains methods that provide a mechanism to enforce the rules of chess and provide information on board and game state
-
+/* contains methods that provide a mechanism to enforce the rules of chess and provide information on board and game state
+ * does not handle fifty-move rule, threefold repetition, or insufficient material to checkmate opponent cases
+ * http://www.e4ec.org/immr.html for info regarding insufficient material rule and examples
+ */
 /* NOTE only works for player
  * pawnTile the tile of the pawn that could perform en passant
  * returns any instances of en passant that can be made
@@ -117,6 +119,8 @@ function canCastle(castlingKingTile, castlingRookTile) {
 function inCheck(board, bColour) {
 	var inCheck = false;
 	var kingsTile = (bColour === WHITE) ? board.whiteKingTile : board.blackKingTile;
+	var checkingTile = null;
+	
 	// if I need to get all the possibly enemy moves
 	if (arguments.length == 2) {
 		var possibleEnemyActions = [];
@@ -130,6 +134,7 @@ function inCheck(board, bColour) {
 		for (let i = 0; i < possibleEnemyActions.length; i++) {
 			if (possibleEnemyActions[i].actionType === ActionType.ATTACK && possibleEnemyActions[i].row === kingsTile.row && possibleEnemyActions[i].column === kingsTile.column) {
 				inCheck = true;
+				checkingTile = board.getPieceTile(possibleEnemyActions[i].agent);
 				break;
 			}
 		}
@@ -141,15 +146,131 @@ function inCheck(board, bColour) {
 	}
 	
 	// set inCheck property of appropriate piece
-	if (inCheck)
-		if (bColour == WHITE)
+	if (inCheck) {
+		if (bColour == WHITE) {
 			board.whiteKingTile.piece.isInCheck = true;
-		else
+		}
+		else {
 			board.blackKingTile.piece.isInCheck = true;
-	else
+		}
+	}
+	else {
 		if (bColour == WHITE)
 			board.whiteKingTile.piece.isInCheck = false;
 		else
 			board.blackKingTile.piece.isInCheck = false;
+	}
+	board.tileOfCheckingPiece = checkingTile;
 	return inCheck;
+}
+
+/*
+ */
+function terminalGameConditionTest(board) {
+	var gameOver = false;
+	// var pieceLegalActionList = [];
+	var legalMoves = [];
+	var colourToCheck = (isWhiteTurn) ? WHITE : BLACK;
+	
+	for (let i = 0; i < board.occupiedTiles.length; i++) {
+		if (board.occupiedTiles[i].piece.isWhite === colourToCheck) {
+			let currentTile = board.occupiedTiles[i];
+			let potentialMoves = currentTile.piece.getStandardMoves(board, false, currentTile.row, currentTile.column);
+			
+			if (currentTile.piece.type == 'Pawn') {
+				potentialMoves = potentialMoves.concat(getEnPassantMoves(board, false, currentTile));
+			}
+			else if (currentTile.piece.type == 'King') {
+				// castling options
+				// check right
+				let castlingRookTile = board.getTile(currentTile.row, 7);
+				if (castlingRookTile !== null && canCastle(currentTile, castlingRookTile)) {		
+					legalMoves.push(new Action(currentTile.piece, ActionType.MOVE, currentTile.row, currentTile.column + 2));	// can push to legal moves as canCastle checks for move legality inherently
+				}
+				// check left
+				castlingRookTile = board.getTile(currentTile.row, 0);
+				if (castlingRookTile !== null && canCastle(currentTile, castlingRookTile))	{
+					legalMoves.push(new Action(currentTile.piece, ActionType.MOVE, currentTile.row, currentTile.column - 2));
+				}
+			}
+			
+			// only allow actions that won't place the King in check
+			potentialMoves.forEach(function(action) {
+				let futureBoardState = new Board(board);
+				futureBoardState.movePiece(currentTile.row, currentTile.column, action.row, action.column);
+				if (!inCheck(futureBoardState, currentTile.piece.isWhite)) {
+					legalMoves.push(action);
+				}
+			});
+		}
+	}
+	
+	// (inCheck) ? win-loss : stalemate
+	if (legalMoves.length == 0) {
+		if (inCheck(board, colourToCheck)) {
+			console.log('terminalGameStateFn return: ' + colourToCheck + ' lost!');
+		}
+		// stalemate
+		else {
+			console.log('terminalGameStateFn return: stalemate');
+		}
+		gameOver = true;
+	}
+	
+	return gameOver;
+}
+
+/* consider including an argument to indicate whether the tile should be highlighted
+ *
+ */
+function getLegalMoves(tile) {
+	// highlight legal moves
+	// legalMoves.forEach(function(action) {
+		// let actionColour;
+		// if (action.actionType == ActionType.MOVE) {
+			// actionColour = MELLOW_YELLOW;
+		// }
+		// else if (action.actionType == ActionType.ATTACK) {
+			// actionColour = LIGHT_RED;
+		// }
+		// fill(ctxHighlight, actionColour, action);
+	// });
+}
+
+function getAllLegalMoves(bColour) {
+	var legalMoves = [];
+	
+	for (let i = 0; i < board.occupiedTiles.length; i++) {
+		if (board.occupiedTiles[i].piece.isWhite === bColour) {
+			let currentTile = board.occupiedTiles[i];
+			let potentialMoves = currentTile.piece.getStandardMoves(board, false, currentTile.row, currentTile.column);
+			
+			if (currentTile.piece.type == 'Pawn') {
+				potentialMoves = potentialMoves.concat(getEnPassantMoves(board, false, currentTile));
+			}
+			else if (currentTile.piece.type == 'King') {
+				// castling options
+				// check right
+				let castlingRookTile = board.getTile(currentTile.row, 7);
+				if (castlingRookTile !== null && canCastle(currentTile, castlingRookTile)) {		
+					legalMoves.push(new Action(currentTile.piece, ActionType.MOVE, currentTile.row, currentTile.column + 2));	// can push to legal moves as canCastle checks for move legality inherently
+				}
+				// check left
+				castlingRookTile = board.getTile(currentTile.row, 0);
+				if (castlingRookTile !== null && canCastle(currentTile, castlingRookTile))	{
+					legalMoves.push(new Action(currentTile.piece, ActionType.MOVE, currentTile.row, currentTile.column - 2));
+				}
+			}
+			
+			// only allow actions that won't place the King in check
+			potentialMoves.forEach(function(action) {
+				let futureBoardState = new Board(board);
+				futureBoardState.movePiece(currentTile.row, currentTile.column, action.row, action.column);
+				if (!inCheck(futureBoardState, currentTile.piece.isWhite)) {
+					legalMoves.push(action);
+				}
+			});
+		}
+	}
+	return legalMoves;
 }

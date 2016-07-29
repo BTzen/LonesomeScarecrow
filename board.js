@@ -1,14 +1,14 @@
-// TODO have each board keep track of their kings
-// TODO calculate if King's move will result in it being in check
-// TODO get check tests working for PC and CPU
+/* Billings, M., Kurylovich, A. */
 
-// NOTE untested
+// TODO stalemate conditions, check for terminal conditions for match
+// TODO make actionLog wider - doesn't fit some moves
 /* Note: Board class does not contain the functionality to draw the pieces. That is handled by chessboardScript.js
 */
 function Board(boardToClone) {
 	this.occupiedTiles = [];
 	this.whiteKingTile;
 	this.blackKingTile;
+	this.tileOfCheckingPiece = null;
 	
 	if (arguments.length === 1) {
 		if (boardToClone.hasOwnProperty("occupiedTiles") && boardToClone.occupiedTiles !== null && boardToClone.occupiedTiles !== undefined) {
@@ -18,6 +18,7 @@ function Board(boardToClone) {
 				let tileToClone = boardToClone.occupiedTiles[i];
 				let pieceToClone = tileToClone.piece;
 				
+				// TODO replace with cloneTile function
 				var clonePiece;
 				// allows for quick identification of piece type while debugging
 				if (pieceToClone instanceof Pawn) {
@@ -47,6 +48,10 @@ function Board(boardToClone) {
 				this.occupiedTiles.push(cloneTile);
 				
 				if (clonePiece.type == 'King') {
+					if (boardToClone.tileOfCheckingPiece !== null) {
+						this.tileOfCheckingPiece = (new Tile()).clone(boardToClone.tileOfCheckingPiece);
+					}
+					
 					if (clonePiece.isWhite)
 						this.whiteKingTile = cloneTile;
 					else
@@ -60,7 +65,6 @@ function Board(boardToClone) {
 Board.prototype.clear = function() {
 	this.occupiedTiles = [];
 }
-
 
 /* Returns piece located at tile specified by the intersection of the row and column
  * returns tile or null, or undefined if the given index is out of bounds
@@ -77,7 +81,7 @@ Board.prototype.getPiece = function(row, col) {
 /* Return the tile of the argument piece.  Used to find a piece's position on the board.
  * piece the piece you want to know the position of
  */
-Board.prototype.getPositionOfPiece = function(piece) {
+Board.prototype.getPieceTile = function(piece) {
 	var currentTile = null;
 	for (let i = 0; i < this.occupiedTiles.length; i++) {
 		if (this.occupiedTiles[i].piece == piece) {
@@ -118,45 +122,38 @@ Board.prototype.initialize = function() {
 		// this.addPiece(new Bishop(BLACK), 0, 2);
 		// this.addPiece(new Queen(BLACK), 0, 3);
 		// this.blackKingTile = new Tile(new King(BLACK), 0, 4);
-		// this.addPiece(this.blackKingTile.piece, 0, 4);
+		// this.occupiedTiles.push(this.blackKingTile);
 		// this.addPiece(new Bishop(BLACK), 0, 5);
 		// this.addPiece(new Knight(BLACK), 0, 6);
 		// this.addPiece(new Rook(BLACK), 0, 7);
 		
-		// for (let i = 0; i < 8; i++)
-			// this.addPiece(new Pawn(BLACK), 1, i);
+		// for (let i = 0; i < 8; i++) {
+			// if (i !== 4)
+				// this.addPiece(new Pawn(BLACK), 1, i);
+		// }
 		
 		// // place white pieces
-		// for (let i = 0; i < 8; i++) 
-			// this.addPiece(new Pawn(WHITE), 6, i);
+		// for (let i = 0; i < 8; i++) {
+			// if (i !== 7)
+				// this.addPiece(new Pawn(WHITE), 6, i);
+		// }
 		
 		// this.addPiece(new Rook(WHITE), 7, 0);
 		// this.addPiece(new Knight(WHITE), 7, 1);
 		// this.addPiece(new Bishop(WHITE), 7, 2);
 		// this.addPiece(new Queen(WHITE), 7, 3);
 		// this.whiteKingTile = new Tile(new King(WHITE), 7, 4);
-		// this.addPiece(this.whiteKingTile.piece, this.whiteKingTile.row, this.whiteKingTile.column);
+		// this.occupiedTiles.push(this.whiteKingTile);
 		// this.addPiece(new Bishop(WHITE), 7, 5);
 		// this.addPiece(new Knight(WHITE), 7, 6);
-		// this.addPiece(new Rook(WHITE), 7, 7);
+		// this.addPiece(new Rook(WHITE), 5, 7);
 		
-		this.blackKingTile = new Tile(new King(BLACK), 3, 4);
+		this.blackKingTile = new Tile(new King(BLACK), 0, 0);
 		this.occupiedTiles.push(this.blackKingTile);
-		// this.addPiece(this.blackKingTile.piece, this.blackKingTile.row, this.blackKingTile.column);
-		this.whiteKingTile = new Tile(new King(WHITE), 1, 4);
-		// this.addPiece(this.whiteKingTile.piece, this.whiteKingTile.row, this.whiteKingTile.column);
+		this.addPiece(new Rook(WHITE), 5, 1);
+		this.addPiece(new Rook(WHITE), 4, 4);
+		this.whiteKingTile = new Tile(new King(WHITE), 7, 4);
 		this.occupiedTiles.push(this.whiteKingTile);
-		this.addPiece(new Rook(WHITE), 2, 3);
-		this.addPiece(new Rook(BLACK), 2, 6);
-		
-		// en passant with black test
-		// this.addPiece(new Pawn(WHITE), 6, 1);
-		// this.addPiece(new Pawn(BLACK), 4, 2);
-		// this.addPiece(new Pawn(WHITE), 6, 3);
-		// this.addPiece(new Pawn(BLACK), 4, 4);	
-		
-		// CPU and black castling test
-		
 	} else {
 		console.log("context of 'this' may be unintended:" + this);
 	}
@@ -258,4 +255,38 @@ function Tile(piece, row, col) {
 
 Tile.prototype.toString = function() {
 	return this.piece + ' [' + this.row + ', ' + this.col + ']';
+}
+
+/* Clone a board tile.  Returns the cloned tile.
+ * tile the tile to clone
+ */
+Tile.prototype.clone = function(tile) {
+	var cloneTile;
+	// allows for quick identification of piece type while debugging
+	if (tile.piece instanceof Pawn) {
+		cloneTile = new Pawn();
+	}
+	else if (tile.piece instanceof Rook) {
+		cloneTile = new Rook();
+	}
+	else if (tile.piece instanceof Knight) {
+		cloneTile = new Knight();
+	}
+	else if (tile.piece instanceof Bishop) {
+		cloneTile = new Bishop();
+	}
+	else if (tile.piece instanceof King) {
+		cloneTile = new King();
+	}
+	else if (tile.piece instanceof Queen) {
+		cloneTile = new Queen();
+	}
+	
+	for (var prop in tile.piece) {
+		cloneTile[prop] = tile.piece[prop];
+	}
+	
+	cloneTile.row = tile.row;
+	cloneTile.column = tile.column;
+	return cloneTile;
 }

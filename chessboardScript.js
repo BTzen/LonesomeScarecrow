@@ -1,5 +1,4 @@
 /* Billings, M., Kurylovich, A. */
-// TODO player can intentionally move king into checkmates
 $(document).ready(function() {
 	var canvasHighlight = document.getElementById('highlight');
 	var canvasPieces = document.getElementById('chesspieceCanvas');
@@ -102,24 +101,14 @@ function promotePiece(piece) {
 	//replace existing piece with a piece of that type
 }
 
-/* Responsible for creating 'highlighted tiles' which contain all legal moves for a given piece. Logic for displaying this information to the user is handled separately from this method.
- * ctxHighlight
- * ctxPiece
- * board
- * x the horizontal pixel of the selected piece?? NOTE need to check basic accuracy of this statement
- * y the vertical pixel ....
+/* Outputs the result of an action to the actionLog.
+ *
  */
-// function highlightListener(ctxHighlight, ctxPiece, board, x, y) {
-	// highlightedTiles = [];				// will contain the list of tiles that the piece found using coordinates (x,y) can end up on through movement or attack
-	// lastSelectedTile = null;
-	// gameLoop(x, y);
-// }
-
 function logAction(pieceType, previousRow, previousColumn, action) {
 	console.log();
 	var actionList = document.getElementById('actionListBody');
 	
-	if (isWhiteTurn) {
+	if (lastSelectedTile.piece.isWhite) {
 		actionList.innerHTML += "<tr><td>" + ++actionCount + "." + "</td>" +
 			"<td>" + createChessNotationData(board, objLogData) + "</td>"; //convert('King', prevTileOfMovedPiece.row, prevTileOfMovedPiece.column, ) + 
 	}
@@ -132,7 +121,7 @@ function logAction(pieceType, previousRow, previousColumn, action) {
 	var table = document.getElementById('actionList');
 	table.scrollTop = table.scrollHeight - table.clientHeight;
 }
-// TODO add 2nd param to calls
+
 /* return a string representing the action performed.  This information is displayed to the user within #actionList.
  *
  */
@@ -250,9 +239,14 @@ function gameLoop(x, y) {
 				playerTurn(board, x, y);
 		
 				// player moved piece
-				if (lastSelectedTile == null) {
+				if (isWhiteTurn == false) {	// set in playerTurn after piece is moved
 					logAction();
-					toggleTurn();
+					if (terminalGameConditionTest(board)) { //terminalGameConditionTest()
+						console.log('terminalGameConditionTest true');
+					}
+					else {
+						toggleTurnDisplayText();
+					}
 				}
 			}
 			// else CPU is white
@@ -260,10 +254,9 @@ function gameLoop(x, y) {
 		else {
 			playerTurn(board, x, y);
 	
-			// player moved piece
-			if (lastSelectedTile == null) {
+			if (isWhiteTurn == true) {	// set in playerTurn after piece is moved
 				logAction();
-				toggleTurn();
+				toggleTurnDisplayText();
 			}
 			// if (!isWhiteTurn) {
 				// // setTimeout(function() {		// setTimeout is necessary to draw the player move before drawing the CPUs move
@@ -314,21 +307,6 @@ function playerTurn(board, x, y) {
 			}
 		}
 		
-		// castling logic
-		// if (lastSelectedTile.piece.type == 'King') {
-			// //move the rook to the appropriate position
-			// if (Math.abs(lastSelectedTile.column - highlightedTile.column) == 2) {
-				// let rookTile = null;
-				// if (lastSelectedTile.column < highlightedTile.column) {		// castle right
-					// rookTile = board.getPiece(lastSelectedTile.row, 7);
-					// board.movePiece(lastSelectedTile.row, 7, lastSelectedTile.row, highlightedTile.column - 1);
-				// }
-				// else {
-					// rookTile = board.getPiece(lastSelectedTile.row, 0);		// castle left
-					// board.movePiece(lastSelectedTile.row, 0, lastSelectedTile.row, highlightedTile.column + 1);
-				// }
-			// }
-		// }
 		castlingHandler(lastSelectedTile, highlightedTile);
 		
 		//move the piece corresponding to that highlighted pattern to the selected location 
@@ -351,28 +329,29 @@ function playerTurn(board, x, y) {
 		
 		//update tracking variables
 		highlightedTile = null;
-		highlightedTiles = []; 						// reset which tiles are hightlighted each time this runs
-		lastSelectedTile = null;					
+		highlightedTiles = []; 												// reset which tiles are hightlighted each time this runs
+		isWhiteTurn = (lastSelectedTile.piece.isWhite) ? false : true;		// toggle game turn after a piece has moved
 	}
 	/* logic used when a piece is first selected - before anything is highlighted for the player
 	 * check if player clicked on their own piece and highlight the appropriate tiles in response
 	 */
 	else if (lastSelectedTile = getBoardTileWithCoords(board, x, y)) {
 		var lastSelectedPiece = lastSelectedTile.piece;
-		var legalMoves = [];
-		var potentialMoves = [];
+		var legalMoves = [];			// all moves which don't place the acting side's King in check
+		var potentialMoves = [];		// all moves
+		var isPlayerTurn;
 		highlightedTiles = [];
 		
 		// DEBUG currently lets you select any piece
 		// only allow interaction with pieces of the correct colour
 		if (lastSelectedTile !== undefined)
-			var isPlayerTurn = lastSelectedTile.piece.isWhite === lastSelectedTile.piece.isWhite; 
+			isPlayerTurn = lastSelectedTile.piece.isWhite === lastSelectedTile.piece.isWhite; 
 		
 		// only allow King to be selected if King is in check
 		// NOTE need to test with other enemy pieces of all types
-		let playersKing = (isWhiteTurn) ? board.whiteKingTile.piece : board.blackKingTile.piece;		//(playerIsWhite)
-		if (playersKing !== undefined && inCheck(board, playersKing.isWhite)) {
-			// if (lastSelectedPiece.isWhite == playerIsWhite) {	// TODO remove isWhite condition once testing is done
+		let selectedKingTile = (lastSelectedTile.piece.isWhite) ? board.whiteKingTile : board.blackKingTile;		//(playerIsWhite)
+	
+		if (selectedKingTile !== undefined && inCheck(board, selectedKingTile.piece.isWhite)) { 		// opens the possibility of moving the other side's pieces if the player's side King is in check
 			if (lastSelectedPiece.type == 'King') {
 				potentialMoves = lastSelectedPiece.getStandardMoves(board, false, lastSelectedTile.row, lastSelectedTile.column);
 			
@@ -380,7 +359,7 @@ function playerTurn(board, x, y) {
 				potentialMoves.forEach(function(action) {
 					let futureBoardState = new Board(board);
 					futureBoardState.movePiece(lastSelectedTile.row, lastSelectedTile.column, action.row, action.column);
-					if (!inCheck(futureBoardState, playersKing.isWhite)) {
+					if (!inCheck(futureBoardState, selectedKingTile.piece.isWhite)) {
 						let actionColour;
 						if (action.actionType == ActionType.MOVE) {
 							actionColour = MELLOW_YELLOW;
@@ -392,55 +371,69 @@ function playerTurn(board, x, y) {
 						legalMoves.push(action);
 					}
 				});
-			
-				// checkmate
-				if (legalMoves.length == 0) {
-					alert('code for checkmate goes here');
-				}
 			} 
 			// allow selection of pieces that can get the King out of check
 			else {
-				
+				let potentialMovesForPiece;
+				if (lastSelectedPiece.isWhite == selectedKingTile.piece.isWhite) {			
+					potentialMovesForPiece = lastSelectedTile.piece.getStandardMoves(board, false, lastSelectedTile.row, lastSelectedTile.column);
+			
+					for (let i = 0; i < potentialMovesForPiece.length; i++) {
+						let action = potentialMovesForPiece[i];
+						if (action.actionType == ActionType.ATTACK && action.row == board.tileOfCheckingPiece.row && action.column == board.tileOfCheckingPiece.column) {
+							legalMoves.push(action);
+							fill(ctxHighlight, LIGHT_RED, action);
+							break;
+						}
+					}
+				}
 			}
 		}
 		else {	// highlight the appropriate tiles
-			legalMoves = [];
 			let potentialMoves = lastSelectedPiece.getStandardMoves(board, false, lastSelectedTile.row, lastSelectedTile.column); 
 			
 			if (lastSelectedPiece.type == 'Pawn')
-				getEnPassantMoves(board, true, lastSelectedTile);
+				potentialMoves = potentialMoves.concat(getEnPassantMoves(board, false, lastSelectedTile));
 			else if (lastSelectedPiece.type == 'King') {
-				// only allow actions that won't place the King in check
-				potentialMoves.forEach(function(action) {
-					let futureBoardState = new Board(board);
-					futureBoardState.movePiece(lastSelectedTile.row, lastSelectedTile.column, action.row, action.column);
-					if (!inCheck(futureBoardState, lastSelectedPiece.isWhite)) {
-						let actionColour;
-						if (action.actionType == ActionType.MOVE) {
-							actionColour = MELLOW_YELLOW;
-						}
-						else if (action.actionType == ActionType.ATTACK) {
-							actionColour = LIGHT_RED;
-						}
-						fill(ctxHighlight, actionColour, action);
-						legalMoves.push(action);
-					}
-				});
 				// castling options
 				// check right
 				let castlingRookTile = board.getTile(lastSelectedTile.row, 7);
-				if (castlingRookTile !== null && canCastle(lastSelectedTile, castlingRookTile))		
-					fill(ctxHighlight, MELLOW_YELLOW, new Action(this, ActionType.MOVE, lastSelectedTile.row, lastSelectedTile.column + 2));	
+				if (castlingRookTile !== null && canCastle(lastSelectedTile, castlingRookTile)) {		
+					legalMoves.push(new Action(this, ActionType.MOVE, lastSelectedTile.row, lastSelectedTile.column + 2));	// can push to legal moves as canCastle checks for move legality inherently
+				}
 				// check left
 				castlingRookTile = board.getTile(lastSelectedTile.row, 0);
-				if (castlingRookTile !== null && canCastle(lastSelectedTile, castlingRookTile))		
-					fill(ctxHighlight, MELLOW_YELLOW, new Action(this, ActionType.MOVE, lastSelectedTile.row, lastSelectedTile.column - 2));	
+				if (castlingRookTile !== null && canCastle(lastSelectedTile, castlingRookTile))	{
+					legalMoves.push(new Action(this, ActionType.MOVE, lastSelectedTile.row, lastSelectedTile.column - 2));
+				}
 			}
-			// standard case: potential moves = legal moves
-			else {
-				lastSelectedPiece.getStandardMoves(board, true, lastSelectedTile.row, lastSelectedTile.column);
-			}
+			// only allow actions that won't place the King in check
+			potentialMoves.forEach(function(action) {
+				let futureBoardState = new Board(board);
+				futureBoardState.movePiece(lastSelectedTile.row, lastSelectedTile.column, action.row, action.column);
+				if (!inCheck(futureBoardState, lastSelectedPiece.isWhite)) {
+					legalMoves.push(action);
+				}
+			});
+				
+			// highlight legal moves
+			legalMoves.forEach(function(action) {
+				let actionColour;
+				if (action.actionType == ActionType.MOVE) {
+					actionColour = MELLOW_YELLOW;
+				}
+				else if (action.actionType == ActionType.ATTACK) {
+					actionColour = LIGHT_RED;
+				}
+				fill(ctxHighlight, actionColour, action);
+			});
 		}
+		// King is in checkmate if there are no legal moves for the King to make
+		// if (legalMoves.length == 0) {
+			// let kingsMoves = selectedKingTile.piece.getStandardMoves(board, false, selectedKingTile.row, selectedKingTile.column);
+			
+			// // alert('code for checkmate');
+		// }
 	} 
 	else {	// player clicked off the piece
 		highlightedTiles = [];
@@ -493,7 +486,7 @@ function CPUTurn(x, y) {
 	// var nextAIAction = minimax(board, BLACK);		// action object
 	var agentTile;									// the tile of the piece that will be acted upon
 	if (nextAIAction !== null) {
-		agentTile = board.getPositionOfPiece(nextAIAction.agent);
+		agentTile = board.getPieceTile(nextAIAction.agent);
 	
 		enPassantHandler(nextAIAction);
 		
@@ -538,8 +531,7 @@ function resetBoard(board) {
 	draw(board);
 }
 
-function toggleTurn() {
-	isWhiteTurn = !isWhiteTurn;
+function toggleTurnDisplayText() {
 	var turnText = (isWhiteTurn) ? 'Turn: White' : 'Turn: Black';
 	document.getElementById('turn').innerHTML = turnText;
 }
