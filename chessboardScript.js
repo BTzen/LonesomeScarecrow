@@ -1,4 +1,5 @@
 /* Billings, M., Kurylovich, A. */
+// fails to reset isInCheck property after a move occurs which removes the King from check
 $(document).ready(function() {
 	var canvasHighlight = document.getElementById('highlight');
 	var canvasPieces = document.getElementById('chesspieceCanvas');
@@ -105,10 +106,10 @@ function promotePiece(piece) {
  *
  */
 function logAction(pieceType, previousRow, previousColumn, action) {
-	console.log();
 	var actionList = document.getElementById('actionListBody');
+	var whiteMovedLast = (isWhiteTurn) ? false : true;
 	
-	if (lastSelectedTile.piece.isWhite) {
+	if (whiteMovedLast) {
 		actionList.innerHTML += "<tr><td>" + ++actionCount + "." + "</td>" +
 			"<td>" + createChessNotationData(board, objLogData) + "</td>"; //convert('King', prevTileOfMovedPiece.row, prevTileOfMovedPiece.column, ) + 
 	}
@@ -177,20 +178,13 @@ function createChessNotationData(board, logData) {
 			break;
 	}
 	
-	string += logData.previousRow;
+	string += Math.abs(logData.previousRow - 8);
 	
 	if (logData.action.actionType == ActionType.MOVE) {
 		string += '-';
 	}
 	else {
 		string += 'x';
-	}
-	
-	// checkmate
-		
-	
-	if (board.blackKingTile.piece.isInCheck || board.whiteKingTile.isInCheck) {
-		string += '+';
 	}
 	
 	// location moved to
@@ -224,7 +218,14 @@ function createChessNotationData(board, logData) {
 			break;
 	}
 	
-	string += logData.action.row;
+	string += Math.abs(logData.action.row - 8);
+	
+	// checkmate
+	// check
+	if (board.blackKingTile.piece.isInCheck || board.whiteKingTile.piece.isInCheck) {
+		string += '+';
+	}
+	
 	return string;
 }
 
@@ -232,61 +233,39 @@ function createChessNotationData(board, logData) {
  * x the x coordinate of the user's click
  * y the y coordinate of the user's click
 */
-function gameLoop(x, y) { 
+function gameLoop(x, y) {
+	var displayText = "";
+	
 	if (gameIsRunning) {
-		if (isWhiteTurn) {
-			if (playerIsWhite) {
-				playerTurn(board, x, y);
-		
-				// player moved piece
-				if (isWhiteTurn == false) {	// set in playerTurn after piece is moved
-					logAction();
-					if (terminalGameConditionTest(board)) { //terminalGameConditionTest()
+		if (playerIsWhite) {
+			playerTurn(board, x, y);
+	
+			// player moved piece - black's turn
+			if (!isWhiteTurn) {	// set in playerTurn after piece is moved
+				logAction();
+				
+				setTimeout(function() {		// setTimeout is necessary to draw the player move before drawing the CPUs move
+					CPUTurn(x, y);
+					
+					// check if CPU move caused the game to end
+					if (terminalGameConditionTest(board)) {
 						console.log('terminalGameConditionTest true');
+						gameIsRunning = false;
+						var turnText = (isWhiteTurn) ? 'Turn: White' : 'Turn: Black';
+						document.getElementById('turn').innerHTML = turnText;
 					}
 					else {
 						toggleTurnDisplayText();
 					}
-				}
+				}, 10);
 			}
-			// else CPU is white
-		}
-		else {
-			if (playerIsWhite) {
-				// CPU
-				playerTurn(board, x, y);
-				
-				if (terminalGameConditionTest(board)) { //terminalGameConditionTest()
-					console.log('terminalGameConditionTest true');
-				}
-				else {
-					toggleTurnDisplayText();
-				}
-				//playerTurn
-				
-		
-				if (isWhiteTurn == true) {	// set in playerTurn after piece is moved
-					logAction();
-					toggleTurnDisplayText();
-				}
-			}
-			 
 			
-			
-			// if (!isWhiteTurn) {
-				// // setTimeout(function() {		// setTimeout is necessary to draw the player move before drawing the CPUs move
-					// // //if (!isWhiteTurn) 
-					// // CPUTurn(x, y);
-				// // }, 20);
-				// logAction();
-				// toggleTurn();
-			// }
 		}
 	}
 	// game is over
-	if (!gameIsRunning) {
-		board.initialize(WHITE);
-	}
+	// if (!gameIsRunning) {
+		// board.initialize(WHITE);
+	// }
 }
 // TODO* add board param
 /* code supporting the player's interaction with the game
@@ -391,22 +370,59 @@ function playerTurn(board, x, y) {
 			// TODO doesn't work if you block the checkingPiece's path to the kind
 			else {
 				let potentialMovesForPiece;
+				let movesOfCheckingPiece; 
 				if (lastSelectedPiece.isWhite == selectedKingTile.piece.isWhite) {			
 					potentialMovesForPiece = lastSelectedTile.piece.getStandardMoves(board, false, lastSelectedTile.row, lastSelectedTile.column);
-			
+					movesOfCheckingPiece = board.tileOfCheckingPiece.piece.getStandardMoves(board, false, board.tileOfCheckingPiece.row, board.tileOfCheckingPiece.column);
+					
 					for (let i = 0; i < potentialMovesForPiece.length; i++) {
 						let action = potentialMovesForPiece[i];
 						// if the selected piece can attack the checking piece
 						if (action.actionType == ActionType.ATTACK && action.row == board.tileOfCheckingPiece.row && action.column == board.tileOfCheckingPiece.column) {
 							legalMoves.push(action);
-							fill(ctxHighlight, LIGHT_RED, action);
+							fill(ctxHighlight, LIGHT_RED, action); // consider doing this outside the loop separately
 							break;
 						}
 						// if the selected piece can block the checking piece and prevent it from capturing the King next move
 						else if (action.agent.type !== 'Knight') {
+							for (let j = 0; j < movesOfCheckingPiece.length; j++) {
+								if (potentialMovesForPiece[i].row == movesOfCheckingPiece[j].row && potentialMovesForPiece[i].column == movesOfCheckingPiece[j].column) {
+									if (movesOfCheckingPiece[j].row == 5 && movesOfCheckingPiece[j].column == 6)
+										console.log();
+									// vert and horz cap if row != and col !=
+									// vert cap if row ==
+									if (board.tileOfCheckingPiece.row == selectedKingTile.row) {
+										if (Math.abs(potentialMovesForPiece[i].column - selectedKingTile.column) < Math.abs(board.tileOfCheckingPiece.column - selectedKingTile.column)) {
+											legalMoves.push(potentialMovesForPiece[i]);
+										}
+									}
+									// horz cap if col ==
+									else if (board.tileOfCheckingPiece.column == selectedKingTile.column) {
+										if (Math.abs(potentialMovesForPiece[i].row - selectedKingTile.row) < Math.abs(board.tileOfCheckingPiece.row - selectedKingTile.row)) {
+											legalMoves.push(potentialMovesForPiece[i]);
+										}
+									}
+									else {
+										if (Math.abs(potentialMovesForPiece[i].row - selectedKingTile.row) < Math.abs(board.tileOfCheckingPiece.row - selectedKingTile.row) 
+											&& Math.abs(potentialMovesForPiece[i].column - selectedKingTile.column) < Math.abs(board.tileOfCheckingPiece.column - selectedKingTile.column))										{
+											legalMoves.push(potentialMovesForPiece[i]);
+										}
+									}
+								}
+							}
 							
 						}
 					}
+					legalMoves.forEach(function(action) {
+						let actionColour;
+						if (action.actionType == ActionType.MOVE) {
+							actionColour = MELLOW_YELLOW;
+						}
+						else if (action.actionType == ActionType.ATTACK) {
+							actionColour = LIGHT_RED;
+						}
+						fill(ctxHighlight, actionColour, action);
+					});
 				}
 			}
 		}
@@ -499,17 +515,12 @@ function castlingHandler(agentTile, actionTile) {
  * TODO support 
  */
 function CPUTurn(x, y) {
-	// DEBUG
-	// var agentTile = board.getTile(4, 2);
-	// var highlightedTile = new Action(agentTile.piece, ActionType.ENPASSANT, 5, 3);
-	var nextAIAction = new Action(board.getPiece(6, 3), ActionType.MOVE, 7, 3);
-	
-	// var nextAIAction = minimax(board, BLACK);		// action object
+	var nextAIAction = minimax(board, BLACK);		// action object
 	var agentTile;									// the tile of the piece that will be acted upon
+	
+	// null if there are no legal moves
 	if (nextAIAction !== null) {
 		agentTile = board.getPieceTile(nextAIAction.agent);
-	
-		enPassantHandler(nextAIAction);
 		
 		if (pawnThatMovedTwoLastTurn !== null)
 			pawnThatMovedTwoLastTurn = null;
@@ -524,21 +535,15 @@ function CPUTurn(x, y) {
 		if (agentTile.piece.type == "Pawn" && agentTile.row !== 7 && nextAIAction.row == 7) {
 			let CPUcolour = (playerIsWhite) ? BLACK : WHITE;
 			board.addPiece(new Queen(CPUcolour), agentTile.row, agentTile.column);
-			// agentTile = new Tile(new Queen(CPUcolour), agentTile.row, agentTile.column);
 		}
 		
 		castlingHandler(agentTile, nextAIAction);
 		board.movePiece(agentTile.row, agentTile.column, nextAIAction.row, nextAIAction.column);
-
+		
+		isWhiteTurn = !isWhiteTurn;
+		logAction();
 		draw(board);
 	}
-	// // AI caught in checkmate
-	// else {
-		// alert("Success! You won!");
-		// gameIsRunning = false;
-		
-	// }
-	
 	// DEBUG
 	// console.log('next move will move ' + nextAIAction.agent + ' from [' + agentTile.row + ', ' + agentTile.column + '] to ['
 		// + nextAIAction.row + ', ' + nextAIAction.column + ']'); 

@@ -1,4 +1,5 @@
 // Billings, M.
+// blackKing thinks it's in check after being placed inCheck (see img001)
 // ERROR some board states return Number.MAX_VALUE
 
 var desiredPly = 1;		// the desired search depth
@@ -6,13 +7,13 @@ var successors = [];	// stores every board state that can be reached from moving
 
 // DEBUG
 /* encapsulates data needed to infer the best move from a given state
- * state the state of the board
+ * board the board state represented 
  * action the action that led from the prior state to the current one
  *
  *
  */
-function Node(state, utility, action, ply, children, parent) {
-	this.state = state;
+function Node(board, utility, action, ply, children, parent) {
+	this.board = board;
 	this.utility = utility;
 	this.action = action;
 	this.ply = ply;
@@ -29,26 +30,16 @@ function Node(state, utility, action, ply, children, parent) {
 function utility(s, maxIsWhite) {
 	var sum = 0;
 	
-	// console.log("Current number of tiles on given board: " + s.occupiedTiles.length);
 	for (let tile of s.occupiedTiles) {
 		// console.log("Piece: " + tile.piece);
 		let val = tile.piece.value;
-		// DEBUG not tested
-		/* check if the piece in question is a pawn which has reached the opposite end of the board
-		 * and is therefore a candidate for promotion.
-		 */
-		// let promotionRow = (tile.piece.isWhite) ? 0 : 7;
-		// if (tile.piece.type == 'Pawn' && tile.row == promotionRow)
-			// val += 10;							// arbitrary value to add weight to actions that result in promotion
-		
+
 		if (maxIsWhite !== tile.piece.isWhite) { 	// DEBUG added maxIsWhite to try and account for if the player wants to play black
 			val *= -1;
 		}
-		// console.log("Value: " + val);	
 		sum += val;
 		
 	}
-	// console.log("total sum: " + sum);
 	return sum;
 }
 
@@ -56,11 +47,11 @@ function utility(s, maxIsWhite) {
  * 
  * 
  */ 
-function minimax(state, maxIsWhite) {
+function minimax(board, maxIsWhite) {
 	// isCheckingBoard = true;		// prevent tiles in UI from being visibly highlighted
-	var nodes = [];				// store all possible moves from current state
-	var possibleActions = [];	// stores all possible actions possible for a given state
-	nodes.push(new Node(state, undefined, null, 0, undefined, null));			// push root node
+	var nodes = [];				// store all possible moves from current board
+	var possibleActions = [];	// stores all possible actions possible for a given board
+	nodes.push(new Node(board, undefined, null, 0, undefined, null));			// push root node
 	var action = null;					//the (or one of the) optimal actions to take
 	var bestUtility = max(nodes[0], maxIsWhite, nodes);
 	console.log('minimax returned: ' + bestUtility);
@@ -73,21 +64,23 @@ function minimax(state, maxIsWhite) {
 		}
 		action = nextMoveNode.action;
 	}
-	else {
-		alert('no children for this node state');
-	}
+	// can't move the King.  Could be checkmate or stalemate.
+	// else {
+		// alert('no children for this node board');
+	// }
 	return action;	// return the action in successors(state) with value v
 }
 
 // contains common logic for min and max methods
 function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {		
 	var u = (isRunningMaxCode) ? -Number.MAX_VALUE : Number.MAX_VALUE;
-	// var CPUColour = (playerIsWhite) ? BLACK : WHITE;
+	var kingTile = (playerIsWhite) ? node.board.blackKingTile : node.board.whiteKingTile;
+	var CPUColour = (playerIsWhite) ? BLACK : WHITE;
 	
 	//blackKingTile !== undefined used to test en passant
 	
-	if (isTerminalState(node.state) || node.ply == desiredPly) {	
-		u = utility(node.state, maxIsWhite);
+	if (terminalGameConditionTest(node.board) || node.ply == desiredPly) {	
+		u = utility(node.board, maxIsWhite);
 	}
 	else {
 		var child = null;
@@ -96,22 +89,22 @@ function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {
 			pieceColorToCheck = !pieceColorToCheck;
 		var possibleActions = [];
 		
-		if (blackKingTile !== undefined && inCheck(board, BLACK)) {
-			possibleActions = blackKingTile.piece.getStandardMoves(node.state, false, blackKingTile.row, blackKingTile.column);
+		if (kingTile !== undefined && inCheck(node.board, CPUColour)) {	// CPU colour was BLACK
+			possibleActions = kingTile.piece.getStandardMoves(node.board, false, kingTile.row, kingTile.column);
 		}
 		else {
 			// loop through all the occupied tiles and find all the possible moves for the relevant team
 			// try each of those moves and see which one offers the best result
-			node.state.occupiedTiles.forEach(function(tile) {
+			node.board.occupiedTiles.forEach(function(tile) {
 				if (pieceColorToCheck == tile.piece.isWhite) {			// only check pieces of the appropriate colour
 					// // DEBUG castling check for pawns
 					// if (tile.row == 1 && tile.column == 0) 
 						// console.log();
-					possibleActions = possibleActions.concat(tile.piece.getStandardMoves(node.state, false, tile.row, tile.column));
+					possibleActions = possibleActions.concat(tile.piece.getStandardMoves(node.board, false, tile.row, tile.column));
 	
 					if (tile.piece.type == 'Pawn')
-						possibleActions = possibleActions.concat(getEnPassantMoves(node.state, false, tile.row, tile));
-					else if (blackKingTile !== undefined && tile.piece.type == 'King') {
+						possibleActions = possibleActions.concat(getEnPassantMoves(node.board, false, tile));
+					else if (kingTile !== undefined && tile.piece.type == 'King') {
 						// check right
 						let castlingRookTile = board.getTile(tile.row, 7);
 						if (castlingRookTile !== null && canCastle(tile, castlingRookTile))		
@@ -127,20 +120,25 @@ function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {
 		/* create a new board state for each of the possible actions
 		 * note: possibleActions = [] if there are no possible moves which may cause problems for utility calculations done within this function
 		 */
-		possibleActions.forEach(function(action, index) {
-			child = new Board(node.state);
-			child.movePiece(action.agent.row, action.agent.column, possibleActions[index].row, possibleActions[index].column);
+		for (let i = 0; i < possibleActions.length; i++) {	//possibleActions.forEach(function(action, index)
+			if (i == 4)
+				console.log();
+			let agentTile = node.board.getPieceTile(possibleActions[i].agent);
+			child = new Board(node.board);
+			child.movePiece(agentTile.row, agentTile.column, possibleActions[i].row, possibleActions[i].column);
 			
 			// return list of actions if the King isn't in checkmate
-			if (blackKingTile !== undefined && !(blackKingTile.piece.isInCheck && inCheck(BLACK))) {
-				let newNode = new Node(child, undefined, possibleActions[index], node.ply + 1, null, node);
-				nodes.push(newNode);
-				successors.push(newNode);
-			}
-			else if (blackKingTile !== undefined) {
-				blackIsInCheckmate = true;
-			}			
-		});
+			if (kingTile !== undefined) {
+				if (!(kingTile.piece.isInCheck && inCheck(child, CPUColour))) {
+					let newNode = new Node(child, undefined, possibleActions[i], node.ply + 1, null, node);
+					nodes.push(newNode);
+					successors.push(newNode);
+				}
+				else {
+					blackHasBeenCheckmated = true;
+				}		
+			}	
+		}
 		possibleActions = [];
 			
 		node.children = successors;
@@ -150,7 +148,7 @@ function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {
 			// DEBUG
 			// one player can't make any moves eg. they only have one pawn and it's blocked by a piece belonging to the opposing player - CATCH case, shouldn't happen in a real game
 			if (node.children.length == 0) {
-				u = utility(node.state, maxIsWhite);
+				u = utility(node.board, maxIsWhite);
 			}
 			// examine all children of current node
 			else {
@@ -181,9 +179,9 @@ function min(node, maxIsWhite, nodes) {
 /* TODO doesn't check for stalemate or surrender
  * returns true if the game is over and false otherwise
  */
-function isTerminalState(state) {
+function isTerminalState(board) {
 	var isTerminalState = false;
-	var blackKing = blackKingTile.piece;
+	var blackKing = board.blackKingTile.piece;
 	
 	// TODO check if the function call is necessary here 
 	// if (inCheck(CPUColour) || inCheck(CPUColour)

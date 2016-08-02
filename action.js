@@ -1,4 +1,5 @@
 /* Billings, M. */
+// consider adding colour data to Action
 
 /* Contains data necessary to determine legal actions for a given piece at a given point in time.
  * agent the piece the will perform the action

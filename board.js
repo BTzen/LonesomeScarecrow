@@ -117,43 +117,43 @@ Board.prototype.initialize = function() {
 	
 	if (this instanceof Board) {
 		// place black pieces
-		this.addPiece(new Rook(BLACK), 0, 0);
-		this.addPiece(new Knight(BLACK), 0, 1);
-		this.addPiece(new Bishop(BLACK), 0, 2);
-		this.addPiece(new Queen(BLACK), 0, 3);
-		this.blackKingTile = new Tile(new King(BLACK), 0, 4);
-		this.occupiedTiles.push(this.blackKingTile);
-		this.addPiece(new Bishop(BLACK), 0, 5);
-		this.addPiece(new Knight(BLACK), 0, 6);
-		this.addPiece(new Rook(BLACK), 0, 7);
-		
-		for (let i = 0; i < 8; i++) {
-			// if (i !== 4)
-				this.addPiece(new Pawn(BLACK), 1, i);
-		}
-		
-		// place white pieces
-		for (let i = 0; i < 8; i++) {
-			// if (i !== 7)
-				this.addPiece(new Pawn(WHITE), 6, i);
-		}
-		
-		this.addPiece(new Rook(WHITE), 7, 0);
-		this.addPiece(new Knight(WHITE), 7, 1);
-		this.addPiece(new Bishop(WHITE), 7, 2);
-		this.addPiece(new Queen(WHITE), 7, 3);
-		this.whiteKingTile = new Tile(new King(WHITE), 7, 4);
-		this.occupiedTiles.push(this.whiteKingTile);
-		this.addPiece(new Bishop(WHITE), 7, 5);
-		this.addPiece(new Knight(WHITE), 7, 6);
-		this.addPiece(new Rook(WHITE), 7, 7);
-		
-		// this.blackKingTile = new Tile(new King(BLACK), 0, 0);
+		// this.addPiece(new Rook(BLACK), 0, 0);
+		// this.addPiece(new Knight(BLACK), 0, 1);
+		// this.addPiece(new Bishop(BLACK), 0, 2);
+		// this.addPiece(new Queen(BLACK), 0, 3);
+		// this.blackKingTile = new Tile(new King(BLACK), 0, 4);
 		// this.occupiedTiles.push(this.blackKingTile);
-		// this.addPiece(new Rook(WHITE), 5, 1);
-		// this.addPiece(new Rook(WHITE), 4, 4);
+		// this.addPiece(new Bishop(BLACK), 0, 5);
+		// this.addPiece(new Knight(BLACK), 0, 6);
+		// this.addPiece(new Rook(BLACK), 0, 7);
+		
+		// for (let i = 0; i < 8; i++) {
+			// this.addPiece(new Pawn(BLACK), 1, i);
+		// }
+		
+		// // place white pieces
+		// for (let i = 0; i < 8; i++) {
+			// this.addPiece(new Pawn(WHITE), 6, i);
+		// }
+		
+		// this.addPiece(new Rook(WHITE), 7, 0);
+		// this.addPiece(new Knight(WHITE), 7, 1);
+		// this.addPiece(new Bishop(WHITE), 7, 2);
+		// this.addPiece(new Queen(WHITE), 7, 3);
 		// this.whiteKingTile = new Tile(new King(WHITE), 7, 4);
 		// this.occupiedTiles.push(this.whiteKingTile);
+		// this.addPiece(new Bishop(WHITE), 7, 5);
+		// this.addPiece(new Knight(WHITE), 7, 6);
+		// this.addPiece(new Rook(WHITE), 7, 7);
+		
+		
+		this.blackKingTile = new Tile(new King(BLACK), 0, 1);
+		this.occupiedTiles.push(this.blackKingTile);
+
+
+		this.whiteKingTile = new Tile(new King(WHITE), 7, 4);
+		this.occupiedTiles.push(this.whiteKingTile);
+		this.addPiece(new Queen(WHITE), 3, 2);
 	} else {
 		console.log("context of 'this' may be unintended:" + this);
 	}

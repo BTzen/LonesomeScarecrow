@@ -2,9 +2,9 @@
  * does not handle fifty-move rule, threefold repetition, or insufficient material to checkmate opponent cases
  * http://www.e4ec.org/immr.html for info regarding insufficient material rule and examples
  */
-/* NOTE only works for player
+/* Returns all en passant actions a pawn can take
+ * NOTE only works for player
  * pawnTile the tile of the pawn that could perform en passant
- * returns any instances of en passant that can be made
  */
 function getEnPassantMoves(board, bHighlight, pawnTile) {
 	var legalMoves = [];
@@ -147,29 +147,26 @@ function inCheck(board, bColour) {
 	
 	// set inCheck property of appropriate piece
 	if (inCheck) {
-		if (bColour == WHITE) {
-			board.whiteKingTile.piece.isInCheck = true;
-		}
-		else {
-			board.blackKingTile.piece.isInCheck = true;
-		}
+		kingsTile.piece.isInCheck = true;
 	}
 	else {
-		if (bColour == WHITE)
-			board.whiteKingTile.piece.isInCheck = false;
-		else
-			board.blackKingTile.piece.isInCheck = false;
+		kingsTile.piece.isInCheck = false;
 	}
 	board.tileOfCheckingPiece = checkingTile;
 	return inCheck;
 }
 
-/*
+/* 
+ * want to know what condition the game ended with
+ * 1) was it a win or a draw? which side won?
+ * 2) if it was a draw, which of the following was it:
+ *    fifty-move rule, threefold repetition, insufficient material to checkmate opponent, stalemate
  */
 function terminalGameConditionTest(board) {
 	var gameOver = false;
-	// var pieceLegalActionList = [];
 	var legalMoves = [];
+	var detailString = '';		// contains extra information about the game ending condition
+	var bDraw;
 	var colourToCheck = (isWhiteTurn) ? WHITE : BLACK;
 	
 	for (let i = 0; i < board.occupiedTiles.length; i++) {
@@ -208,6 +205,13 @@ function terminalGameConditionTest(board) {
 	// (inCheck) ? win-loss : stalemate
 	if (legalMoves.length == 0) {
 		if (inCheck(board, colourToCheck)) {
+			if (colourToCheck == WHITE)
+				detailString = 'black wins'
+			else
+				detailString = 'white wins'
+			
+			outcome = 'checkmate';
+			// DEBUG
 			console.log('terminalGameStateFn return: ' + colourToCheck + ' lost!');
 		}
 		// stalemate
@@ -217,7 +221,15 @@ function terminalGameConditionTest(board) {
 		gameOver = true;
 	}
 	
-	return gameOver;
+	if (!gameOver) {
+		return false;
+	}
+	else {
+		return {
+			isDraw: bDraw,
+			detailString: detailString
+		};
+	}
 }
 
 /* consider including an argument to indicate whether the tile should be highlighted

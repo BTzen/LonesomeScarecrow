@@ -4,7 +4,7 @@ const OFFSET = 10;
 const PIECE_FONT = "70px Arial unicode MS";
 const MELLOW_YELLOW = "rgba(255, 255, 102, 0.7)";
 const LIGHT_RED = "rgba(255, 0, 0, 0.25)"
-const WHITE = true;		// the player that moves first
+const WHITE = true;						// the player that moves first
 
 var canvas;
 var ctx;
@@ -12,18 +12,17 @@ var ctx;
 var actionCount = 0;					// keep track of the number of moves that have been made in the current game
 var actionLog = [];						// record actions taken during a game
 var board;								// primary board used to play the game
-// var checkingPiece;						// piece that place the current side's King in check
+// var checkingPiece;					// piece that place the current side's King in check
 var isWhiteTurn = true;					// change back to TRUE; changed to FALSE for debugging minimax
 var gameIsRunning = false;				// true when the player is playing a game
 var highlightedTiles = [];
 var lastSelectedTile; 					// for moving pieces
 var pawnThatMovedTwoLastTurn = null;	// pawn that moved two tiles on the last turn
 var playerIsWhite = true;
-var blackIsInCheckmate					// may be unnecessary
-var whiteIsInCheckmate;	
-// var whiteKingTile, blackKingTile;
-var objLogData = {				// store the previous location of the most recently moved chess piece
-	action : undefined,			//contains row and column data for new piece location
+var blackHasBeenCheckmated = false;					
+var whiteHasBeenCheckmated = false;	
+var objLogData = {						// store the previous location of the most recently moved chess piece
+	action : undefined,					//contains row and column data for new piece location
 	previousRow : undefined,
 	previousColumn : undefined
 };

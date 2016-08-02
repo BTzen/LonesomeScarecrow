@@ -42,6 +42,8 @@ function acceptPromotionListener() {
 function startMatchListener() {
 	// carry out necessary logic to begin playing
 	gameIsRunning = true;
+	whiteHasBeenCheckmated = false;
+	blackHasBeenCheckmated = false;
 	$('#turn').css('visibility', 'visible');		//display which colour's turn it is to user
 	$('.uiReset').attr('disabled', false);			
 	$('.uiStart').attr('disabled', true);			
