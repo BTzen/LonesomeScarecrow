@@ -12,15 +12,12 @@ var ctx;
 var actionCount = 0;					// keep track of the number of moves that have been made in the current game
 var actionLog = [];						// record actions taken during a game
 var board;								// primary board used to play the game
-// var checkingPiece;					// piece that place the current side's King in check
 var isWhiteTurn = true;					// change back to TRUE; changed to FALSE for debugging minimax
 var gameIsRunning = false;				// true when the player is playing a game
 var highlightedTiles = [];
 var lastSelectedTile; 					// for moving pieces
 var pawnThatMovedTwoLastTurn = null;	// pawn that moved two tiles on the last turn
 var playerIsWhite = true;
-var blackHasBeenCheckmated = false;					
-var whiteHasBeenCheckmated = false;	
 var objLogData = {						// store the previous location of the most recently moved chess piece
 	action : undefined,					//contains row and column data for new piece location
 	previousRow : undefined,

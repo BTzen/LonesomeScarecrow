@@ -43,31 +43,33 @@ function utility(s, maxIsWhite) {
 	return sum;
 }
 
-/* returns an action with the best utility score.  Currently always returns the last child of the root with the greatest utility
+/* returns an action with the best utility score.  Returns null if there are no legal actions to take.
  * 
  * 
  */ 
 function minimax(board, maxIsWhite) {
-	// isCheckingBoard = true;		// prevent tiles in UI from being visibly highlighted
 	var nodes = [];				// store all possible moves from current board
 	var possibleActions = [];	// stores all possible actions possible for a given board
 	nodes.push(new Node(board, undefined, null, 0, undefined, null));			// push root node
 	var action = null;					//the (or one of the) optimal actions to take
 	var bestUtility = max(nodes[0], maxIsWhite, nodes);
+
 	console.log('minimax returned: ' + bestUtility);
 	let nextMoveNode = null;
 	if (nodes[0].children !== undefined && nodes[0].children.length > 0) {
 		for (var i = 0; i < nodes[0].children.length; i++) {		// ERRATA bugs out when there are no pieces left of a certain colour
 			if (nodes[0].children[i].utility === bestUtility) {
-				nextMoveNode = nodes[0].children[i];
+				if (nextMoveNode == null || Math.random() >= 0.5)
+					nextMoveNode = nodes[0].children[i];
+				if (nextMoveNode.action.actionType == ActionType.ENPASSANT) {
+					nextMoveNode = nodes[0].children[i];
+					break;
+				}
 			}
 		}
 		action = nextMoveNode.action;
 	}
-	// can't move the King.  Could be checkmate or stalemate.
-	// else {
-		// alert('no children for this node board');
-	// }
+
 	return action;	// return the action in successors(state) with value v
 }
 
@@ -78,8 +80,8 @@ function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {
 	var CPUColour = (playerIsWhite) ? BLACK : WHITE;
 	
 	//blackKingTile !== undefined used to test en passant
-	
-	if (terminalGameConditionTest(node.board) || node.ply == desiredPly) {	
+	terminalTestResult = terminalGameConditionTest(node.board)
+	if (terminalTestResult.isTerminalState || node.ply == desiredPly) {	
 		u = utility(node.board, maxIsWhite);
 	}
 	else {
@@ -120,23 +122,24 @@ function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {
 		/* create a new board state for each of the possible actions
 		 * note: possibleActions = [] if there are no possible moves which may cause problems for utility calculations done within this function
 		 */
-		for (let i = 0; i < possibleActions.length; i++) {	//possibleActions.forEach(function(action, index)
-			if (i == 4)
-				console.log();
-			let agentTile = node.board.getPieceTile(possibleActions[i].agent);
+		for (let i = 0; i < possibleActions.length; i++) {
+			// DEBUG
+			// if (i == 4)
+				// console.log();
+			let agentTile = node.board.getTileWithPiece(possibleActions[i].agent);
 			child = new Board(node.board);
 			child.movePiece(agentTile.row, agentTile.column, possibleActions[i].row, possibleActions[i].column);
 			
 			// return list of actions if the King isn't in checkmate
 			if (kingTile !== undefined) {
-				if (!(kingTile.piece.isInCheck && inCheck(child, CPUColour))) {
+				if (!inCheck(child, CPUColour)) {
 					let newNode = new Node(child, undefined, possibleActions[i], node.ply + 1, null, node);
 					nodes.push(newNode);
 					successors.push(newNode);
 				}
-				else {
-					blackHasBeenCheckmated = true;
-				}		
+				// else {
+					// blackHasBeenCheckmated = true;
+				// }		
 			}	
 		}
 		possibleActions = [];

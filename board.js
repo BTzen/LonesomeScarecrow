@@ -1,9 +1,8 @@
 /* Billings, M., Kurylovich, A. */
 
-// TODO stalemate conditions, check for terminal conditions for match
-// TODO make actionLog wider - doesn't fit some moves
-/* Note: Board class does not contain the functionality to draw the pieces. That is handled by chessboardScript.js
-*/
+/* Note: Board class does not contain the functionality to draw the pieces. That is handled in chessboardScript.js
+ *
+ */
 function Board(boardToClone) {
 	this.occupiedTiles = [];
 	this.whiteKingTile;
@@ -62,10 +61,6 @@ function Board(boardToClone) {
 	}
 }
 
-Board.prototype.clear = function() {
-	this.occupiedTiles = [];
-}
-
 /* Returns piece located at tile specified by the intersection of the row and column
  * returns tile or null, or undefined if the given index is out of bounds
 */
@@ -79,9 +74,9 @@ Board.prototype.getPiece = function(row, col) {
 }
 
 /* Return the tile of the argument piece.  Used to find a piece's position on the board.
- * piece the piece you want to know the position of
+ * piece the piece you want the tile for
  */
-Board.prototype.getPieceTile = function(piece) {
+Board.prototype.getTileWithPiece = function(piece) {
 	var currentTile = null;
 	for (let i = 0; i < this.occupiedTiles.length; i++) {
 		if (this.occupiedTiles[i].piece == piece) {
@@ -117,43 +112,43 @@ Board.prototype.initialize = function() {
 	
 	if (this instanceof Board) {
 		// place black pieces
-		// this.addPiece(new Rook(BLACK), 0, 0);
-		// this.addPiece(new Knight(BLACK), 0, 1);
-		// this.addPiece(new Bishop(BLACK), 0, 2);
-		// this.addPiece(new Queen(BLACK), 0, 3);
-		// this.blackKingTile = new Tile(new King(BLACK), 0, 4);
-		// this.occupiedTiles.push(this.blackKingTile);
-		// this.addPiece(new Bishop(BLACK), 0, 5);
-		// this.addPiece(new Knight(BLACK), 0, 6);
-		// this.addPiece(new Rook(BLACK), 0, 7);
-		
-		// for (let i = 0; i < 8; i++) {
-			// this.addPiece(new Pawn(BLACK), 1, i);
-		// }
-		
-		// // place white pieces
-		// for (let i = 0; i < 8; i++) {
-			// this.addPiece(new Pawn(WHITE), 6, i);
-		// }
-		
-		// this.addPiece(new Rook(WHITE), 7, 0);
-		// this.addPiece(new Knight(WHITE), 7, 1);
-		// this.addPiece(new Bishop(WHITE), 7, 2);
-		// this.addPiece(new Queen(WHITE), 7, 3);
-		// this.whiteKingTile = new Tile(new King(WHITE), 7, 4);
-		// this.occupiedTiles.push(this.whiteKingTile);
-		// this.addPiece(new Bishop(WHITE), 7, 5);
-		// this.addPiece(new Knight(WHITE), 7, 6);
-		// this.addPiece(new Rook(WHITE), 7, 7);
-		
-		
-		this.blackKingTile = new Tile(new King(BLACK), 0, 1);
+		this.addPiece(new Rook(BLACK), 0, 0);
+		this.addPiece(new Knight(BLACK), 0, 1);
+		this.addPiece(new Bishop(BLACK), 0, 2);
+		this.addPiece(new Queen(BLACK), 0, 3);
+		this.blackKingTile = new Tile(new King(BLACK), 0, 4);
 		this.occupiedTiles.push(this.blackKingTile);
-
-
+		this.addPiece(new Bishop(BLACK), 0, 5);
+		this.addPiece(new Knight(BLACK), 0, 6);
+		this.addPiece(new Rook(BLACK), 0, 7);
+		
+		for (let i = 0; i < 8; i++) {
+			this.addPiece(new Pawn(BLACK), 1, i);
+		}
+		
+		// place white pieces
+		for (let i = 0; i < 8; i++) {
+			this.addPiece(new Pawn(WHITE), 6, i);
+		}
+		
+		this.addPiece(new Rook(WHITE), 7, 0);
+		this.addPiece(new Knight(WHITE), 7, 1);
+		this.addPiece(new Bishop(WHITE), 7, 2);
+		this.addPiece(new Queen(WHITE), 7, 3);
 		this.whiteKingTile = new Tile(new King(WHITE), 7, 4);
 		this.occupiedTiles.push(this.whiteKingTile);
-		this.addPiece(new Queen(WHITE), 3, 2);
+		this.addPiece(new Bishop(WHITE), 7, 5);
+		this.addPiece(new Knight(WHITE), 7, 6);
+		this.addPiece(new Rook(WHITE), 7, 7);
+		
+		// DEBUG
+		// this.blackKingTile = new Tile(new King(BLACK), 0, 1);
+		// this.occupiedTiles.push(this.blackKingTile);
+
+
+		// this.whiteKingTile = new Tile(new King(WHITE), 7, 4);
+		// this.occupiedTiles.push(this.whiteKingTile);
+		// this.addPiece(new Queen(WHITE), 3, 2);
 	} else {
 		console.log("context of 'this' may be unintended:" + this);
 	}

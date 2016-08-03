@@ -40,15 +40,13 @@ function acceptPromotionListener() {
  *
 */
 function startMatchListener() {
-	// carry out necessary logic to begin playing
 	gameIsRunning = true;
-	whiteHasBeenCheckmated = false;
-	blackHasBeenCheckmated = false;
-	$('#turn').css('visibility', 'visible');		//display which colour's turn it is to user
+	document.getElementById('turn').innerHTML = 'Turn: White';
+	$('#turn').css('visibility', 'visible');					// display which colour's turn it is to user
 	$('.uiReset').attr('disabled', false);			
 	$('.uiStart').attr('disabled', true);			
 
-	board.initialize(WHITE);	// initalize backing data structure
+	board.initialize();			// initalize backing data structure
 	draw(board);				// draw pieces on the canvas
 }
 
@@ -58,16 +56,13 @@ function startMatchListener() {
 function resetListener() {
 	if (gameIsRunning) {
 		gameIsRunning = false;
-		// $('#uiPly').attr('disabled', false);
-		// $('.uiReset').attr('disabled', true);
-		// $('.uiStart').attr('disabled', false);
-		
-		// document.getElementById('highlight').getContext('2d').clearRect(0,0, LENGTH * 8, LENGTH * 8);
 	}
-	else {
-		resetBoard(board);
-	}
-	gameIsRunning = false;
+	
+	isWhiteTurn = true;
+	board.initialize();
+	draw(board);
+	ctxHighlight.clearRect(0,0, LENGTH * 8, LENGTH * 8);
+	$('#actionListBody').empty();							// clear action log
 	$('#uiPly').attr('disabled', false);
 	$('.uiReset').attr('disabled', true);
 	$('.uiStart').attr('disabled', false);

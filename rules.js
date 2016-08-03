@@ -134,7 +134,7 @@ function inCheck(board, bColour) {
 		for (let i = 0; i < possibleEnemyActions.length; i++) {
 			if (possibleEnemyActions[i].actionType === ActionType.ATTACK && possibleEnemyActions[i].row === kingsTile.row && possibleEnemyActions[i].column === kingsTile.column) {
 				inCheck = true;
-				checkingTile = board.getPieceTile(possibleEnemyActions[i].agent);
+				checkingTile = board.getTileWithPiece(possibleEnemyActions[i].agent);
 				break;
 			}
 		}
@@ -157,6 +157,7 @@ function inCheck(board, bColour) {
 }
 
 /* 
+ * objDetails argument will store additional details about the game terminal conditions if the function returns true and will be unchanged by the call otherwise
  * want to know what condition the game ended with
  * 1) was it a win or a draw? which side won?
  * 2) if it was a draw, which of the following was it:
@@ -165,9 +166,12 @@ function inCheck(board, bColour) {
 function terminalGameConditionTest(board) {
 	var gameOver = false;
 	var legalMoves = [];
-	var detailString = '';		// contains extra information about the game ending condition
-	var bDraw;
 	var colourToCheck = (isWhiteTurn) ? WHITE : BLACK;
+	var returnObj = {				
+		isTerminalState : false,		
+		isDraw : undefined,
+		details : undefined				// contains additional information about the match e.g. if it ended in a draw, what kind of draw was it
+	};
 	
 	for (let i = 0; i < board.occupiedTiles.length; i++) {
 		if (board.occupiedTiles[i].piece.isWhite === colourToCheck) {
@@ -205,33 +209,32 @@ function terminalGameConditionTest(board) {
 	// (inCheck) ? win-loss : stalemate
 	if (legalMoves.length == 0) {
 		if (inCheck(board, colourToCheck)) {
+			bDraw = false;
 			if (colourToCheck == WHITE)
-				detailString = 'black wins'
+				sDetails = 'Black wins'
 			else
-				detailString = 'white wins'
+				sDetails = 'White wins'
 			
-			outcome = 'checkmate';
 			// DEBUG
 			console.log('terminalGameStateFn return: ' + colourToCheck + ' lost!');
 		}
 		// stalemate
 		else {
+			bDraw = true;
+			sDetails = 'Stalemate';
 			console.log('terminalGameStateFn return: stalemate');
 		}
-		gameOver = true;
+		returnObj.isTerminalState = true;
 	}
 	
-	if (!gameOver) {
-		return false;
+	
+	if (returnObj.isTerminalState) {
+		returnObj.isDraw = bDraw;
+		returnObj.details = sDetails;
 	}
-	else {
-		return {
-			isDraw: bDraw,
-			detailString: detailString
-		};
-	}
+	return returnObj;
 }
-
+// not used
 /* consider including an argument to indicate whether the tile should be highlighted
  *
  */
@@ -249,6 +252,7 @@ function getLegalMoves(tile) {
 	// });
 }
 
+// not used
 function getAllLegalMoves(bColour) {
 	var legalMoves = [];
 	

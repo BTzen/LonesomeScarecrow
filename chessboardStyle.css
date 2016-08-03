@@ -9,7 +9,7 @@
 }
 
 #actionList td {
-	border: 1px solid red;
+	/* border: 1px solid red; */
 }
 
 #chessboard {
@@ -90,7 +90,7 @@ fieldset legend {	/* override styles for children*/ /* fieldset */
 	/* padding-bottom: 0.75em; */
 	/* position: absolute; */
 	height: 585px;				/* align bottom with board */
-	width: 170px;
+	width: 190px;
 	vertical-align: top;
 
 	position: relative;
