@@ -17,7 +17,6 @@ function Board(boardToClone) {
 				let tileToClone = boardToClone.occupiedTiles[i];
 				let pieceToClone = tileToClone.piece;
 				
-				// TODO replace with cloneTile function
 				var clonePiece;
 				// allows for quick identification of piece type while debugging
 				if (pieceToClone instanceof Pawn) {
@@ -116,8 +115,9 @@ Board.prototype.initialize = function() {
 		this.addPiece(new Knight(BLACK), 0, 1);
 		this.addPiece(new Bishop(BLACK), 0, 2);
 		this.addPiece(new Queen(BLACK), 0, 3);
-		this.blackKingTile = new Tile(new King(BLACK), 0, 4);
-		this.occupiedTiles.push(this.blackKingTile);
+		// this.blackKingTile = new Tile(new King(BLACK), 0, 4);
+		// this.occupiedTiles.push(this.blackKingTile);
+		this.addPiece(new King(BLACK), 0, 4);
 		this.addPiece(new Bishop(BLACK), 0, 5);
 		this.addPiece(new Knight(BLACK), 0, 6);
 		this.addPiece(new Rook(BLACK), 0, 7);
@@ -135,8 +135,9 @@ Board.prototype.initialize = function() {
 		this.addPiece(new Knight(WHITE), 7, 1);
 		this.addPiece(new Bishop(WHITE), 7, 2);
 		this.addPiece(new Queen(WHITE), 7, 3);
-		this.whiteKingTile = new Tile(new King(WHITE), 7, 4);
-		this.occupiedTiles.push(this.whiteKingTile);
+		// this.whiteKingTile = new Tile(new King(WHITE), 7, 4);
+		// this.occupiedTiles.push(this.whiteKingTile);
+		this.addPiece(new King(WHITE), 7, 4);
 		this.addPiece(new Bishop(WHITE), 7, 5);
 		this.addPiece(new Knight(WHITE), 7, 6);
 		this.addPiece(new Rook(WHITE), 7, 7);
@@ -215,10 +216,30 @@ Board.prototype.movePiece = function(fromRow, fromCol, toRow, toCol) {
  */
 Board.prototype.addPiece = function(piece, row, col) {
 	var bPieceReplacesExistingElement = false;
+	// var pieceToAdd;
+	
+	if (piece.type == 'King') {
+		if (piece.isWhite)
+			this.whiteKingTile = piece;
+		else
+			this.blackKingTile = piece;
+	}
 	
 	// check data structure to see if it contains a piece located on the given tile
 	for (var i = 0; i < this.occupiedTiles.length; i++) {
 		if (this.occupiedTiles[i].row === row && this.occupiedTiles[i].column === col) {
+			
+			if (piece.type == 'King') {
+				if (piece.isWhite) {
+					this.whiteKingTile = piece;
+					this.occupiedTiles[i].piece = this.whiteKingTile;
+				}
+				else {
+					this.blackKingTile = piece;
+					this.occupiedTiles[i].piece = this.blackKingTile;
+				}
+			}
+			
 			this.occupiedTiles[i].piece = piece;
 			bPieceReplacesExistingElement = true;
 		}
@@ -226,7 +247,19 @@ Board.prototype.addPiece = function(piece, row, col) {
 	// creates a new tile for the data structure otherwise
 	if (!bPieceReplacesExistingElement) {
 		var newTile = new Tile(piece, row, col);
-		this.occupiedTiles.push(newTile);
+		
+		if (piece.type == 'King') {
+			if (piece.isWhite) {
+				this.whiteKingTile = newTile;
+				this.occupiedTiles.push(this.whiteKingTile);
+			}
+			else {
+				this.blackKingTile = newTile;
+				this.occupiedTiles.push(this.blackKingTile);
+			}
+		}
+		else
+			this.occupiedTiles.push(newTile);
 	}
 }
 

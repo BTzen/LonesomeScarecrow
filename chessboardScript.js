@@ -1,11 +1,27 @@
 /* Billings, M., Kurylovich, A. */
 
+// TODO prevent player from being able to control BLACK
+// TODO checkmate isn't properly displayed in action log
+// TODO probably with AI not taking legal action for Healy problem (2 moves, #2 I believe) 
+
 $(document).ready(function() {
 	var canvasHighlight = document.getElementById('highlight');
 	var canvasPieces = document.getElementById('chesspieceCanvas');
+	var composition;
 	var ctxHighlight = canvasHighlight.getContext('2d');
 	var ctxPiece = canvasPieces.getContext('2d');				// the context that the pieces are drawn on - used EVERYWHERE
 	board = new Board();
+	
+	compositions = {
+		currentCompositionID : null,							// id for composition currently displayed to player
+		currentCompositionGroupID : null,						// used to find composition group that composition belongs to
+		nextID : 0,												// next value that will be assigned as the id to new compositions
+		checkmateInTwo : new CompositionGroup(),
+		checkmateInThree : new CompositionGroup(),
+		checkmateInFour : new CompositionGroup()
+	};
+	
+	populateCompositionList();
 });	
 
 /* Find a piece on the board using pixel coordinates on the canvas
@@ -41,6 +57,19 @@ function drawBoard(canvas, ctx) {
         }
         white = !white;
     }
+}
+
+/* hightlights board tiles in the given colour
+ * ctxHighlight context the highlight is displayed on
+ * colour the colour to highlight with
+ * action action that is pushed to the list of highlighted tiles
+ */
+function fill(ctxHighlight, colour, action) {
+	if (action.column > -1 && action.column < 8 && action.row > -1 && action.row < 8) {
+		ctxHighlight.fillStyle = colour;
+		ctxHighlight.fillRect(action.column * LENGTH, action.row * LENGTH, LENGTH, LENGTH);
+		highlightedTiles.push(action); 
+	}
 }
 
 /* Draws a piece from the backing data structure to the board
@@ -240,6 +269,7 @@ function createChessNotationData(board, logData) {
 function gameLoop(x, y) {
 	var displayText = "";
 	var terminalStateData;
+	var currentComposition;
 	
 	if (gameIsRunning) {
 		if (playerIsWhite) {
@@ -248,7 +278,7 @@ function gameLoop(x, y) {
 			// player moved piece - black's turn
 			if (!isWhiteTurn) {	// set in playerTurn after piece is moved
 				outputText('Turn: Black');
-				logAction(playerIsWhite);
+				// logAction(playerIsWhite);
 				
 				setTimeout(function() {		// setTimeout is necessary to draw the player move before drawing the CPUs move
 					CPUTurn(x, y);
@@ -258,12 +288,31 @@ function gameLoop(x, y) {
 					if (terminalTestResult.isTerminalState) {
 						gameIsRunning = false; 
 						outputText(terminalTestResult.details);
+						$('#uiUndo').attr('disabled', true);
+						$('#uiReset').attr('disabled', false);
 					}
 					else {
 						outputText('Turn: White');
-						logAction(!playerIsWhite);
+						// logAction(!playerIsWhite);
 					}
 					
+					// save state
+					currentComposition = getComposition(compositions.currentCompositionGroupID, compositions.currentCompositionID);
+					
+					if (currentComposition !== null) {
+						currentComposition.states.push(new Board(board));		// cloned so each state acts as a snapshot of a board
+						
+						// enable undo button once the first action has been taken
+						if (currentComposition.states.length == 1) {
+							$('#uiUndo').attr('disabled', false);
+						} 
+						
+						// reset board if player has made too many moves
+						// doesn't currently reset the board
+						if (currentComposition.states.length >= compositions.currentCompositionGroupID && terminalTestResult.isTerminalState == false) {
+							alert('Too many moves!');
+						}
+					}
 				}, 200);
 			}
 			
@@ -379,7 +428,6 @@ function playerTurn(board, x, y) {
 				});
 			} 
 			// allow selection of pieces that can get the King out of check
-			// TODO doesn't work if you block the checkingPiece's path to the king
 			else {
 				let potentialMovesForPiece;
 				let movesOfCheckingPiece; 
@@ -520,7 +568,7 @@ function castlingHandler(agentTile, actionTile) {
 }
 
 /* code controlling AI action
- * TODO support 
+ * 
  */
 function CPUTurn(x, y) {
 	var nextAIAction = minimax(board, BLACK);		// action object
@@ -560,14 +608,6 @@ function CPUTurn(x, y) {
 	// console.log('next move will move ' + nextAIAction.agent + ' from [' + agentTile.row + ', ' + agentTile.column + '] to ['
 		// + nextAIAction.row + ', ' + nextAIAction.column + ']'); 
 }
-
-/* resets DS to initial state and draws it to the argument board
- * board the board which will be drawn to the canvas
- */
-// function resetBoard(board) {
-	// board.initialize();
-	// draw(board);
-// }
 
 function outputText(string) {
 	document.getElementById('turn').innerHTML = string;

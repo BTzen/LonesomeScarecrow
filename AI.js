@@ -61,10 +61,11 @@ function minimax(board, maxIsWhite) {
 			if (nodes[0].children[i].utility === bestUtility) {
 				if (nextMoveNode == null || Math.random() >= 0.5)
 					nextMoveNode = nodes[0].children[i];
-				if (nextMoveNode.action.actionType == ActionType.ENPASSANT) {
-					nextMoveNode = nodes[0].children[i];
-					break;
-				}
+				// DEBUG
+				// if (nextMoveNode.action.actionType == ActionType.ENPASSANT) {
+					// nextMoveNode = nodes[0].children[i];
+					// break;
+				// }
 			}
 		}
 		action = nextMoveNode.action;
@@ -178,22 +179,3 @@ function max(node, maxIsWhite, nodes) {
 function min(node, maxIsWhite, nodes) {
 	return minimaxHelper(node, false, maxIsWhite, nodes);	// false
 }
-
-/* TODO doesn't check for stalemate or surrender
- * returns true if the game is over and false otherwise
- */
-function isTerminalState(board) {
-	var isTerminalState = false;
-	var blackKing = board.blackKingTile.piece;
-	
-	// TODO check if the function call is necessary here 
-	// if (inCheck(CPUColour) || inCheck(CPUColour)
-		// || board.occupiedTiles.length == 2) {	// only 2 kings on board
-			// isTerminalState = true;
-	// }
-	
-	
-	// a stalemate occurs when the only 2 pieces on the board are Kings, regardless of their position, if the remaining pieces on the board make checkmate impossible (e.g. can't checkmate an opponent with only a king and a bishop), if the King is not in check but has no legal moves
-	return isTerminalState;
-}
-

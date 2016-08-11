@@ -56,12 +56,12 @@ Pawn.prototype.getStandardMoves = function(board, bHighlight, row, column) {
 		legalMoves.push(new Action(this, ActionType.ATTACK, row + (1*sign), column - 1));
 	}
 	// movement
-	if (board.getPiece(row + (1 * sign),column) === null) {
+	if (board.getPiece(row + (1 * sign), column) === null) {
 		if (bHighlight)
 			fill(ctxHighlight, MELLOW_YELLOW, new Action(this, ActionType.MOVE, row + (1*sign), column));
 		legalMoves.push(new Action(this, ActionType.MOVE, row + (1*sign), column));
 	} 
-	if (!this.hasMoved)
+	if (!this.hasMoved && board.getPiece(row + (1 * sign), column) === null)
 		if (board.getPiece(row + (2 * sign), column) === null) {
 			if (bHighlight)
 				fill(ctxHighlight, MELLOW_YELLOW, new Action(this, ActionType.MOVE, row + (2*sign), column));

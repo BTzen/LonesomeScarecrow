@@ -2,8 +2,10 @@
 
 // assign listeners
 $(window).load(function() {
+	document.getElementById('uiNext').addEventListener('click', nextProblemListener);
 	document.getElementById('uiStart').addEventListener('click', startMatchListener);
 	document.getElementById('uiReset').addEventListener('click', resetListener);
+	document.getElementById('uiUndo').addEventListener('click', undoListener);
 });
 
 /* show promotion dialog when pawn reaches opposite side of board
@@ -36,7 +38,7 @@ function acceptPromotionListener() {
 	draw(board);
 }
 
-/* begin a match against AI on "Start" button click
+/* randomly select from the given problem type
  *
 */
 function startMatchListener() {
@@ -46,25 +48,67 @@ function startMatchListener() {
 	$('.uiReset').attr('disabled', false);			
 	$('.uiStart').attr('disabled', true);			
 
-	board.initialize();			// initalize backing data structure
-	draw(board);				// draw pieces on the canvas
+	loadRandomComposition();
+	// draw(board);				// draw pieces on the canvas
 }
-
+// Caribou
 /* reset the board to its initial state
  *
  */
 function resetListener() {
-	if (gameIsRunning) {
-		gameIsRunning = false;
-	}
+	if (!gameIsRunning)
+		gameIsRunning = true;
 	
 	isWhiteTurn = true;
-	board.initialize();
+	
+	// reset and draw board
+	currentComposition = getComposition(compositions.currentCompositionGroupID, compositions.currentCompositionID);
+	if (currentComposition !== null) {
+		board = new Board(currentComposition.initialState);
+		currentComposition.states = [];					// reset array
+	}
+	else {
+		throw ('currentComposition is null');
+	}
+	
 	draw(board);
-	ctxHighlight.clearRect(0,0, LENGTH * 8, LENGTH * 8);
-	$('#actionListBody').empty();							// clear action log
-	$('#uiPly').attr('disabled', false);
-	$('.uiReset').attr('disabled', true);
-	$('.uiStart').attr('disabled', false);
-	$('#turn').css({'visibility':'hidden'});
+	
+	ctxHighlight.clearRect(0,0, LENGTH * 8, LENGTH * 8);			// remove any visible highlighting
+	$('#actionListBody').empty();									// clear action log
+	document.getElementById('turn').innerHTML = 'Turn: White';
+	$('#uiUndo').attr('disabled', true);
+	$('#uiStart').attr('disabled', true);
+}
+
+/* undo the last turn. Returns player to the state before their last move, rolling back the most recent actions of the player and CPU.  Caribou contests
+ * does not set gameIsRunning back to true if the user solved the composition
+ * user cannot undo the last move if the move resulted in a terminal state
+ */
+function undoListener() {
+	var previousState;
+	var composition = getComposition(compositions.currentCompositionGroupID, compositions.currentCompositionID);
+	
+	if (composition.states.length > 1) {
+		composition.states.splice(-1, 1);					// delete last element
+		previousState = composition.states.pop();
+		
+		if (previousState !== undefined) {		// pop used on empty array
+			board = previousState;
+		}
+	}
+	else {
+		resetListener();
+	}
+	
+	draw(board);
+	
+	// revert UI elements
+	document.getElementById('turn').innerHTML = 'Turn: White';
+}
+
+/* Generate a new, currently unsolved problem in the same class as the currently selected problem type
+ *
+ */
+function nextProblemListener() {
+	loadRandomComposition();
 }

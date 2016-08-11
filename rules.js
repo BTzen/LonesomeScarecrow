@@ -34,7 +34,7 @@ function getEnPassantMoves(board, bHighlight, pawnTile) {
 }
 
 /* Checks if castling is possible with rook at given position
- * TODO needs to check if King is currently in check
+ * 
  */
 function canCastle(castlingKingTile, castlingRookTile) {
 	var canCastle = true;
