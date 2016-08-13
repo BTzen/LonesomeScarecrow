@@ -20,7 +20,7 @@ var lastSelectedTile; 					// for moving pieces
 var pawnThatMovedTwoLastTurn = null;	// pawn that moved two tiles on the last turn
 var playerIsWhite = true;
 var objLogData = {						// store the previous location of the most recently moved chess piece
-	action : undefined,					//contains row and column data for new piece location
+	action : undefined,					// contains row and column data for new piece location
 	previousRow : undefined,
 	previousColumn : undefined
 };

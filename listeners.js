@@ -34,7 +34,6 @@ function acceptPromotionListener() {
 	}
 	
 	board.addPiece(newPiece, row, col);
-	$('#promotion').dialog("close");	//close dialog
 	draw(board);
 }
 
@@ -43,7 +42,7 @@ function acceptPromotionListener() {
 */
 function startMatchListener() {
 	gameIsRunning = true;
-	document.getElementById('turn').innerHTML = 'Turn: White';
+	outputText('Turn: White');
 	$('#turn').css('visibility', 'visible');					// display which colour's turn it is to user
 	$('.uiReset').attr('disabled', false);			
 	$('.uiStart').attr('disabled', true);			
@@ -75,7 +74,7 @@ function resetListener() {
 	
 	ctxHighlight.clearRect(0,0, LENGTH * 8, LENGTH * 8);			// remove any visible highlighting
 	$('#actionListBody').empty();									// clear action log
-	document.getElementById('turn').innerHTML = 'Turn: White';
+	outputText('Turn: White');		// document.getElementById('turn').innerHTML = 'Turn: White';
 	$('#uiUndo').attr('disabled', true);
 	$('#uiStart').attr('disabled', true);
 }
@@ -103,7 +102,7 @@ function undoListener() {
 	draw(board);
 	
 	// revert UI elements
-	document.getElementById('turn').innerHTML = 'Turn: White';
+	outputText('Turn: White'); //document.getElementById('turn').innerHTML = 'Turn: White';
 }
 
 /* Generate a new, currently unsolved problem in the same class as the currently selected problem type
@@ -111,4 +110,7 @@ function undoListener() {
  */
 function nextProblemListener() {
 	loadRandomComposition();
+	outputText('Turn: White');
+	$('#uiUndo').attr('disabled', true);
+	$('#uiStart').attr('disabled', true);
 }

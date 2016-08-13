@@ -1,8 +1,10 @@
 /* Billings, M., Kurylovich, A. */
 
-// TODO prevent player from being able to control BLACK
-// TODO checkmate isn't properly displayed in action log
+// TODO error with ?? where board stops responding
+// TODO pawns don't have their hasMoved set upon initialization; allows them to move 2 tiles
+// TODO prevent CPU from taking turn after the player has failed to check in the required number of moves; AI moves after alert is closed
 // TODO probably with AI not taking legal action for Healy problem (2 moves, #2 I believe) 
+// TODO prevent player from being able to control BLACK
 
 $(document).ready(function() {
 	var canvasHighlight = document.getElementById('highlight');
@@ -11,6 +13,7 @@ $(document).ready(function() {
 	var ctxHighlight = canvasHighlight.getContext('2d');
 	var ctxPiece = canvasPieces.getContext('2d');				// the context that the pieces are drawn on - used EVERYWHERE
 	board = new Board();
+	init();
 	
 	compositions = {
 		currentCompositionID : null,							// id for composition currently displayed to player
@@ -277,43 +280,7 @@ function gameLoop(x, y) {
 			
 			// player moved piece - black's turn
 			if (!isWhiteTurn) {	// set in playerTurn after piece is moved
-				outputText('Turn: Black');
-				// logAction(playerIsWhite);
-				
-				setTimeout(function() {		// setTimeout is necessary to draw the player move before drawing the CPUs move
-					CPUTurn(x, y);
-					
-					// check if CPU move caused the game to end
-					terminalTestResult = terminalGameConditionTest(board);
-					if (terminalTestResult.isTerminalState) {
-						gameIsRunning = false; 
-						outputText(terminalTestResult.details);
-						$('#uiUndo').attr('disabled', true);
-						$('#uiReset').attr('disabled', false);
-					}
-					else {
-						outputText('Turn: White');
-						// logAction(!playerIsWhite);
-					}
-					
-					// save state
-					currentComposition = getComposition(compositions.currentCompositionGroupID, compositions.currentCompositionID);
-					
-					if (currentComposition !== null) {
-						currentComposition.states.push(new Board(board));		// cloned so each state acts as a snapshot of a board
-						
-						// enable undo button once the first action has been taken
-						if (currentComposition.states.length == 1) {
-							$('#uiUndo').attr('disabled', false);
-						} 
-						
-						// reset board if player has made too many moves
-						// doesn't currently reset the board
-						if (currentComposition.states.length >= compositions.currentCompositionGroupID && terminalTestResult.isTerminalState == false) {
-							alert('Too many moves!');
-						}
-					}
-				}, 200);
+				CPUTurnWrapper();
 			}
 			
 		}
@@ -366,24 +333,42 @@ function playerTurn(board, x, y) {
 		// NOTE CPU (black) will move before the piece to upgrade to is selected
 		if (lastSelectedTile.piece.isWhite && lastSelectedTile.piece.type === 'Pawn') {
 			if (row == 0) {
-				//call promotion fn
+				//create promotion dialog
 				$('#promotion')
-					.data( {isWhite: true, row: row, column: column} )	// 2nd 'row' is the variable
-					.dialog({
-						dialogClass: "no-close",						// remove close button
-						modal: true,
-						title: "Promote piece"
-					});
+				.data( {isWhite: true, row: row, column: column} )	// 2nd 'row' is the variable
+				.dialog({
+					buttons: { 
+						'Accept': function() {
+							acceptPromotionListener();
+							$(this).dialog('close');
+						}
+					},
+					dialogClass: "no-close",						// remove close button
+					modal: true,
+					title: "Promote piece",
+					close: function(event, ui) {
+						// update check status for opponent
+						inCheck(board, !playerIsWhite);
+					
+						//update tracking variables
+						highlightedTile = null;
+						highlightedTiles = []; 												// reset which tiles are hightlighted each time this runs
+						isWhiteTurn = (lastSelectedTile.piece.isWhite) ? false : true;		// toggle game turn after a piece has moved
+						
+						CPUTurnWrapper();													// run code for Black's turn
+					}
+				});
 			}
 		}
+		else {
+			// update check status for opponent
+			inCheck(board, !playerIsWhite);
 		
-		// update check status for opponent
-		inCheck(board, !playerIsWhite);
-		
-		//update tracking variables
-		highlightedTile = null;
-		highlightedTiles = []; 												// reset which tiles are hightlighted each time this runs
-		isWhiteTurn = (lastSelectedTile.piece.isWhite) ? false : true;		// toggle game turn after a piece has moved
+			//update tracking variables
+			highlightedTile = null;
+			highlightedTiles = []; 												// reset which tiles are hightlighted each time this runs
+			isWhiteTurn = (lastSelectedTile.piece.isWhite) ? false : true;		// toggle game turn after a piece has moved
+		}
 	}
 	/* logic used when a piece is first selected - before anything is highlighted for the player
 	 * check if player clicked on their own piece and highlight the appropriate tiles in response
@@ -570,7 +555,7 @@ function castlingHandler(agentTile, actionTile) {
 /* code controlling AI action
  * 
  */
-function CPUTurn(x, y) {
+function CPUTurn() {
 	var nextAIAction = minimax(board, BLACK);		// action object
 	var agentTile;									// the tile of the piece that will be acted upon
 	
@@ -609,8 +594,53 @@ function CPUTurn(x, y) {
 		// + nextAIAction.row + ', ' + nextAIAction.column + ']'); 
 }
 
+/* Contains the code needed to execute the CPU's turn.  Necessary to prevent the CPU from taking action before the player (in the case of promotion) has selected a piece to promote to.
+ *
+ */
+function CPUTurnWrapper() {
+	outputText('Turn: Black');
+	// logAction(playerIsWhite);
+	
+	setTimeout(function() {		// setTimeout is necessary to draw the player move before drawing the CPUs move
+		CPUTurn(); //CPUTurn(x, y);
+		
+		// check if CPU move caused the game to end
+		terminalTestResult = terminalGameConditionTest(board);
+		if (terminalTestResult.isTerminalState) {
+			gameIsRunning = false; 
+			outputText(terminalTestResult.details);
+			$('#uiUndo').attr('disabled', true);
+			$('#uiReset').attr('disabled', false);
+		}
+		else {
+			outputText('Turn: White');
+			// logAction(!playerIsWhite);
+		}
+		
+		// save state
+		currentComposition = getComposition(compositions.currentCompositionGroupID, compositions.currentCompositionID);
+		
+		if (currentComposition !== null) {
+			currentComposition.states.push(new Board(board));		// cloned so each state acts as a snapshot of a board
+			
+			// enable undo button once the first action has been taken
+			if (currentComposition.states.length == 1) {
+				$('#uiUndo').attr('disabled', false);
+			} 
+			
+			// reset board if player has made too many moves
+			// doesn't currently reset the board
+			if (currentComposition.states.length >= compositions.currentCompositionGroupID && terminalTestResult.isTerminalState == false) {
+				alert('Too many moves!');
+			}
+		}
+	}, 500);
+}
+/* outputs the given string to the game state indicator above the board
+ *
+ */
 function outputText(string) {
 	document.getElementById('turn').innerHTML = string;
 }
 
-window.onload = init;
+// window.onload = init;

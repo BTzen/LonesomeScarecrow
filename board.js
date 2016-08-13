@@ -224,6 +224,19 @@ Board.prototype.addPiece = function(piece, row, col) {
 		else
 			this.blackKingTile = piece;
 	}
+	// only allow 2 moves if the pawn is placed in the correct starting row
+	else if (piece.type == 'Pawn') {
+		if (piece.isWhite !== playerIsWhite) { //piece is controlled by the CPU
+			if (row !== 1) {
+				piece.hasMoved = true;
+			}
+		}
+		else {
+			if (row !== 6) {
+				piece.hasMoved = true;
+			}
+		}
+	}
 	
 	// check data structure to see if it contains a piece located on the given tile
 	for (var i = 0; i < this.occupiedTiles.length; i++) {

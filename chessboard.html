@@ -44,7 +44,7 @@
 				<label>Problem Type:</label>
 				<select id="problemTypeSelector">
 					<option value="2">checkmate in 2 moves</option>
-					<option value="3">checkmate in 3 moves</option>
+					<option value="3" >checkmate in 3 moves</option>
 					<option value="4" selected>checkmate in 4 moves</option>
 				</select>
 				<!-- <div>
@@ -73,12 +73,12 @@
 	<div id="promotion">
 		<label>&#9813;&#9814;&#9815;&#9816;</label>
 		<div id="promoteOptions">
-			<input type="radio" name="promotionPick" value="Queen">Queen
+			<input type="radio" name="promotionPick" value="Queen" checked>Queen
 			<input type="radio" name="promotionPick" value="Rook">Rook
 			<input type="radio" name="promotionPick" value="Bishop">Bishop
 			<input type="radio" name="promotionPick" value="Knight">Knight
 		</div>
-		<input type="button" id="acceptPromotion" value="Accept" onclick="acceptPromotionListener()">
+		<!-- <input type="button" id="acceptPromotion" value="Accept"> --><!-- onclick="acceptPromotionListener()" -->
 	</div>
 </body>
 </html>
