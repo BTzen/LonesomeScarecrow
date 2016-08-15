@@ -1,5 +1,8 @@
 # LonesomeScarecrow
 
+Bugs: <br />
+- rapidly left-clicking during a move causes the CPU to make multiple moves
+
 Some things to be aware of: <br />
 1) type="number" used for ply in html file is not supported in Internet Explorer 9 and earlier versions<br />
 2) 'initial' keyword used in CSS not supported in IE<br />
