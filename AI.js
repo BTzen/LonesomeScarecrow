@@ -1,6 +1,4 @@
 // Billings, M.
-// blackKing thinks it's in check after being placed inCheck (see img001)
-// ERROR some board states return Number.MAX_VALUE
 
 /* encapsulates data needed to infer the best move from a given state
  * board the board state represented 
