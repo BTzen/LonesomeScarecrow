@@ -2,10 +2,6 @@
 // blackKing thinks it's in check after being placed inCheck (see img001)
 // ERROR some board states return Number.MAX_VALUE
 
-var desiredPly = 1;		// the desired search depth
-var successors = [];	// stores every board state that can be reached from moving a particular piece
-
-// DEBUG
 /* encapsulates data needed to infer the best move from a given state
  * board the board state represented 
  * action the action that led from the prior state to the current one
@@ -61,10 +57,11 @@ function minimax(board, maxIsWhite) {
 			if (nodes[0].children[i].utility === bestUtility) {
 				if (nextMoveNode == null || Math.random() >= 0.5)
 					nextMoveNode = nodes[0].children[i];
-				if (nextMoveNode.action.actionType == ActionType.ENPASSANT) {
-					nextMoveNode = nodes[0].children[i];
-					break;
-				}
+				// DEBUG
+				// if (nextMoveNode.action.actionType == ActionType.ENPASSANT) {
+					// nextMoveNode = nodes[0].children[i];
+					// break;
+				// }
 			}
 		}
 		action = nextMoveNode.action;
@@ -74,12 +71,12 @@ function minimax(board, maxIsWhite) {
 }
 
 // contains common logic for min and max methods
-function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {		
+function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {	
+	var children = [];		// stores every board state that can be reached from moving a particular piece
 	var u = (isRunningMaxCode) ? -Number.MAX_VALUE : Number.MAX_VALUE;
 	var kingTile = (playerIsWhite) ? node.board.blackKingTile : node.board.whiteKingTile;
 	var CPUColour = (playerIsWhite) ? BLACK : WHITE;
 	
-	//blackKingTile !== undefined used to test en passant
 	terminalTestResult = terminalGameConditionTest(node.board)
 	if (terminalTestResult.isTerminalState || node.ply == desiredPly) {	
 		u = utility(node.board, maxIsWhite);
@@ -87,16 +84,70 @@ function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {
 	else {
 		var child = null;
 		var pieceColorToCheck = (maxIsWhite) ? WHITE : BLACK;
-		if (!isRunningMaxCode)
-			pieceColorToCheck = !pieceColorToCheck;
 		var possibleActions = [];
 		
+		if (!isRunningMaxCode)
+			pieceColorToCheck = !pieceColorToCheck;
+		
+		// search only for actions that will remove the King from check
 		if (kingTile !== undefined && inCheck(node.board, CPUColour)) {	// CPU colour was BLACK
+			let potentialMovesForPiece;
+			let movesOfCheckingPiece;
+			
 			possibleActions = kingTile.piece.getStandardMoves(node.board, false, kingTile.row, kingTile.column);
+			
+			// determine which pieces can get the King out of check
+			// loop through all pieces
+			for (let i = 0; i < node.board.occupiedTiles.length; i++) {
+				let currentTile = node.board.occupiedTiles[i];
+				
+				if (currentTile.piece.isWhite === CPUColour) {
+					potentialMovesForPiece = currentTile.piece.getStandardMoves(node.board, false, currentTile.row, currentTile.column);
+					movesOfCheckingPiece = node.board.tileOfCheckingPiece.piece.getStandardMoves(node.board, false, node.board.tileOfCheckingPiece.row, node.board.tileOfCheckingPiece.column);
+					
+					// Aug. 15, 8:00 pm
+					for (let j = 0; j < potentialMovesForPiece.length; j++) {
+						let action = potentialMovesForPiece[j];
+						// if piece can attack checking piece
+						if (action.actionType == ActionType.ATTACK && action.row == node.board.tileOfCheckingPiece.row && action.column == node.board.tileOfCheckingPiece.column) {
+							possibleActions.push(action);
+						}
+						// see if piece can block by checking if said piece can move to a tile between the attacker and the King
+						else if (currentTile.piece.type !== 'Knight') {
+							for (let k = 0; k < movesOfCheckingPiece; k++) {
+								if (potentialMovesForPiece[j].row == movesOfCheckingPiece[k].row && potentialMovesForPiece[j].column == movesOfCheckingPiece[k].column) {
+									// row check
+									if (node.board.tileOfCheckingPiece.row === kingTile.row) {
+										if (Math.abs(potentialMovesForPiece[j].column - kingTile.column) < Math.abs(node.board.tileOfCheckingPiece.column - kingTile.column)) {
+											possibleActions.push(potentialMovesForPiece[j]);
+										}
+									}
+									// column check
+									else if (node.board.tileOfCheckingPiece.column === kingTile.column) {
+										if (Math.abs(potentialMovesForPiece[j].row - kingTile.row) < Math.abs(node.board.tileOfCheckingPiece.row - kingTile.row)) {
+											possibleActions.push(potentialMovesForPiece[j]);
+										}
+									}
+									// row and column check
+									else {
+										if (Math.abs(potentialMovesForPiece[j].row - kingTile.row) < Math.abs(node.board.tileOfCheckingPiece.row - kingTile.row) 
+											&& Math.abs(potentialMovesForPiece[j].column - kingTile.column) < Math.abs(node.board.tileOfCheckingPiece.column - kingTile.column)) 
+											{
+												possibleActions.push(potentialMovesForPiece[j]);
+											}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
+		/* loop through all the occupied tiles and find all the possible moves for the relevant colour
+		 * try each of those moves and see which one offers the best result
+		 */
 		else {
-			// loop through all the occupied tiles and find all the possible moves for the relevant team
-			// try each of those moves and see which one offers the best result
+			
 			node.board.occupiedTiles.forEach(function(tile) {
 				if (pieceColorToCheck == tile.piece.isWhite) {			// only check pieces of the appropriate colour
 					// // DEBUG castling check for pawns
@@ -119,6 +170,7 @@ function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {
 				}
 			});
 		}
+		
 		/* create a new board state for each of the possible actions
 		 * note: possibleActions = [] if there are no possible moves which may cause problems for utility calculations done within this function
 		 */
@@ -135,17 +187,13 @@ function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {
 				if (!inCheck(child, CPUColour)) {
 					let newNode = new Node(child, undefined, possibleActions[i], node.ply + 1, null, node);
 					nodes.push(newNode);
-					successors.push(newNode);
-				}
-				// else {
-					// blackHasBeenCheckmated = true;
-				// }		
+					children.push(newNode);
+				}	
 			}	
 		}
 		possibleActions = [];
-			
-		node.children = successors;
-		successors = [];
+		node.children = children;
+		children = [];
 		
 		if (node.children !== null) {
 			// DEBUG
@@ -157,8 +205,8 @@ function minimaxHelper(node, isRunningMaxCode, maxIsWhite, nodes) {
 			else {
 				for (let i = 0; i < node.children.length; i++) {
 					// DEBUG
-					if (i == 8 && node.ply == 0) 
-						console.log();
+					// if (i == 8 && node.ply == 0) 
+						// console.log();
 					u = (isRunningMaxCode) ? Math.max(u, min(node.children[i], maxIsWhite, nodes)) : Math.min(u, max(node.children[i], maxIsWhite, nodes));
 				}
 			}
@@ -178,22 +226,3 @@ function max(node, maxIsWhite, nodes) {
 function min(node, maxIsWhite, nodes) {
 	return minimaxHelper(node, false, maxIsWhite, nodes);	// false
 }
-
-/* TODO doesn't check for stalemate or surrender
- * returns true if the game is over and false otherwise
- */
-function isTerminalState(board) {
-	var isTerminalState = false;
-	var blackKing = board.blackKingTile.piece;
-	
-	// TODO check if the function call is necessary here 
-	// if (inCheck(CPUColour) || inCheck(CPUColour)
-		// || board.occupiedTiles.length == 2) {	// only 2 kings on board
-			// isTerminalState = true;
-	// }
-	
-	
-	// a stalemate occurs when the only 2 pieces on the board are Kings, regardless of their position, if the remaining pieces on the board make checkmate impossible (e.g. can't checkmate an opponent with only a king and a bishop), if the King is not in check but has no legal moves
-	return isTerminalState;
-}
-
