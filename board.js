@@ -40,7 +40,8 @@ function Board(boardToClone) {
 				}
 				
 				for (var prop in pieceToClone) { //tileToClone.piece
-					clonePiece[prop] = pieceToClone[prop];
+					if (pieceToClone.hasOwnProperty(prop))
+						clonePiece[prop] = pieceToClone[prop];
 				}
 				
 				let cloneTile = new Tile(clonePiece, tileToClone.row, tileToClone.column);					
@@ -278,7 +279,8 @@ Tile.prototype.clone = function(tile) {
 	}
 	
 	for (var prop in tile.piece) {
-		cloneTile[prop] = tile.piece[prop];
+		if (tile.piece.hasOwnProperty(prop))
+			cloneTile[prop] = tile.piece[prop];
 	}
 	
 	cloneTile.row = tile.row;
