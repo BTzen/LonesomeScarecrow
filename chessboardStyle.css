@@ -167,9 +167,13 @@ fieldset legend {	/* override styles for children*/ /* fieldset */
 	text-align: center;
 }
 
-.blackAction {
-	color: red;
-	float: right;
+.problemPropertyValue {
+	display: block;
+}
+
+.problemProperty {
+	display: block;
+	font-weight: bold;
 }
 
 /* prevent the dialog box from showing the close button */
@@ -185,7 +189,3 @@ ol {	/* override defaults */
 	margin:0;
 	margin-left: .5em; /* prevent numbers from running out of their container */
 }
-
-/* html, body {
-	height: 100%;
-} */

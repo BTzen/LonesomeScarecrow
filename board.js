@@ -1,5 +1,7 @@
 /* Billings, M., Kurylovich, A. */
 
+// TODO cloning process modifies objects and inserts prototype properties into the object
+
 /* Note: Board class does not contain the functionality to draw the pieces. That is handled in chessboardScript.js
  *
  */
@@ -37,9 +39,10 @@ function Board(boardToClone) {
 				else if (pieceToClone instanceof Queen) {
 					clonePiece = new Queen();
 				}
-				
-				for (var prop in pieceToClone) { //tileToClone.piece
-					clonePiece[prop] = pieceToClone[prop];
+				// copy all other properties of the object (excluding inherited properties from the prototype chain)
+				for (var prop in pieceToClone) {
+					if (pieceToClone.hasOwnProperty(prop))
+						clonePiece[prop] = pieceToClone[prop];
 				}
 				
 				let cloneTile = new Tile(clonePiece, tileToClone.row, tileToClone.column);					
@@ -47,6 +50,8 @@ function Board(boardToClone) {
 				
 				if (clonePiece.type == 'King') {
 					if (boardToClone.tileOfCheckingPiece !== null) {
+						// var t = this;
+						// var temp = new Tile();
 						this.tileOfCheckingPiece = (new Tile()).clone(boardToClone.tileOfCheckingPiece);
 					}
 					
@@ -216,7 +221,6 @@ Board.prototype.movePiece = function(fromRow, fromCol, toRow, toCol) {
  */
 Board.prototype.addPiece = function(piece, row, col) {
 	var bPieceReplacesExistingElement = false;
-	// var pieceToAdd;
 	
 	if (piece.type == 'King') {
 		if (piece.isWhite)
@@ -255,6 +259,7 @@ Board.prototype.addPiece = function(piece, row, col) {
 			
 			this.occupiedTiles[i].piece = piece;
 			bPieceReplacesExistingElement = true;
+			break;
 		}
 	}
 	// creates a new tile for the data structure otherwise
@@ -302,29 +307,31 @@ Tile.prototype.toString = function() {
  * tile the tile to clone
  */
 Tile.prototype.clone = function(tile) {
-	var cloneTile;
+	var cloneTile = new Tile();
 	// allows for quick identification of piece type while debugging
 	if (tile.piece instanceof Pawn) {
-		cloneTile = new Pawn();
+		cloneTile.piece = new Pawn();
 	}
 	else if (tile.piece instanceof Rook) {
-		cloneTile = new Rook();
+		cloneTile.piece = new Rook();
 	}
 	else if (tile.piece instanceof Knight) {
-		cloneTile = new Knight();
+		cloneTile.piece = new Knight();
 	}
 	else if (tile.piece instanceof Bishop) {
-		cloneTile = new Bishop();
+		cloneTile.piece = new Bishop();
 	}
 	else if (tile.piece instanceof King) {
-		cloneTile = new King();
+		cloneTile.piece = new King();
 	}
 	else if (tile.piece instanceof Queen) {
-		cloneTile = new Queen();
+		cloneTile.piece = new Queen();
 	}
 	
+	// copy all other properties of the object (excluding inherited properties from the prototype chain)
 	for (var prop in tile.piece) {
-		cloneTile[prop] = tile.piece[prop];
+		if (tile.piece.hasOwnProperty(prop))
+			cloneTile.piece[prop] = tile.piece[prop];
 	}
 	
 	cloneTile.row = tile.row;

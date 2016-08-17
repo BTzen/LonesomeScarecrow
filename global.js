@@ -13,8 +13,10 @@ var actionCount = 0;					// keep track of the number of moves that have been mad
 var actionLog = [];						// record actions taken during a game
 var board;								// primary board used to play the game
 var compositions;						// contains all chess compositions					
-var isWhiteTurn = true;					// change back to TRUE; changed to FALSE for debugging minimax
+var isWhiteTurn = true;					// indicates which colour's turn it is to move
+var desiredPly = 1;						// the desired search depth
 var gameIsRunning = false;				// true when the player is playing a game
+var gameLoopIsRunning = false;			// used to prevent multiple occurences of the gameLoop function from running at once
 var highlightedTiles = [];
 var lastSelectedTile; 					// for moving pieces
 var pawnThatMovedTwoLastTurn = null;	// pawn that moved two tiles on the last turn

@@ -75,14 +75,12 @@ function canCastle(castlingKingTile, castlingRookTile) {
 							// left-hand or right-hand rook
 							if (startCol == 1) {		// lefthand
 								if (columnDifference > -4 && columnDifference <= 1) {
-									// console.log("can't castle left");
 									canCastle = false;
 									break;
 								}
 							}
 							else {
 								if (columnDifference >= -1) {
-									// console.log("can't castle right");
 									canCastle = false;
 									break;
 								}
@@ -108,8 +106,8 @@ function canCastle(castlingKingTile, castlingRookTile) {
 	
 	// Need to update the data of last tile as the current way of checking pieces changes the lastSelectedPiece and associated data
 	// DEBUG
-	var sRookToCastleWith = (castlingRookTile.column == 0) ? 'left rook' : 'right rook';
-	console.log('canCastle with ' + sRookToCastleWith + ': ' + canCastle);
+	// var sRookToCastleWith = (castlingRookTile.column == 0) ? 'left rook' : 'right rook';
+	// console.log('canCastle with ' + sRookToCastleWith + ': ' + canCastle);
 	return canCastle;
 }
 
@@ -216,13 +214,13 @@ function terminalGameConditionTest(board) {
 				sDetails = 'White wins'
 			
 			// DEBUG
-			console.log('terminalGameStateFn return: ' + colourToCheck + ' lost!');
+			// console.log('terminalGameStateFn return: ' + colourToCheck + ' lost!');
 		}
 		// stalemate
 		else {
 			bDraw = true;
 			sDetails = 'Stalemate';
-			console.log('terminalGameStateFn return: stalemate');
+			// console.log('terminalGameStateFn return: stalemate');
 		}
 		returnObj.isTerminalState = true;
 	}

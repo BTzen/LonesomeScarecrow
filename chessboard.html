@@ -43,10 +43,17 @@
 				<!-- <label>Choose from the following problems: <input type="number" id="uiPly" min="2" max="4" value="2">  moves</label> -->
 				<label>Problem Type:</label>
 				<select id="problemTypeSelector">
-					<option value="2">checkmate in 2 moves</option>
+					<option value="1" >checkmate in 1 move</option>
+					<option value="2" >checkmate in 2 moves</option>
 					<option value="3" >checkmate in 3 moves</option>
 					<option value="4" selected>checkmate in 4 moves</option>
 				</select>
+				<br /><br />
+				<label id="typeProperty" class="problemProperty"></label>
+				<label id="currentProblemType" class="problemPropertyValue"></label>
+				<br/>
+				<label id="turnsRemainingProperty" class="problemProperty"></label>
+				<label id="turnsRemaining"></label>
 				<!-- <div>
 					<table id='actionList'>
 					<thead>
@@ -63,7 +70,7 @@
 				<div id="gameControlWidgets">
 					<input type="button" id="uiNext" value="Next Problem">
 					<input type="button" id="uiUndo" value="Undo" disabled>	
-					<input type="button" id="uiStart" class="uiStart" value="Start">
+					<!-- <input type="button" id="uiStart" class="uiStart" value="Start"> -->
 					<input type="button" id="uiReset" class="uiReset" value="Reset board" disabled>
 				</div>
 			</fieldset>
