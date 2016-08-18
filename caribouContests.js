@@ -15,48 +15,56 @@ function CompositionGroup() {
 
 function getComposition(groupID, compositionID) {
 	var desiredComposition = null;
+	var problemGroup;
 	
 	if (groupID == 2) {
-		for (let i = 0; i < compositions.checkmateInTwo.unsolvedProblems.length; i++) {
-			if (compositions.checkmateInTwo.unsolvedProblems[i].id == compositionID) {
-				desiredComposition = compositions.checkmateInTwo.unsolvedProblems[i];
-			}
-		}
+		problemGroup = compositions.checkmateInTwo;
 	}
 	else if (groupID == 3) {
-		for (let i = 0; i < compositions.checkmateInThree.unsolvedProblems.length; i++) {
-			if (compositions.checkmateInThree.unsolvedProblems[i].id == compositionID) {
-				desiredComposition = compositions.checkmateInThree.unsolvedProblems[i];
-			}
-		}
+		problemGroup = compositions.checkmateInThree;
 	}
 	else if (groupID == 4) {
-		for (let i = 0; i < compositions.checkmateInFour.unsolvedProblems.length; i++) {
-			if (compositions.checkmateInFour.unsolvedProblems[i].id == compositionID) {
-				desiredComposition = compositions.checkmateInFour.unsolvedProblems[i];
-			}
+		problemGroup = compositions.checkmateInFour;
+	}
+	else {
+		throw "groupID(" + groupID + ") not currently supported by getComposition()";
+	}
+	
+	for (let i = 0; i < problemGroup.unsolvedProblems.length; i++) {
+		if (problemGroup.unsolvedProblems[i].id == compositionID) {
+			desiredComposition = problemGroup.unsolvedProblems[i];
 		}
 	}
 	
 	return desiredComposition;
 }
 
-/* sets the board to a random composition and draws it to the canvas
- *
+// function compositionSearch(id, first, last) {
+	// // var start = 0;
+	// // var end = compositionGroup.length;
+	// var middle = Math.floor((first + last) / 2);
+	
+	// if (compositionGroup[middle].id == id)
+		// return compositionGroup[middle];
+	// else if (compositionGroup[middle].id < id) 
+		// return compositionSearch(id, first + 1, last);
+	// else 
+		// return compositionSearch(id, first, middle - 1);
+// }
+
+/* sets the board to a random composition and draws it to the canvas.  
+ * 
  */
 function loadRandomComposition() {
 	var problemType;
 	var problemTypeSelector;
 	var min, max, rand;
-	var currentPopulatedGroupID = [2, 3, 4];
 	var problemTypeString;
 	var turnsRemaining;
 
 	// randomly select problem from a particular group using the dropdown
 	problemTypeSelector = document.getElementById('problemTypeSelector');
 	switch (problemTypeSelector.value) {
-		case '0':
-			break;
 		case '1':
 			alert("no 1 move puzzles yet");
 			break;
@@ -79,7 +87,7 @@ function loadRandomComposition() {
 			turnsRemaining = 4;
 			break;
 		default:
-			console.log('default switch case reached');
+			throw "case " + problemTypeSelector.value + " not currently supported by loadRandomComposition()";
 			break;
 	}
 	// randomly select a composition
@@ -99,9 +107,9 @@ function loadRandomComposition() {
 		draw(board);
 	}
 	// DEBUG
-	// else {
-		// alert("You've solved all " + problemTypeSelector.options[problemTypeSelector.selectedIndex].text + " problems!");
-	// }
+	else {
+		alert("You've solved all " + problemTypeSelector.options[problemTypeSelector.selectedIndex].text + " problems! Refresh the page to go again.");
+	}
 	
 	document.getElementById('typeProperty').innerHTML = "Current Problem Type";
 	document.getElementById('currentProblemType').innerHTML = problemTypeString;

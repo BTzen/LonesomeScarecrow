@@ -19,7 +19,7 @@ $(document).ready(function() {
 	compositions = {
 		currentCompositionID : null,							// id for composition currently displayed to player
 		currentCompositionGroupID : null,						// used to find composition group that composition belongs to
-		nextID : 0,												// next value that will be assigned as the id to new compositions
+		nextID : 0,												// next value that will be given as an id to a new composition
 		checkmateInTwo : new CompositionGroup(),
 		checkmateInThree : new CompositionGroup(),
 		checkmateInFour : new CompositionGroup()
@@ -581,9 +581,12 @@ function CPUTurnWrapper() {
 	var displayText = "";
 	var terminalStateData;
 	var currentComposition;
+	var problemGroup;
 	
 	outputText('Turn: Black');
 	// logAction(playerIsWhite);
+	
+	currentComposition = getComposition(compositions.currentCompositionGroupID, compositions.currentCompositionID);				// get the composition the board's currently displaying
 	
 	setTimeout(function() {		// setTimeout is necessary to draw the player move before drawing the CPUs move
 		CPUTurn();
@@ -593,6 +596,32 @@ function CPUTurnWrapper() {
 		if (terminalTestResult.isTerminalState) {
 			gameIsRunning = false; 
 			outputText(terminalTestResult.details);
+			
+			// add composition to list of solved compositions
+			// find composition group for comp
+			/* find the currentComposition from within the group
+			 * compare id's of group elements
+			 */
+			if (compositions.currentCompositionGroupID == 2) {
+				problemGroup = compositions.checkmateInTwo;
+			}
+			else if (compositions.currentCompositionGroupID == 3) {
+				problemGroup = compositions.checkmateInThree;
+			}
+			else if (compositions.currentCompositionGroupID == 4) {
+				problemGroup = compositions.checkmateInFour;
+			}
+			else {
+				throw "compositions.currentCompositionGroupID(" + compositions.currentCompositionGroupID + ") not currently supported";
+			}
+			
+			for (let i = 0; i < problemGroup.unsolvedProblems.length; i++) {
+				if (problemGroup.unsolvedProblems[i].id == compositions.currentCompositionID) {
+					// remove composition from unsolvedProblems and moved it to solvedProblems
+					let x = problemGroup.unsolvedProblems.splice(i, 1);
+					problemGroup.solvedProblems.push(x);
+				}
+			} 
 		}
 		else {
 			outputText('Turn: White');
@@ -600,8 +629,6 @@ function CPUTurnWrapper() {
 		}
 		
 		// save state
-		currentComposition = getComposition(compositions.currentCompositionGroupID, compositions.currentCompositionID);
-		
 		if (currentComposition !== null) {
 			currentComposition.states.push(new Board(board));		// cloned so each state acts as a snapshot of a board
 			document.getElementById('turnsRemaining').innerHTML = parseInt(document.getElementById('turnsRemaining').innerHTML) - 1;					// moves remaining

@@ -59,16 +59,6 @@ function acceptPromotionListener() {
 	draw(board);
 }
 
-/* randomly select from the given problem type
- *
-*/
-function startMatchListener() {
-	gameIsRunning = true;
-	outputText('Turn: White');
-	$('#turn').css('visibility', 'visible');					// display which colour's turn it is to user
-	$('.uiReset').attr('disabled', false);						
-}
-
 // Caribou
 /* reset the board to its initial state
  *
@@ -160,12 +150,15 @@ function nextProblemListener() {
 	gameIsRunning = true;
 	isWhiteTurn = true;
 	highlightedTiles = [];										// prevent the selection of a highlighted tile as an action if the player selects a piece and then uses the next problem widget
+	ctxHighlight.clearRect(0, 0, LENGTH * 8, LENGTH * 8);		// remove visual presence of highlight
 	
 	// reset states
-	composition = getComposition(compositions.currentCompositionGroupID, compositions.currentCompositionID);
-	if (composition !== null)
-		composition.states = [];
-	
+	if (compositions.currentCompositionID !== null) {
+		composition = getComposition(compositions.currentCompositionGroupID, compositions.currentCompositionID);
+		if (composition !== null)
+			composition.states = [];
+	}
+
 	loadRandomComposition();
 	
 	// update UI elements
